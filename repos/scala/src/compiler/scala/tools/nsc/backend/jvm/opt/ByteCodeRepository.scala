@@ -52,9 +52,9 @@ class ByteCodeRepository[BT <: BTypes](
   private val targetSize = 500
 
   private object lruCounter
-      extends AtomicLong(0l)
+      extends AtomicLong(0L)
       with collection.generic.Clearable {
-    def clear(): Unit = { this.set(0l) }
+    def clear(): Unit = { this.set(0L) }
   }
   recordPerRunCache(lruCounter)
 

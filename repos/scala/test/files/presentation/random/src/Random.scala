@@ -18,19 +18,15 @@ object randomclient {
     val filter /*?*/ = try {
       Integer.parseInt(args(0) /*?*/ ) match {
         case 1 =>
-          x: Int =>
-            x % 2 != 0
+          x: Int => x % 2 != 0
         case 2 =>
-          x: Int =>
-            x % 2 == 0
+          x: Int => x % 2 == 0
         case _ =>
-          x: Int =>
-            x != 0
+          x: Int => x != 0
       }
     } catch {
       case _ /*?*/ =>
-        x: Int =>
-          x < 100
+        x: Int => x < 100
     }
 
     try {

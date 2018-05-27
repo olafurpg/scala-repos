@@ -342,7 +342,9 @@ class Tuple(val i: Int) extends Group("Tuple") with Arity {
   def apply() = {
     <file name={fileName}>{header}
 
-/** A tuple of {i} elements; the canonical representation of a [[scala.{Product.className(i)}]].
+/** A tuple of {i} elements; the canonical representation of a [[scala.{
+      Product.className(i)
+    }]].
  *
  *  @constructor  Create a new tuple with {i} elements.{idiomatic}
 {params}
@@ -414,7 +416,9 @@ class Product(val i: Int) extends Group("Product") with Arity {
   def apply() = {
     <file name={fileName}>{header}
 object {className} {{
-  def unapply{invariantArgs}(x: {className}{invariantArgs}): Option[{className}{invariantArgs}] =
+  def unapply{invariantArgs}(x: {className}{invariantArgs}): Option[{className}{
+      invariantArgs
+    }] =
     Some(x)
 }}
 

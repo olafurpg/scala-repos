@@ -54,8 +54,7 @@ object LiftJavaScript {
 
   def servePageJs: LiftRules.DispatchPF = {
     case PageJs(response) =>
-      () =>
-        Full(response)
+      () => Full(response)
   }
 
   def settings: JsObj = {

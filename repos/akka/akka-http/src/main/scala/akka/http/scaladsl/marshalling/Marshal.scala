@@ -66,8 +66,7 @@ class Marshal[A](val value: A) {
                 case Marshalling.WithFixedContentType(`best`, marshal) ⇒
                   marshal
                 case Marshalling.WithOpenCharset(`bestMT`, marshal) ⇒
-                  () ⇒
-                    marshal(bestCS)
+                  () ⇒ marshal(bestCS)
               }
           }
         } else None

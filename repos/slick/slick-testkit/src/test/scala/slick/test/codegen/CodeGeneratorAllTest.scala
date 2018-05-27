@@ -69,7 +69,7 @@ class CodeGeneratorAllTest(val tdb: JdbcTestDB) extends DBTest {
                   else super.rawType
               }
             }
-      })
+        })
     val profileName =
       tdb.profile.getClass.toString.dropRight(1).split("[\\. ]").last
 

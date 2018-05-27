@@ -88,7 +88,7 @@ trait Rules {
         case Failure       => throw new ScalaSigParserError("Unexpected failure")
         case Error(x) =>
           throw new ScalaSigParserError("Unexpected error: " + x)
-    }
+      }
 }
 
 /** A factory for rules that apply to a particular context.
@@ -150,8 +150,7 @@ trait StateRules {
           }
       }
     }
-    in: S =>
-      rep(in, rules.toList, Nil)
+    in: S => rep(in, rules.toList, Nil)
   }
 
   /** Create a rule that succeeds with a list of all the provided rules that succeed.
@@ -174,8 +173,7 @@ trait StateRules {
           case Error(x)        => Error(x)
         }
     }
-    in =>
-      rep(in, initial)
+    in => rep(in, initial)
   }
 }
 

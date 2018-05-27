@@ -42,7 +42,7 @@ class LBFGS[T](convergenceCheck: ConvergenceCheck[T], m: Int)(
     extends FirstOrderMinimizer[T, DiffFunction[T]](convergenceCheck)
     with SerializableLogging {
 
-  def this(maxIter: Int = -1, m: Int = 7, tolerance: Double = 1E-9)(
+  def this(maxIter: Int = -1, m: Int = 7, tolerance: Double = 1e-9)(
       implicit space: MutableInnerProductModule[T, Double]) =
     this(FirstOrderMinimizer.defaultConvergenceCheck(maxIter, tolerance), m)
   import space._
@@ -91,7 +91,7 @@ class LBFGS[T](convergenceCheck: ConvergenceCheck[T], m: Int)(
     val alpha =
       search.minimize(ff, if (state.iter == 0.0) 1.0 / norm(dir) else 1.0)
 
-    if (alpha * norm(grad) < 1E-10) throw new StepSizeUnderflow
+    if (alpha * norm(grad) < 1e-10) throw new StepSizeUnderflow
     alpha
   }
 }

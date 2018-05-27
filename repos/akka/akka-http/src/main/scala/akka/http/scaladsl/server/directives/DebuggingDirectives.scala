@@ -61,8 +61,7 @@ object LoggingMagnet {
     // # message-magnets
     forMessageFromFullShow[T] {
       val (marker, level) = markerAndLevel
-      Message ⇒
-        LogEntry(Message, marker, level)
+      Message ⇒ LogEntry(Message, marker, level)
     }
 
   implicit def forMessageFromShow[T](
@@ -86,13 +85,14 @@ object LoggingMagnet {
     // # request-response-magnets
     forRequestResponseFromFullShow {
       val (marker, level) = markerAndLevel
-      request ⇒ response ⇒
-        Some(
-          LogEntry(
-            "Response for\n  Request : " + request +
-              "\n  Response: " + response,
-            marker,
-            level))
+      request ⇒
+        response ⇒
+          Some(
+            LogEntry(
+              "Response for\n  Request : " + request +
+                "\n  Response: " + response,
+              marker,
+              level))
     }
 
   implicit def forRequestResponseFromFullShow(
@@ -101,8 +101,7 @@ object LoggingMagnet {
     // # request-response-magnets
     LoggingMagnet { log ⇒ request ⇒
       val showResult = show(request)
-      result ⇒
-        showResult(result).foreach(_.logTo(log))
+      result ⇒ showResult(result).foreach(_.logTo(log))
     }
 }
 

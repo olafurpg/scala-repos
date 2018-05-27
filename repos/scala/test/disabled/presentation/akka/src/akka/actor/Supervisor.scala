@@ -157,7 +157,7 @@ sealed class Supervisor(
             val childSupervisor = Supervisor(supervisorConfig)
             supervisor.link(childSupervisor.supervisor)
             _childSupervisors.add(childSupervisor)
-      })
+        })
   }
 }
 

@@ -49,7 +49,9 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
     while (i < i1) {
       if (a(i) > ai(j)) {
         var h = j - 1
-        if (j < k) { ai(j + 1) = ai(j); j += 1 }
+        if (j < k) {
+          ai(j + 1) = ai(j); j += 1
+        }
         while (h >= 0 && a(i) > ai(h)) { ai(h + 1) = ai(h); h -= 1 }
         ai(h + 1) = a(i)
       } else if (j < k) {
@@ -75,7 +77,9 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
     while (i < i1) {
       if (a(i) > ai(j)) {
         var h = j - 1
-        if (j < k) { ai(j + 1) = ai(j); j += 1 }
+        if (j < k) {
+          ai(j + 1) = ai(j); j += 1
+        }
         while (h >= 0 && a(i) > ai(h)) { ai(h + 1) = ai(h); h -= 1 }
         ai(h + 1) = a(i)
       } else if (j < k) {
@@ -101,7 +105,9 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
     while (i < i1) {
       if (a(i) > ai(j)) {
         var h = j - 1
-        if (j < k) { ai(j + 1) = ai(j); j += 1 }
+        if (j < k) {
+          ai(j + 1) = ai(j); j += 1
+        }
         while (h >= 0 && a(i) > ai(h)) { ai(h + 1) = ai(h); h -= 1 }
         ai(h + 1) = a(i)
       } else if (j < k) {

@@ -151,7 +151,9 @@ class Lexer(rd: Reader) {
     if (bp == nread) {
       nread = rd.read(buf)
       bp = 0
-      if (nread <= 0) { ch = 0; atEOF = true; return }
+      if (nread <= 0) {
+        ch = 0; atEOF = true; return
+      }
     }
     ch = buf(bp)
     bp += 1

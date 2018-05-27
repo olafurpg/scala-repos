@@ -127,14 +127,12 @@ case class ScCompoundType(
               val res = tp
                 .lowerType()
                 .recursiveUpdate(update, visited + this)
-              () =>
-                res
+              () => res
             }, {
               val res = tp
                 .upperType()
                 .recursiveUpdate(update, visited + this)
-              () =>
-                res
+              () => res
             },
             tp.ptp
           )
@@ -195,14 +193,12 @@ case class ScCompoundType(
               val res = tp
                 .lowerType()
                 .recursiveVarianceUpdateModifiable(newData, update, 1)
-              () =>
-                res
+              () => res
             }, {
               val res = tp
                 .upperType()
                 .recursiveVarianceUpdateModifiable(newData, update, 1)
-              () =>
-                res
+              () => res
             },
             tp.ptp
           )

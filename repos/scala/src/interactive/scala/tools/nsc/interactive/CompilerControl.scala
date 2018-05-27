@@ -279,7 +279,9 @@ trait CompilerControl { self: Global =>
   def askForResponse[A](op: () => A): Response[A] = {
     val r = new Response[A]
     if (self.onCompilerThread) {
-      try { r set op() } catch { case exc: Throwable => r raise exc }
+      try {
+        r set op()
+      } catch { case exc: Throwable => r raise exc }
       r
     } else {
       val ir = scheduler askDoQuickly op

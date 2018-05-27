@@ -47,7 +47,7 @@ class TypeableTests {
     val cl = l.cast[Long]
     assertTrue(cl.isDefined)
 
-    val f: Any = 23.0F
+    val f: Any = 23.0f
     val cf = f.cast[Float]
     assertTrue(cf.isDefined)
 
@@ -86,7 +86,7 @@ class TypeableTests {
     val cl = l.cast[jl.Long]
     assertTrue(cl.isDefined)
 
-    val f: Any = 23.0F
+    val f: Any = 23.0f
     val cf = f.cast[jl.Float]
     assertTrue(cf.isDefined)
 
@@ -533,12 +533,12 @@ class TypeableTests {
     assertEquals("Typeable[A with B]", typeableString(i1))
     assertEquals("Typeable[A]", typeableString(new A {}))
 
-    val o: Option[Long] = Some(4l)
+    val o: Option[Long] = Some(4L)
     assertEquals("Typeable[Option[Long]]", typeableString(o))
 
     val e: Either[Long, String] = Right("")
     assertEquals("Typeable[Either[Long, String]]", typeableString(e))
-    assertEquals("Typeable[Right[Long]]", typeableString(Right(3l)))
+    assertEquals("Typeable[Right[Long]]", typeableString(Right(3L)))
 
     val l: List[Int] = List(1, 2)
     assertEquals("Typeable[List[Int]]", typeableString(l))

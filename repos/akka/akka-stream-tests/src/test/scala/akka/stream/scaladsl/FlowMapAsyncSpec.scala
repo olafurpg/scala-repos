@@ -53,7 +53,7 @@ class FlowMapAsyncSpec extends AkkaSpec {
           Future {
             Thread.sleep(ThreadLocalRandom.current().nextInt(1, 10))
             n
-        })
+          })
         .to(Sink.fromSubscriber(c))
         .run()
       val sub = c.expectSubscription()
@@ -71,7 +71,7 @@ class FlowMapAsyncSpec extends AkkaSpec {
           Future {
             probe.ref ! n
             n
-        })
+          })
         .to(Sink.fromSubscriber(c))
         .run()
       val sub = c.expectSubscription()
@@ -102,7 +102,7 @@ class FlowMapAsyncSpec extends AkkaSpec {
               Await.ready(latch, 10.seconds)
               n
             }
-        })
+          })
         .to(Sink.fromSubscriber(c))
         .run()
       val sub = c.expectSubscription()
@@ -123,7 +123,7 @@ class FlowMapAsyncSpec extends AkkaSpec {
               Await.ready(latch, 10.seconds)
               n
             }
-        })
+          })
         .to(Sink.fromSubscriber(c))
         .run()
       val sub = c.expectSubscription()
@@ -140,7 +140,7 @@ class FlowMapAsyncSpec extends AkkaSpec {
           Future {
             if (n == 3) throw new RuntimeException("err3") with NoStackTrace
             else n
-        })
+          })
         .withAttributes(supervisionStrategy(resumingDecider))
         .to(Sink.fromSubscriber(c))
         .run()
@@ -178,7 +178,7 @@ class FlowMapAsyncSpec extends AkkaSpec {
               if (n == 3)
                 throw new RuntimeException("err3b") with NoStackTrace
               else n
-          })
+            })
           .withAttributes(supervisionStrategy(resumingDecider))
           .grouped(10)
           .runWith(Sink.head),

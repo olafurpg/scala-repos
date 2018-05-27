@@ -91,7 +91,7 @@ object CommonUtil {
           case 'n'  => "\n"
           case 'r'  => "\r"
           case 't'  => "\t"
-      })
+        })
     quotedUnicodePattern.replaceAllIn(
       result,
       m => jl.Short.parseShort(m.group(1), 16).toChar.toString)

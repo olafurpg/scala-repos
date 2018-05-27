@@ -16,21 +16,21 @@ object Template {
         Seq("/assets/js/jquery.min.js", "/assets/js/bootstrap.min.js")) = {
     <html lang="en">
       <head>
-        <title>{ title }</title>
+        <title>{title}</title>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta name="description" content=""/>
         <meta name="author" content=""/>
         <!-- Le styles -->
-        <link href={ url("/assets/css/bootstrap.css") } rel="stylesheet"/>
-        <link href={ url("/assets/css/bootstrap-responsive.css") } rel="stylesheet"/>
-        <link href={ url("/assets/css/syntax.css") } rel="stylesheet"/>
-        <link href={ url("/assets/css/scalatra.css") } rel="stylesheet"/>
+        <link href={url("/assets/css/bootstrap.css")} rel="stylesheet"/>
+        <link href={url("/assets/css/bootstrap-responsive.css")} rel="stylesheet"/>
+        <link href={url("/assets/css/syntax.css")} rel="stylesheet"/>
+        <link href={url("/assets/css/scalatra.css")} rel="stylesheet"/>
         <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
           <![endif]-->
-        { head }
+        {head}
       </head>
       <body>
         <div class="navbar navbar-inverse navbar-fixed-top">
@@ -50,31 +50,31 @@ object Template {
         <div class="container">
           <div class="content">
             <div class="page-header">
-              <h1>{ title }</h1>
+              <h1>{title}</h1>
             </div>
-            { content }
+            {content}
             <hr/>
-            <a href={ url("/date/2009/12/26") }>date example</a><br/>
-            <a href={ url("/form") }>form example</a><br/>
-            <a href={ url("/upload") }>upload</a><br/>
-            <a href={ url("/") }>hello world</a><br/>
-            <a href={ url("/flash-map/form") }>flash scope</a><br/>
-            <a href={ url("/login") }>login</a><br/>
-            <a href={ url("/logout") }>logout</a><br/>
-            <a href={ url("/basic-auth") }>basic auth</a><br/>
-            <a href={ url("/filter-example") }>filter example</a><br/>
-            <a href={ url("/cookies-example") }>cookies example</a><br/>
-            <a href={ url("/atmosphere") }>atmosphere chat demo</a><br/>
+            <a href={url("/date/2009/12/26")}>date example</a><br/>
+            <a href={url("/form")}>form example</a><br/>
+            <a href={url("/upload")}>upload</a><br/>
+            <a href={url("/")}>hello world</a><br/>
+            <a href={url("/flash-map/form")}>flash scope</a><br/>
+            <a href={url("/login")}>login</a><br/>
+            <a href={url("/logout")}>logout</a><br/>
+            <a href={url("/basic-auth")}>basic auth</a><br/>
+            <a href={url("/filter-example")}>filter example</a><br/>
+            <a href={url("/cookies-example")}>cookies example</a><br/>
+            <a href={url("/atmosphere")}>atmosphere chat demo</a><br/>
           </div><!-- /content -->
         </div><!-- /container -->
         <!-- Le javascript
             ================================================== -->
         <!-- Placed at the end of the document so the pages load faster -->
         {
-          (defaultScripts ++ scripts) map { pth =>
-            <script type="text/javascript" src={ url(pth) }></script>
-          }
-        }
+      (defaultScripts ++ scripts) map { pth =>
+        <script type="text/javascript" src={url(pth)}></script>
+      }
+    }
       </body>
     </html>
   }
@@ -92,9 +92,9 @@ class TemplateExample
     displayPage(
       "Scalatra: Date Example",
       <ul>
-        <li>Year: { params("year") }</li>
-        <li>Month: { params("month") }</li>
-        <li>Day: { params("day") }</li>
+        <li>Year: {params("year")}</li>
+        <li>Month: {params("month")}</li>
+        <li>Day: {params("day")}</li>
       </ul>
       <pre>Route: /date/:year/:month/:day</pre>
     )
@@ -103,7 +103,7 @@ class TemplateExample
   get("/form") {
     displayPage(
       "Scalatra: Form Post Example",
-      <form action={ url("/post") } method='POST'>
+      <form action={url("/post")} method='POST'>
         Post something:<input name="submission" type='text'/>
         <input type='submit'/>
       </form>
@@ -114,7 +114,7 @@ class TemplateExample
   post("/post") {
     displayPage(
       "Scalatra: Form Post Result",
-      <p>You posted: { params("submission") }</p>
+      <p>You posted: {params("submission")}</p>
       <pre>Route: /post</pre>)
   }
 
@@ -123,12 +123,12 @@ class TemplateExample
       case (Some(first: String), Some(last: String)) =>
         displayPage(
           "Scalatra: Session Example",
-          <pre>You have logged in as: { first + "-" + last }</pre>
+          <pre>You have logged in as: {first + "-" + last}</pre>
           <pre>Route: /login</pre>)
       case x =>
         displayPage(
           "Scalatra: Session Example" + x.toString,
-          <form action={ url("/login") } method='POST'>
+          <form action={url("/login")} method='POST'>
             First Name:<input name="first" type='text'/>
             Last Name:<input name="last" type='text'/>
             <input type='submit'/>
@@ -145,7 +145,7 @@ class TemplateExample
         session("last") = last
         displayPage(
           "Scalatra: Session Example",
-          <pre>You have just logged in as: { first + " " + last }</pre>
+          <pre>You have just logged in as: {first + " " + last}</pre>
           <pre>Route: /login</pre>)
       }
     }
@@ -163,7 +163,7 @@ class TemplateExample
     displayPage(
       "Scalatra: Hello World",
       <h2>Hello world!</h2>
-      <p>Referer: { (request referrer) map { Text(_) } getOrElse { <i>none</i> } }</p>
+      <p>Referer: {(request referrer) map { Text(_) } getOrElse { <i>none</i> }}</p>
       <pre>Route: /</pre>
     )
   }
@@ -193,7 +193,7 @@ class TemplateExample
   get("/flash-map/result") {
     displayPage(
       title = "Scalatra: Flash  Example",
-      content = <span>Message = { flash.getOrElse("message", "") }</span>
+      content = <span>Message = {flash.getOrElse("message", "")}</span>
     )
   }
 

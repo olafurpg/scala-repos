@@ -170,8 +170,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     })(Strategy.Sequential)
 
     get.unsafePerformAsyncInterruptibly(r => a ! Some(r), completed)
-    () =>
-      { a ! None }
+    () => { a ! None }
   }
 
   @deprecated("use unsafePerformAsyncInterruptibly", "7.2")

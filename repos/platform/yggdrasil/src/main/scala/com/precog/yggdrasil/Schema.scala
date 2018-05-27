@@ -212,8 +212,7 @@ object Schema {
           _.definedAt(0, size)
         } reduceOption { _ | _ } getOrElse new BitSet
 
-      (row: Int) =>
-        bits(row)
+      (row: Int) => bits(row)
     }
 
     def handleUnfixed(
@@ -243,8 +242,7 @@ object Schema {
           _.definedAt(0, size)
         } reduceOption { _ | _ } getOrElse new BitSet
 
-      (row: Int) =>
-        objBits(row)
+      (row: Int) => objBits(row)
     }
 
     def handleEmpty(emptyCType: CType, cols: Map[ColumnRef, Column]) = {
@@ -258,8 +256,7 @@ object Schema {
           _.definedAt(0, size)
         } reduceOption { _ | _ } getOrElse new BitSet
 
-      (row: Int) =>
-        emptyBits(row)
+      (row: Int) => emptyBits(row)
     }
 
     def combineFixedResults(results: Seq[Int => Boolean]): Int => Boolean = {
@@ -313,8 +310,7 @@ object Schema {
         val leftTypes = findTypes(left, seenPath, cols, size)
         val rightTypes = findTypes(right, seenPath, cols, size)
 
-        (row: Int) =>
-          leftTypes(row) || rightTypes(row)
+        (row: Int) => leftTypes(row) || rightTypes(row)
 
       case JArrayHomogeneousT(jtpe) =>
         findTypes(jtpe, CPath(seenPath.nodes :+ CPathArray), cols, size)

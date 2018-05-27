@@ -812,7 +812,7 @@ object MethodResolveProcessor {
         r.innerResolveResult match {
           case Some(rr) => !rr.defaultParameterUsed
           case None     => !r.defaultParameterUsed
-      })
+        })
 
     if (isShapeResolve) {
       if (filtered.isEmpty) {

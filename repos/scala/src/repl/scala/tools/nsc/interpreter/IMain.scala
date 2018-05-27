@@ -1151,7 +1151,9 @@ class IMain(
 
     /** load and run the code using reflection */
     def loadAndRun: (String, Boolean) = {
-      try { ("" + (lineRep call sessionNames.print), true) } catch {
+      try {
+        ("" + (lineRep call sessionNames.print), true)
+      } catch {
         case ex: Throwable => (lineRep.bindError(ex), false)
       }
     }

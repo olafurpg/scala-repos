@@ -31,7 +31,7 @@ trait Semiring[@specialized(Int, Short, Long, Float, Double) V]
 
   def ==(a: V, b: V): Boolean
   def !=(a: V, b: V): Boolean
-  def close(a: V, b: V, tolerance: Double = 1E-4): Boolean = a == b
+  def close(a: V, b: V, tolerance: Double = 1e-4): Boolean = a == b
 }
 
 object Semiring {

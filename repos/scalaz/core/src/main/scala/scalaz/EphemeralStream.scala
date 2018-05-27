@@ -300,17 +300,16 @@ object EphemeralStream extends EphemeralStreamInstances {
     val latch = new Object
     // TODO I don't think this annotation does anything, as `v` isn't a class member.
     @volatile var v: Option[WeakReference[V]] = None
-    () =>
-      {
-        val a = v.map(x => x.get)
-        if (a.isDefined && a.get != null) a.get
-        else
-          latch.synchronized {
-            val x = f
-            v = Some(new WeakReference(x))
-            x
-          }
-      }
+    () => {
+      val a = v.map(x => x.get)
+      if (a.isDefined && a.get != null) a.get
+      else
+        latch.synchronized {
+          val x = f
+          v = Some(new WeakReference(x))
+          x
+        }
+    }
   }
 
   def apply[A]: EphemeralStream[A] =

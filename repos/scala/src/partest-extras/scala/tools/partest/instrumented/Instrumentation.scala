@@ -83,8 +83,8 @@ object Instrumentation {
   val standardFilter: MethodCallTrace => Boolean = t => {
     // ignore all calls to Console trigger by printing
     t.className != "scala/Console$" &&
-    // console accesses DynamicVariable, let's discard it too
-    !t.className.startsWith("scala/util/DynamicVariable")
+      // console accesses DynamicVariable, let's discard it too
+      !t.className.startsWith("scala/util/DynamicVariable")
   }
 
   // Used in tests.

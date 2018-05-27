@@ -602,7 +602,7 @@ class ParquetQuerySuite
 
       checkAnswer(
         sqlContext.read.schema(userDefinedSchema).parquet(path),
-        Row(Row(NestedStruct(1, 2L, 3.5D))))
+        Row(Row(NestedStruct(1, 2L, 3.5d))))
     }
   }
 

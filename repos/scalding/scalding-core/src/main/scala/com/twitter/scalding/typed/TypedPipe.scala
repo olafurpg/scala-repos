@@ -798,7 +798,7 @@ trait TypedPipe[+T] extends Serializable {
     */
   def sketch[K, V](
       reducers: Int,
-      eps: Double = 1.0E-5, //272k width = 1MB per row
+      eps: Double = 1.0e-5, //272k width = 1MB per row
       delta: Double = 0.01, //5 rows (= 5 hashes)
       seed: Int = 12345)(
       implicit ev: TypedPipe[T] <:< TypedPipe[(K, V)],

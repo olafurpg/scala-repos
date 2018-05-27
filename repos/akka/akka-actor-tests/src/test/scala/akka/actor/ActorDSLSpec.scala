@@ -205,7 +205,7 @@ class ActorDSLSpec extends AkkaSpec {
         //#supervise-with
         val child = actor("child")(new Act {
           whenFailing { (_, _) ⇒
-            }
+          }
           become {
             case ref: ActorRef ⇒ whenStopping(ref ! "stopped")
             case ex: Exception ⇒ throw ex

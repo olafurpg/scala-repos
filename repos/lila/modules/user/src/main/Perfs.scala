@@ -132,7 +132,7 @@ case class Perfs(
   def updateStandard = copy(
     standard = {
       val subs = List(bullet, blitz, classical, correspondence)
-      subs.maxBy(_.latest.fold(0l)(_.getMillis)).latest.fold(standard) {
+      subs.maxBy(_.latest.fold(0L)(_.getMillis)).latest.fold(standard) {
         date =>
           val nb = subs.map(_.nb).sum
           val glicko =
@@ -176,17 +176,13 @@ case object Perfs {
 
   def speedLens(speed: Speed): Perfs => Perf = speed match {
     case Speed.Bullet =>
-      perfs =>
-        perfs.bullet
+      perfs => perfs.bullet
     case Speed.Blitz =>
-      perfs =>
-        perfs.blitz
+      perfs => perfs.blitz
     case Speed.Classical =>
-      perfs =>
-        perfs.classical
+      perfs => perfs.classical
     case Speed.Correspondence =>
-      perfs =>
-        perfs.correspondence
+      perfs => perfs.correspondence
   }
 
   val perfsBSONHandler = new BSON[Perfs] {

@@ -43,10 +43,9 @@ class CforTest extends SpireProperties {
     var v = 0
     cfor(0)({ v += 1; _ < 3 }, { v += 10; _ + 1 })({
       v += 100
-      x =>
-        {
-          b += x
-        }
+      x => {
+        b += x
+      }
     })
     v shouldBe 111
     b.toList shouldBe List(0, 1, 2)
@@ -59,10 +58,9 @@ class CforTest extends SpireProperties {
     def incr: Int => Int = { v += 10; _ + 1 }
     def body: Int => Unit = {
       v += 100
-      x =>
-        {
-          b += x
-        }
+      x => {
+        b += x
+      }
     }
     cfor(0)(test, incr)(body)
     v shouldBe 111
@@ -80,10 +78,9 @@ class CforTest extends SpireProperties {
     }
     run({ v += 1; _ < 3 }, { v += 10; _ + 1 }, {
       v += 100
-      x =>
-        {
-          b += x
-        }
+      x => {
+        b += x
+      }
     })
     v shouldBe 111
     b.toList shouldBe List(0, 1, 2)

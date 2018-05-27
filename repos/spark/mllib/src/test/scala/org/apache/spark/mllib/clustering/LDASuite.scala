@@ -36,8 +36,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
     val model = new LocalLDAModel(
       tinyTopics,
       Vectors.dense(Array.fill(tinyTopics.numRows)(1.0 / tinyTopics.numRows)),
-      1D,
-      100D)
+      1d,
+      100d)
 
     // Check: basic parameters
     assert(model.k === tinyK)
@@ -354,8 +354,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
        > -31.4413908227
      */
 
-    assert(ldaModel.logLikelihood(docsSingleWord) ~== -25.971 relTol 1E-3D)
-    assert(ldaModel.logLikelihood(docsRepeatedWord) ~== -31.441 relTol 1E-3D)
+    assert(ldaModel.logLikelihood(docsSingleWord) ~== -25.971 relTol 1e-3d)
+    assert(ldaModel.logLikelihood(docsRepeatedWord) ~== -31.441 relTol 1e-3d)
   }
 
   test("LocalLDAModel logPerplexity") {
@@ -381,7 +381,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
      */
 
     // Gensim's definition of perplexity is negative our (and Stanford NLP's) definition
-    assert(ldaModel.logPerplexity(docs) ~== 3.690D relTol 1E-3D)
+    assert(ldaModel.logPerplexity(docs) ~== 3.690d relTol 1e-3d)
   }
 
   test("LocalLDAModel predict") {
@@ -432,7 +432,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
       case (expected, actual) =>
         assert(
           expected._1 === actual._1 &&
-            (expected._2 ~== actual._2 relTol 1E-3D))
+            (expected._2 ~== actual._2 relTol 1e-3d))
     }
 
     docs
@@ -441,7 +441,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
       .zip(actualPredictions.map(_._2).collect())
       .foreach {
         case (single, batch) =>
-          assert(single ~== batch relTol 1E-3D)
+          assert(single ~== batch relTol 1e-3d)
       }
     actualPredictions.unpersist()
   }
@@ -504,7 +504,7 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
       .setSampleWithReplacement(false)
     val lda = new LDA()
       .setK(k)
-      .setDocConcentration(1D / k)
+      .setDocConcentration(1d / k)
       .setTopicConcentration(0.01)
       .setMaxIterations(100)
       .setOptimizer(op)
@@ -540,8 +540,8 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
       new LocalLDAModel(
         tinyTopics,
         Vectors.dense(Array.fill(tinyTopics.numRows)(0.01)),
-        0.5D,
-        10D)
+        0.5d,
+        10d)
     val tempDir1 = Utils.createTempDir()
     val path1 = tempDir1.toURI.toString
 

@@ -154,7 +154,7 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
 
     val xmlMarshaller: ToEntityMarshaller[Data] = Marshaller.combined {
       (data: Data) ⇒
-        <data><name>{ data.name }</name><age>{ data.age }</age></data>
+        <data><name>{data.name}</name><age>{data.age}</age></data>
     }
 
     implicit val dataMarshaller: ToResponseMarshaller[Data] =

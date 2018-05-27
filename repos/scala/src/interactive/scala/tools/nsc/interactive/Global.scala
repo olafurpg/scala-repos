@@ -651,7 +651,9 @@ with ContextTrees with RichCompilationUnits with Picklers {
   private def serviceParsedEntered() {
     var atOldRun = true
     for ((source, rs) <- getParsedEnteredResponses; r <- rs) {
-      if (atOldRun) { newTyperRun(); atOldRun = false }
+      if (atOldRun) {
+        newTyperRun(); atOldRun = false
+      }
       getParsedEnteredNow(source, r)
     }
     getParsedEnteredResponses.clear()
@@ -1309,39 +1311,38 @@ with ContextTrees with RichCompilationUnits with Picklers {
         .toLowerCase()
         .toSet
 
-      (candidate: Name) =>
-        {
-          def candidateChunks = camelComponents(candidate.toString)
-          // Loosely based on IntelliJ's autocompletion: the user can just write everything in
-          // lowercase, as we'll let `isl` match `GenIndexedSeqLike` or `isLovely`.
-          def lenientMatch(
-              entered: String,
-              candidate: List[String],
-              matchCount: Int): Boolean = {
-            candidate match {
-              case Nil => entered.isEmpty && matchCount > 0
-              case head :: tail =>
-                val enteredAlternatives = Set(entered, entered.capitalize)
-                head.inits
-                  .filter(_.length <= entered.length)
-                  .exists(
-                    init =>
-                      enteredAlternatives.exists(
-                        entered =>
-                          lenientMatch(
-                            entered.stripPrefix(init),
-                            tail,
-                            matchCount +
-                              (if (init.isEmpty) 0 else 1))))
-            }
+      (candidate: Name) => {
+        def candidateChunks = camelComponents(candidate.toString)
+        // Loosely based on IntelliJ's autocompletion: the user can just write everything in
+        // lowercase, as we'll let `isl` match `GenIndexedSeqLike` or `isLovely`.
+        def lenientMatch(
+            entered: String,
+            candidate: List[String],
+            matchCount: Int): Boolean = {
+          candidate match {
+            case Nil => entered.isEmpty && matchCount > 0
+            case head :: tail =>
+              val enteredAlternatives = Set(entered, entered.capitalize)
+              head.inits
+                .filter(_.length <= entered.length)
+                .exists(
+                  init =>
+                    enteredAlternatives.exists(
+                      entered =>
+                        lenientMatch(
+                          entered.stripPrefix(init),
+                          tail,
+                          matchCount +
+                            (if (init.isEmpty) 0 else 1))))
           }
-          val containsAllEnteredChars = {
-            // Trying to rule out some candidates quickly before the more expensive `lenientMatch`
-            val candidateLowercaseSet = candidate.toString.toLowerCase().toSet
-            enteredLowercaseSet.diff(candidateLowercaseSet).isEmpty
-          }
-          containsAllEnteredChars && lenientMatch(enteredS, candidateChunks, 0)
         }
+        val containsAllEnteredChars = {
+          // Trying to rule out some candidates quickly before the more expensive `lenientMatch`
+          val candidateLowercaseSet = candidate.toString.toLowerCase().toSet
+          enteredLowercaseSet.diff(candidateLowercaseSet).isEmpty
+        }
+        containsAllEnteredChars && lenientMatch(enteredS, candidateChunks, 0)
+      }
     }
   }
 

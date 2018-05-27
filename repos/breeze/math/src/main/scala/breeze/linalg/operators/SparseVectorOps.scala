@@ -293,7 +293,7 @@ trait DenseVector_SparseVector_Ops {
     Int,
     Double,
     Float,
-    Long) T](implicit @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+    Long) T](implicit @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : OpMulInner.Impl2[DenseVector[T], SparseVector[T], T] =
     new OpMulInner.Impl2[DenseVector[T], SparseVector[T], T] {
       def apply(a: DenseVector[T], b: SparseVector[T]): T = {
@@ -332,7 +332,7 @@ trait DenseVector_SparseVector_Ops {
     Int,
     Double,
     Float,
-    Long) T](implicit @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+    Long) T](implicit @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : zipValues.Impl2[DenseVector[T], SparseVector[T], ZippedValues[T, T]] =
     new zipValues.Impl2[DenseVector[T], SparseVector[T], ZippedValues[T, T]] {
 
@@ -386,7 +386,7 @@ trait DenseVector_SparseVector_Ops {
     Int,
     Double,
     Float,
-    Long) T](implicit @expand.sequence[T](0, 0.0, 0f, 0l) zero: T)
+    Long) T](implicit @expand.sequence[T](0, 0.0, 0f, 0L) zero: T)
     : scaleAdd.InPlaceImpl3[DenseVector[T], T, SparseVector[T]] =
     new scaleAdd.InPlaceImpl3[DenseVector[T], T, SparseVector[T]] {
       def apply(y: DenseVector[T], a: T, x: SparseVector[T]): Unit = {
@@ -445,7 +445,7 @@ trait SparseVectorOps {
       implicit @expand.sequence[Op]({
         _ + _
       }, { _ - _ }) op: Op.Impl2[T, T, T],
-      @expand.sequence[T](0, 0.0, 0f, 0l) zero: T)
+      @expand.sequence[T](0, 0.0, 0f, 0L) zero: T)
     : Op.Impl2[SparseVector[T], SparseVector[T], SparseVector[T]] =
     new Op.Impl2[SparseVector[T], SparseVector[T], SparseVector[T]] {
       def apply(a: SparseVector[T], b: SparseVector[T]): SparseVector[T] = {
@@ -644,7 +644,7 @@ trait SparseVectorOps {
     Int,
     Double,
     Float,
-    Long) T](implicit @expand.sequence[T](0, 0.0, 0f, 0l) zero: T)
+    Long) T](implicit @expand.sequence[T](0, 0.0, 0f, 0L) zero: T)
     : OpMulScalar.Impl2[SparseVector[T], SparseVector[T], SparseVector[T]] =
     new OpMulScalar.Impl2[SparseVector[T], SparseVector[T], SparseVector[T]] {
       def apply(a: SparseVector[T], b: SparseVector[T]): SparseVector[T] = {
@@ -826,7 +826,7 @@ trait SparseVectorOps {
       implicit @expand.sequence[Op]({ _ + _ }, { _ - _ }, { (a, b) =>
         b
       }, { _ pow _ }) op: Op.Impl2[T, T, T],
-      @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : Op.Impl2[SparseVector[T], T, SparseVector[T]] =
     new Op.Impl2[SparseVector[T], T, SparseVector[T]] {
       def apply(a: SparseVector[T], b: T): SparseVector[T] = {
@@ -852,7 +852,7 @@ trait SparseVectorOps {
       implicit @expand.sequence[Op]({
         _ / _
       }, { _ % _ }) op: Op.Impl2[T, T, T],
-      @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : Op.Impl2[SparseVector[T], T, SparseVector[T]] =
     new Op.Impl2[SparseVector[T], T, SparseVector[T]] {
       def apply(a: SparseVector[T], b: T): SparseVector[T] = {
@@ -882,7 +882,7 @@ trait SparseVectorOps {
   implicit def implOps_SVT_T_eq_SVT[
       @expand.args(Int, Double, Float, Long) T,
       @expand.args(OpMulScalar, OpMulMatrix) Op <: OpType](
-      implicit @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      implicit @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : Op.Impl2[SparseVector[T], T, SparseVector[T]] =
     new Op.Impl2[SparseVector[T], T, SparseVector[T]] {
       def apply(a: SparseVector[T], b: T): SparseVector[T] = {
@@ -977,7 +977,7 @@ trait SparseVectorOps {
     Int,
     Double,
     Float,
-    Long) T](implicit @expand.sequence[T](0, 0.0, 0f, 0l) zero: T)
+    Long) T](implicit @expand.sequence[T](0, 0.0, 0f, 0L) zero: T)
     : OpMulInner.Impl2[SparseVector[T], SparseVector[T], T] =
     new OpMulInner.Impl2[SparseVector[T], SparseVector[T], T] {
       def apply(a: SparseVector[T], b: SparseVector[T]): T = {
@@ -1141,7 +1141,7 @@ trait SparseVectorOps {
     Int,
     Double,
     Float,
-    Long) T](implicit @expand.sequence[T](0, 0.0, 0f, 0l) zero: T)
+    Long) T](implicit @expand.sequence[T](0, 0.0, 0f, 0L) zero: T)
     : scaleAdd.InPlaceImpl3[SparseVector[T], T, SparseVector[T]] =
     new scaleAdd.InPlaceImpl3[SparseVector[T], T, SparseVector[T]] {
       def apply(y: SparseVector[T], a: T, x: SparseVector[T]): Unit = {

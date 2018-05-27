@@ -16,7 +16,9 @@ object Test extends App {
   assert(R.C == R.withName("C"))
 
   var failed = false
-  try { Q.withName("x") } catch {
+  try {
+    Q.withName("x")
+  } catch {
     case _: NoSuchElementException => failed = true
   }
   assert(failed)

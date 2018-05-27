@@ -187,7 +187,7 @@ object LazyEitherT extends LazyEitherTInstances {
             z.fold(
               _ => g,
               _ => x.run
-          )))
+            )))
     }
 
     def toLazyOption(implicit F: Functor[F]): LazyOptionT[F, A] =
@@ -405,7 +405,7 @@ private trait LazyEitherTPlus[F[_], E] extends Plus[LazyEitherT[F, E, ?]] {
               ll => LazyEither.lazyLeft(E.append(l, ll)),
               _ => rr
             )
-        },
+          },
         _ => F.point(r)
       )
     })
@@ -483,7 +483,7 @@ private trait LazyEitherTBindRec[F[_], E]
           _.fold(
             e => \/.right(LazyEither.lazyLeft(e)),
             _.map(b => LazyEither.lazyRight(b)))
-      })(a)
+        })(a)
     )
 }
 

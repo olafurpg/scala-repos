@@ -242,8 +242,8 @@ class CachedSpec extends PlaySpecification {
       defaultCache.set("int", 31)
       defaultCache.get[Int]("int") must beSome(31)
 
-      defaultCache.set("long", 31l)
-      defaultCache.get[Long]("long") must beSome(31l)
+      defaultCache.set("long", 31L)
+      defaultCache.get[Long]("long") must beSome(31L)
 
       defaultCache.set("double", 3.14)
       defaultCache.get[Double]("double") must beSome(3.14)
@@ -259,7 +259,7 @@ class CachedSpec extends PlaySpecification {
       val defaultCache = app.injector.instanceOf[CacheApi]
       defaultCache.set("foo", "bar")
       defaultCache.set("int", 31)
-      defaultCache.set("long", 31l)
+      defaultCache.set("long", 31L)
       defaultCache.set("double", 3.14)
       defaultCache.set("boolean", true)
       defaultCache.set("unit", ())

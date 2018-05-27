@@ -64,7 +64,10 @@ object CloseableIterator {
   class Single[+T](item: T) extends CloseableIterator[T] {
     private var more = true
     def hasNext = more
-    def next() = if (more) { more = false; item } else noNext
+    def next() =
+      if (more) {
+        more = false; item
+      } else noNext
     def close {}
   }
 

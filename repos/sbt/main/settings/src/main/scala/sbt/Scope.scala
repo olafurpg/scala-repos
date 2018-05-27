@@ -50,7 +50,7 @@ object Scope {
         subThis(thisScope.config, scope.config),
         subThis(thisScope.task, scope.task),
         subThis(thisScope.extra, scope.extra)
-    )
+      )
 
   def subThis[T](sub: ScopeAxis[T], into: ScopeAxis[T]): ScopeAxis[T] =
     if (into == This) sub else into

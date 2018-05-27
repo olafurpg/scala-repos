@@ -591,7 +591,7 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
       2147483647,
       2147483648L,
       1797693,
-      3.4028235F,
+      3.4028235f,
       1000,
       0,
       true,

@@ -56,6 +56,6 @@ trait SourceResolverTestUtils {
         fo.pathWithinArchive match {
           case None => fo.asLocalFile.getAbsolutePath
           case _    => fo.getName.getPath
-      })
+        })
   }
 }

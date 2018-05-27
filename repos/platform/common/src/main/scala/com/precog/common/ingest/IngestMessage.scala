@@ -82,7 +82,7 @@ object EventMessage {
 }
 
 case class EventId(producerId: ProducerId, sequenceId: SequenceId) {
-  val uid = (producerId.toLong << 32) | (sequenceId.toLong & 0xFFFFFFFFL)
+  val uid = (producerId.toLong << 32) | (sequenceId.toLong & 0XFFFFFFFFL)
 }
 
 object EventId {

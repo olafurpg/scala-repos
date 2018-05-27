@@ -187,7 +187,7 @@ case class ArrayContains(left: Expression, right: Expression)
             hasNull = true
           } else if (v == value) {
             return true
-        })
+          })
     if (hasNull) {
       null
     } else {

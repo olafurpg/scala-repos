@@ -75,7 +75,9 @@ class RangeConsistencyTest {
           if (rn.nextBoolean) Range.inclusive(start, end, step)
           else Range(start, end, step)
 
-        try { r.length } catch {
+        try {
+          r.length
+        } catch {
           case iae: IllegalArgumentException => control.Breaks.break
         }
 

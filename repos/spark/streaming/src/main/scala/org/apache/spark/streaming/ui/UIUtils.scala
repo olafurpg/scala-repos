@@ -181,7 +181,9 @@ private[streaming] object UIUtils {
       }
 
     if (rowspan == 1) {
-      <td valign="middle" style="max-width: 300px">{failureReasonSummary}{details}</td>
+      <td valign="middle" style="max-width: 300px">{failureReasonSummary}{
+        details
+      }</td>
     } else {
       <td valign="middle" style="max-width: 300px" rowspan={rowspan.toString}>
         {failureReasonSummary}{details}

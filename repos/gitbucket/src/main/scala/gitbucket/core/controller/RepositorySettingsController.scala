@@ -356,7 +356,7 @@ trait RepositorySettingsControllerBase extends ControllerBase {
                 Map(
                   "headers" -> _headers(req.getAllHeaders),
                   "payload" -> json
-              ))
+                ))
               .recover(toErrorMap),
             20 seconds),
           "responce" -> Await
@@ -368,7 +368,7 @@ trait RepositorySettingsControllerBase extends ControllerBase {
                       "status" -> res.getStatusLine(),
                       "body" -> EntityUtils.toString(res.getEntity()),
                       "headers" -> _headers(res.getAllHeaders())
-                  ))
+                    ))
                 .recover(toErrorMap),
               20 seconds
             )

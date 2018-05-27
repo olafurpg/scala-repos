@@ -70,7 +70,7 @@ class LogConfigTest {
           assertPropertyInvalid(name, "")
         case positiveIntProperty =>
           assertPropertyInvalid(name, "not_a_number", "-1")
-    })
+      })
   }
 
   private def assertPropertyInvalid(name: String, values: AnyRef*) {

@@ -33,7 +33,7 @@ package object framework {
   def boundedDouble: Gen[Double] = Gen.choose(-1000000d, 1000000d)
 
   /** A generator for longs between 0 and the current time in milliseconds. */
-  def longEpochToNow: Gen[Long] = Gen.choose(1l, System.currentTimeMillis)
+  def longEpochToNow: Gen[Long] = Gen.choose(1L, System.currentTimeMillis)
 
   /** A generator for DateTimeS between the start of the epoch and now. */
   def dateTimeEpochToNow: Gen[DateTime] = longEpochToNow map (new DateTime(_))

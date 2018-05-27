@@ -144,7 +144,9 @@ object Play {
     if (app != null) {
       Threads.withContextClassLoader(app.classloader) {
         app.global.onStop(app)
-        try { Await.ready(app.stop(), Duration.Inf) } catch {
+        try {
+          Await.ready(app.stop(), Duration.Inf)
+        } catch {
           case NonFatal(e) => logger.warn("Error stopping application", e)
         }
       }

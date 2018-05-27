@@ -100,14 +100,13 @@ case class DefaultClient[Req, Rep](
   private[this] def transform(stack: Stack[ServiceFactory[Req, Rep]]) = {
     val failureAccrualTransform: Transformer[Req, Rep] = failureAccrual match {
       case _: DefaultClient.UninitializedFailureAccrual =>
-        factory: ServiceFactory[Req, Rep] =>
-          {
-            val classifier =
-              params[param.ResponseClassifier].responseClassifier
-            DefaultClient
-              .defaultFailureAccrual(statsReceiver, classifier)
-              .andThen(factory)
-          }
+        factory: ServiceFactory[Req, Rep] => {
+          val classifier =
+            params[param.ResponseClassifier].responseClassifier
+          DefaultClient
+            .defaultFailureAccrual(statsReceiver, classifier)
+            .andThen(factory)
+        }
       case _ => failureAccrual
     }
 

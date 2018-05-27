@@ -724,7 +724,7 @@ object Future {
           if (ref.decrementAndGet == 0) {
             result tryComplete Success(None)
           }
-      }
+        }
 
       futuresBuffer.foreach(_ onComplete search)
 

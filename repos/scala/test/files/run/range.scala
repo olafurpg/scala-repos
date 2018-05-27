@@ -13,16 +13,22 @@ object Test {
     // #4321
     assert((Int.MinValue to Int.MaxValue by Int.MaxValue).size == 3)
     // #4308
-    val caught = (try { (Long.MinValue to Long.MaxValue).sum; false } catch {
+    val caught = (try {
+      (Long.MinValue to Long.MaxValue).sum; false
+    } catch {
       case _: IllegalArgumentException => true
     })
     assert(caught)
     // #7432
-    val noElemAtMin = (try { (10 until 10).min; false } catch {
+    val noElemAtMin = (try {
+      (10 until 10).min; false
+    } catch {
       case _: NoSuchElementException => true
     })
     assert(noElemAtMin)
-    val noElemAtMax = (try { (10 until 10).max; false } catch {
+    val noElemAtMax = (try {
+      (10 until 10).max; false
+    } catch {
       case _: NoSuchElementException => true
     })
     assert(noElemAtMax)

@@ -605,7 +605,7 @@ object List extends SeqFactory[List] {
       e match {
         case Left(a)  => a :: as
         case Right(_) => as
-    })
+      })
 
   /**
     * Returns the <code>Right</code> values in the given<code>Iterable</code> of  <code>Either</code>s.
@@ -616,7 +616,7 @@ object List extends SeqFactory[List] {
       e match {
         case Left(_)  => bs
         case Right(b) => b :: bs
-    })
+      })
 
   /** Transforms an Iterable of Eithers into a pair of lists.
     *

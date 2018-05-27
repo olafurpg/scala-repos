@@ -138,7 +138,7 @@ object VideoCubeDemo extends JFXApp {
         width = s
         height = s
         fill = Color.White
-    })
+      })
     //    printf("stars=%s\n", stars)
     children = stars
     translateZ = 100.0

@@ -26,15 +26,14 @@ object Memo extends MemoInstances {
   private class ArrayMemo[V >: Null: ClassTag](n: Int) extends Memo[Int, V] {
     override def apply(f: (Int) => V) = {
       lazy val a = new Array[V](n)
-      k =>
-        {
-          val t = a(k)
-          if (t == null) {
-            val v = f(k)
-            a(k) = v
-            v
-          } else t
-        }
+      k => {
+        val t = a(k)
+        if (t == null) {
+          val v = f(k)
+          a(k) = v
+          v
+        } else t
+      }
     }
   }
 
@@ -48,15 +47,14 @@ object Memo extends MemoInstances {
           Array.fill(n)(sentinel)
         }
       }
-      k =>
-        {
-          val t = a(k)
-          if (t == sentinel) {
-            val v = f(k)
-            a(k) = v
-            v
-          } else t
-        }
+      k => {
+        val t = a(k)
+        if (t == sentinel) {
+          val v = f(k)
+          a(k) = v
+          v
+        } else t
+      }
     }
   }
 
@@ -99,7 +97,7 @@ object Memo extends MemoInstances {
           a = a updated (k, v)
           v
         }
-    })
+      })
   }
 
   /** Cache results in a hash map.  Nonsensical unless `K` has

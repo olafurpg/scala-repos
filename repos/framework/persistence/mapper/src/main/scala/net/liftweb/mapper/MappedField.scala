@@ -254,12 +254,14 @@ trait MappedNullableField[
     }) { funcName =>
       Full(appendFieldId(<input type={formInputType}
                        name={funcName}
-                       value={get match {
-                         case null => ""
-                         case Full(null) => ""
-                         case Full(s) => s.toString
-                         case _ => ""
-                       }}/>))
+                       value={
+        get match {
+          case null       => ""
+          case Full(null) => ""
+          case Full(s)    => s.toString
+          case _          => ""
+        }
+      }/>))
     }
 }
 
@@ -487,7 +489,12 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
     }) { funcName =>
       Full(appendFieldId(<input type={formInputType}
                        name={funcName}
-                       value={get match {case null => "" case s => s.toString}}/>))
+                       value={
+        get match {
+          case null => ""
+          case s    => s.toString
+        }
+      }/>))
     }
 
   /**

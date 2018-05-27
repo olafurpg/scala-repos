@@ -166,7 +166,7 @@ package object runtime {
       val fbits = 23
       val bias = (1 << (ebits - 1)) - 1
       val twoPowFbits = (1 << fbits).toDouble
-      val SubnormalThreshold = 1.1754943508222875E-38 // pow(2, 1-bias)
+      val SubnormalThreshold = 1.1754943508222875e-38 // pow(2, 1-bias)
 
       val isNegative = v < 0
       val av = if (isNegative) -v else v

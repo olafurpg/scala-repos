@@ -154,7 +154,7 @@ case class ProducerRequest(
             topicAndPartition,
             ProducerResponseStatus(
               Errors.forException(e).code,
-              -1l,
+              -1L,
               Message.NoTimestamp))
       }
       val errorResponse =

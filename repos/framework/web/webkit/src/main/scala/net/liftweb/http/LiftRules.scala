@@ -523,7 +523,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
               r.isOpera9 || r.isSafari3_+ =>
           4
         case _ => 2
-    }) {}
+      }) {}
 
   /**
     * A partial function that determines content type based on an incoming
@@ -617,11 +617,12 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * then we log a warning with the given parameter name and URI.
     */
   val handleUnmappedParameter = new FactoryMaker[(Req, String) => Unit](
-    () => { (req: Req, parameterName: String) =>
-      if (parameterName.startsWith("F"))
-        logger.warn(
-          "Unmapped Lift-like parameter seen in request [%s]: %s"
-            .format(req.uri, parameterName))
+    () => {
+      (req: Req, parameterName: String) =>
+        if (parameterName.startsWith("F"))
+          logger.warn(
+            "Unmapped Lift-like parameter seen in request [%s]: %s"
+              .format(req.uri, parameterName))
     }
   ) {}
 
@@ -1239,14 +1240,14 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   /**
     * How long should we wait for all the lazy snippets to render
     */
-  val lazySnippetTimeout: FactoryMaker[TimeSpan] = new FactoryMaker(
-    () => 30.seconds) {}
+  val lazySnippetTimeout: FactoryMaker[TimeSpan] = new FactoryMaker(() =>
+    30.seconds) {}
 
   /**
     * Does the current context support parallel snippet execution
     */
-  val allowParallelSnippets: FactoryMaker[Boolean] = new FactoryMaker(
-    () => false) {}
+  val allowParallelSnippets: FactoryMaker[Boolean] = new FactoryMaker(() =>
+    false) {}
 
   /**
     * Update the function here that calculates particular paths to
@@ -1260,14 +1261,18 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * what should we display?
     */
   val deferredSnippetFailure: FactoryMaker[Failure => NodeSeq] =
-    new FactoryMaker(() => { failure: Failure =>
-      {
+    new FactoryMaker(() => {
+      failure: Failure => {
         if (Props.devMode)
-          <div style="border: red solid 2px">A lift:parallel snippet failed to render.Message:{failure.msg}{failure.exception match {
-          case Full(e) =>
-            <pre>{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
-          case _ => NodeSeq.Empty
-        }}<i>note: this error is displayed in the browser because
+          <div style="border: red solid 2px">A lift:parallel snippet failed to render.Message:{
+            failure.msg
+          }{
+            failure.exception match {
+              case Full(e) =>
+                <pre>{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
+              case _ => NodeSeq.Empty
+            }
+          }<i>note: this error is displayed in the browser because
         your application is running in "development" mode.If you
         set the system property run.mode=production, this error will not
         be displayed, but there will be errors in the output logs.
@@ -1443,7 +1448,11 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   def doWithResource[T](name: String)(f: InputStream => T): Box[T] =
     getResource(name) map { _.openStream } map { is =>
-      try { f(is) } finally { is.close }
+      try {
+        f(is)
+      } finally {
+        is.close
+      }
     }
 
   /**
@@ -1455,7 +1464,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
       val out = new ByteArrayOutputStream
       def reader {
         val len = stream.read(buffer)
-        if (len < 0) return else if (len > 0) out.write(buffer, 0, len)
+        if (len < 0) return
+        else if (len > 0) out.write(buffer, 0, len)
         reader
       }
       reader
@@ -1698,7 +1708,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
           r.uri.toString,
         e)
       XhtmlResponse(
-        (<html> <body>Exception occured while processing {r.uri}<pre>{showException(e)}</pre> </body> </html>),
+        (<html> <body>Exception occured while processing {r.uri}<pre>{
+          showException(e)
+        }</pre> </body> </html>),
         S.htmlProperties.docType,
         List("Content-Type" -> "text/html; charset=utf-8"),
         Nil,
@@ -1712,7 +1724,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
           r.uri.toString,
         e)
       XhtmlResponse(
-        (<html> <body>Something unexpected happened while serving the page at {r.uri}</body> </html>),
+        (<html> <body>Something unexpected happened while serving the page at {
+          r.uri
+        }</body> </html>),
         S.htmlProperties.docType,
         List("Content-Type" -> "text/html; charset=utf-8"),
         Nil,
@@ -1735,8 +1749,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * be copied from the snippet invocation tag to the form tag.  The
     * default list is "class", "id", "target", "style", "onsubmit"
     */
-  val formAttrs: FactoryMaker[List[String]] = new FactoryMaker(
-    () => List("class", "id", "target", "style", "onsubmit")) {}
+  val formAttrs: FactoryMaker[List[String]] = new FactoryMaker(() =>
+    List("class", "id", "target", "style", "onsubmit")) {}
 
   /**
     * By default, Http response headers are appended.  However, there are
@@ -1797,22 +1811,21 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
         val cssPath = path.mkString("/", "/", ".css")
         val css = LiftRules.loadResourceAsString(cssPath);
 
-        () =>
-          {
-            css.map(
-              str =>
-                CSSHelpers.fixCSS(
-                  new BufferedReader(new StringReader(str)),
-                  prefix openOr (S.contextPath)) match {
-                  case (Full(c), _) => CSSResponse(c)
-                  case (x, input) => {
-                    logger.info(
-                      "Fixing " + cssPath +
-                        " failed with result %s".format(x));
-                    CSSResponse(input)
-                  }
+        () => {
+          css.map(
+            str =>
+              CSSHelpers.fixCSS(
+                new BufferedReader(new StringReader(str)),
+                prefix openOr (S.contextPath)) match {
+                case (Full(c), _) => CSSResponse(c)
+                case (x, input) => {
+                  logger.info(
+                    "Fixing " + cssPath +
+                      " failed with result %s".format(x));
+                  CSSResponse(input)
+                }
               })
-          }
+        }
       }
     }
     LiftRules.dispatch.prepend(cssFixer)

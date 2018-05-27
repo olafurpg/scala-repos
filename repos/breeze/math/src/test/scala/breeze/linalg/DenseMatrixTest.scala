@@ -509,7 +509,7 @@ class DenseMatrixTest
           0.1813186813186811,
           -0.3131868131868131,
           0.43956043956043944),
-        inf) < 1E-5)
+        inf) < 1e-5)
 
     // wide matrix solve
     val r3: DenseMatrix[Double] =
@@ -533,7 +533,7 @@ class DenseMatrixTest
       max(
         abs(r4 - DenseMatrix(
           (0.9166666666666667, 1.9166666666666672),
-          (-0.08333333333333352, -0.08333333333333436)))) < 1E-5)
+          (-0.08333333333333352, -0.08333333333333436)))) < 1e-5)
   }
 
   test("Solve Float") {
@@ -554,7 +554,7 @@ class DenseMatrixTest
         r2 - DenseVector(
           0.1813186813186811f,
           -0.3131868131868131f,
-          0.43956043956043944f)) < 1E-5)
+          0.43956043956043944f)) < 1e-5)
 
     // wide matrix solve
     val r3: DenseMatrix[Float] =
@@ -567,7 +567,7 @@ class DenseMatrixTest
           r3 - DenseMatrix(
             (0.1813186813186811f, 0.2197802197802196f),
             (-0.3131868131868131f, -0.1978021978021977f),
-            (0.43956043956043944f, 0.5934065934065933f)))) < 1E-5)
+            (0.43956043956043944f, 0.5934065934065933f)))) < 1e-5)
 
     // tall matrix solve
     val r4: DenseMatrix[Float] =
@@ -579,7 +579,7 @@ class DenseMatrixTest
       max(
         abs(r4 - DenseMatrix(
           (0.9166666666666667f, 1.9166666666666672f),
-          (-0.08333333333333352f, -0.08333333333333436f)))) < 1E-5)
+          (-0.08333333333333352f, -0.08333333333333436f)))) < 1e-5)
   }
 
   test("GH#29 transpose solve is broken") {
@@ -632,7 +632,7 @@ class DenseMatrixTest
     val dm = DenseMatrix.tabulate(2, 5)((i, j) => i * j * 1.0 + 1)
     dm := normalize(dm, Axis._1, 2)
     assert(
-      abs(sum(dm(0, ::).t.map(x => x * x)) - 1.0) < 1E-4,
+      abs(sum(dm(0, ::).t.map(x => x * x)) - 1.0) < 1e-4,
       dm.toString + " not normalized!")
   }
 
@@ -813,7 +813,7 @@ class DenseMatrixTest
   def matricesNearlyEqual(
       A: DenseMatrix[Double],
       B: DenseMatrix[Double],
-      threshold: Double = 1E-6) {
+      threshold: Double = 1e-6) {
     for (i <- 0 until A.rows; j <- 0 until A.cols)
       A(i, j) should be(B(i, j) +- threshold)
   }

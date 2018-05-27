@@ -25,7 +25,7 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
 
   def this(
       maxIter: Int = -1,
-      tolerance: Double = 1E-6,
+      tolerance: Double = 1e-6,
       fvalMemory: Int = 100,
       relativeTolerance: Boolean = true)(
       implicit space: NormedModule[T, Double]) =
@@ -97,7 +97,7 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
         val (adjValue, adjGrad) = adjust(x, grad, value)
         val oneOffImprovement =
           (state.adjustedValue - adjValue) /
-            (state.adjustedValue.abs max adjValue.abs max 1E-6 * state.initialAdjVal.abs)
+            (state.adjustedValue.abs max adjValue.abs max 1e-6 * state.initialAdjVal.abs)
         logger.info(
           f"Val and Grad Norm: $adjValue%.6g (rel: $oneOffImprovement%.3g) ${norm(adjGrad)}%.6g")
         val history = updateHistory(x, grad, value, adjustedFun, state)
@@ -291,7 +291,7 @@ object FirstOrderMinimizer {
     }
 
   def functionValuesConverged[T](
-      tolerance: Double = 1E-9,
+      tolerance: Double = 1e-9,
       relative: Boolean = true,
       historyLength: Int = 10): ConvergenceCheck[T] = {
     new FunctionValuesConverged[T](tolerance, relative, historyLength)
@@ -336,7 +336,7 @@ object FirstOrderMinimizer {
             tolerance *
               (if (relative) s.adjustedValue
                else 1.0),
-            1E-8)) =>
+            1e-8)) =>
         GradientConverged
     }
   }
@@ -358,7 +358,7 @@ object FirstOrderMinimizer {
   def monitorFunctionValues[T](
       f: T => Double,
       numFailures: Int = 5,
-      improvementRequirement: Double = 1E-2,
+      improvementRequirement: Double = 1e-2,
       evalFrequency: Int = 10): ConvergenceCheck[T] =
     new MonitorFunctionValuesCheck(
       f,
@@ -445,7 +445,7 @@ object FirstOrderMinimizer {
       alpha: Double = 0.5,
       maxIterations: Int = 1000,
       useL1: Boolean = false,
-      tolerance: Double = 1E-5,
+      tolerance: Double = 1e-5,
       useStochastic: Boolean = false,
       randomSeed: Int = 0) {
     private implicit val random = new RandBasis(

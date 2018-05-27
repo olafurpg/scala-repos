@@ -61,7 +61,7 @@ class LightArrayRevolverScheduler(
 
   import LightArrayRevolverScheduler._
 
-  private val oneNs = Duration.fromNanos(1l)
+  private val oneNs = Duration.fromNanos(1L)
   private def roundUp(d: FiniteDuration): FiniteDuration =
     try {
       ((d + TickDuration - oneNs) / TickDuration).toLong * TickDuration

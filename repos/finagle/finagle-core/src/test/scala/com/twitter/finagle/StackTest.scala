@@ -34,7 +34,8 @@ class StackTest extends FunSuite {
   test("Stack.transform") {
     val stack = newStack() transform {
       case Stack.Node(head, mk, next) =>
-        if (head.role == testRole3) Stack.Node(testHead4, (l: List[Int]) => 30::l, next)
+        if (head.role == testRole3)
+          Stack.Node(testHead4, (l: List[Int]) => 30 :: l, next)
         else if (head.role == testRole2) next
         else Stack.Node(head, mk, next)
       case other => other
@@ -104,8 +105,10 @@ class StackTest extends FunSuite {
       def make(next: List[Int]): List[Int] = 100 :: next
     }
 
-    assert(stack.replace(testRole4, module).make(empty) == Seq(20, 10, 1, 2, 3, 4))
-    assert(stack.replace(testRole2, module).make(empty) == Seq(20, 100, 1, 2, 3, 4))
+    assert(
+      stack.replace(testRole4, module).make(empty) == Seq(20, 10, 1, 2, 3, 4))
+    assert(
+      stack.replace(testRole2, module).make(empty) == Seq(20, 100, 1, 2, 3, 4))
 
     assert(
       (stack ++ stack).replace(testRole2, module).make(empty) ==

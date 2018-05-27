@@ -70,7 +70,7 @@ object User extends LilaController {
               list
                 .take(getInt("nb").fold(10)(_ min max))
                 .map(env.jsonView(_))))
-      }
+        }
     )
   }
 
@@ -197,7 +197,7 @@ object User extends LilaController {
                 "horde" -> leaderboards.horde,
                 "racingKings" -> leaderboards.racingKings
               ))
-        }
+          }
       )
     } yield res
   }
@@ -218,7 +218,7 @@ object User extends LilaController {
           .topWeek(true)
           .map { users =>
             Ok(Json toJson users.map(env.jsonView.lightPerfIsOnline))
-        })
+          })
   }
 
   def mod(username: String) = Secure(_.UserSpy) { implicit ctx => me =>

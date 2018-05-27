@@ -258,7 +258,7 @@ class FlowConflateSpec extends AkkaSpec {
           } else {
             if (elem == 4) saw4Latch.open()
             state :+ elem
-        })
+          })
         .withAttributes(supervisionStrategy(resumingDecider))
         .to(Sink.fromSubscriber(sinkProbe))
         .withAttributes(inputBuffer(initial = 1, max = 1))

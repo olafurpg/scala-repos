@@ -42,7 +42,7 @@ class SimpleBuildFileModifier(
         case Some(accList) =>
           addElements(module, nextType, fileToWorkingCopy).map(_ :: accList)
         case _ => None
-    })
+      })
   }
 
   protected def addElements(
@@ -75,7 +75,7 @@ class SimpleBuildFileModifier(
                       buildFileEntry.file,
                       SimpleBuildFileModifier.newLine(module.getProject),
                       _)
-                ))
+                  ))
               .find(_.isDefined)
               .flatten))
       .map(opt => opt.flatten.flatten)

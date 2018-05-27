@@ -562,11 +562,11 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
 
     val c = N * trigamma(sum(alpha))
     val q = -N * trigamma(alpha)
-    val b = sum(gradf / q) / (1D / c + sum(1D / q))
+    val b = sum(gradf / q) / (1d / c + sum(1d / q))
 
     val dalpha = -(gradf - b) / q
 
-    if (all((weight * dalpha + alpha) :> 0D)) {
+    if (all((weight * dalpha + alpha) :> 0d)) {
       alpha :+= weight * dalpha
       this.alpha = Vectors.dense(alpha.toArray)
     }
@@ -633,7 +633,7 @@ private[clustering] object OnlineLDAOptimizer {
     val expElogbetad = expElogbeta(ids, ::).toDenseMatrix // ids * K
 
     val phiNorm: BDV[Double] = expElogbetad * expElogthetad :+ 1e-100 // ids
-    var meanGammaChange = 1D
+    var meanGammaChange = 1d
     val ctsVector = new BDV[Double](cts) // ids
 
     // Iterate between gamma and phi until convergence

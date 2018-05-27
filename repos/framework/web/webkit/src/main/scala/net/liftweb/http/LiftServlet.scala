@@ -566,8 +566,7 @@ class LiftServlet extends Loggable {
 
     def respToFunc(in: Box[LiftResponse]): () => Box[LiftResponse] = {
       val ret = in.map(LiftRules.performTransform)
-      () =>
-        ret
+      () => ret
     }
 
     // FIXME Make comet and ajax into pipelining steps.

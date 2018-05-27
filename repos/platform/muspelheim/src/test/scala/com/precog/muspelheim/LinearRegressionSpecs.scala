@@ -790,7 +790,7 @@ trait LinearRegressionSpecs extends EvalStackSpecs {
                   SDecimal(-4.641629704480576))),
                 SArray(Vector(
                   SDecimal(0.000005132290591506234),
-                  SDecimal(1.7232175428295578E-7),
+                  SDecimal(1.7232175428295578e-7),
                   SDecimal(0.0000026890467037135995),
                   SDecimal(0.0014286230989684486))),
                 SArray(Vector(

@@ -121,19 +121,15 @@ class TypeParameter(
       },
       ptp match {
         case tp: ScTypeParam =>
-          () =>
-            tp.lowerBound.getOrNothing
+          () => tp.lowerBound.getOrNothing
         case _ =>
-          () =>
-            Nothing //todo: lower type?
+          () => Nothing //todo: lower type?
       },
       ptp match {
         case tp: ScTypeParam =>
-          () =>
-            tp.upperBound.getOrAny
+          () => tp.upperBound.getOrAny
         case _ =>
-          () =>
-            Any //todo: upper type?
+          () => Any //todo: upper type?
       },
       ptp
     )
@@ -142,12 +138,10 @@ class TypeParameter(
   def update(fun: ScType => ScType): TypeParameter = {
     new TypeParameter(name, typeParams.map(_.update(fun)), {
       val res = fun(lowerType())
-      () =>
-        res
+      () => res
     }, {
       val res = fun(upperType())
-      () =>
-        res
+      () => res
     }, ptp)
   }
 
@@ -489,14 +483,12 @@ case class ScTypePolymorphicType(
                 val res = tp
                   .lowerType()
                   .recursiveUpdate(update, newVisited)
-                () =>
-                  res
+                () => res
               }, {
                 val res = tp
                   .upperType()
                   .recursiveUpdate(update, newVisited)
-                () =>
-                  res
+                () => res
               },
               tp.ptp
             )

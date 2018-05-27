@@ -96,7 +96,7 @@ case class JsLookup(result: JsLookupResult) extends AnyVal {
           case (key, value) if key == fieldName =>
             o ++ (value +: (value \\ fieldName))
           case (_, value) => o ++ (value \\ fieldName)
-      })
+        })
     case JsDefined(arr: JsArray) =>
       arr.value.flatMap(_ \\ fieldName)
     case _ => Seq.empty

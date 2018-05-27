@@ -70,14 +70,12 @@ class FastTrack[MacrosAndAnalyzer <: Macros with Analyzer](
         },
         makeBlackbox(ApiUniverseReify) {
           case Applied(_, ttag :: Nil, (expr :: _) :: _) =>
-            c =>
-              c.materializeExpr(c.prefix.tree, EmptyTree, expr)
+            c => c.materializeExpr(c.prefix.tree, EmptyTree, expr)
         },
         makeBlackbox(StringContext_f) { case _ => _.interpolate },
         makeBlackbox(ReflectRuntimeCurrentMirror) {
           case _ =>
-            c =>
-              currentMirror(c).tree
+            c => currentMirror(c).tree
         },
         makeWhitebox(QuasiquoteClass_api_apply) {
           case _ => _.expandQuasiquote

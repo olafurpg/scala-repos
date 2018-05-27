@@ -210,6 +210,6 @@ class StatsServiceFactory[Req, Rep](
     statsReceiver: StatsReceiver)
     extends ServiceFactoryProxy[Req, Rep](factory) {
   private[this] val availableGauge = statsReceiver.addGauge("available") {
-    if (isAvailable) 1F else 0F
+    if (isAvailable) 1f else 0f
   }
 }

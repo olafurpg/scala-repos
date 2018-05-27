@@ -169,7 +169,7 @@ object OneStageResource {
           td.taskMetrics.map { _.executorRunTime }.getOrElse(-1L)
         case DECREASING_RUNTIME =>
           -td.taskMetrics.map { _.executorRunTime }.getOrElse(-1L)
-    }
+      }
     Ordering.by(extractor)
   }
 }

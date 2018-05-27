@@ -256,20 +256,17 @@ private[spark] class GapSamplingIterator[T: ClassTag](
     val arrayBufferClass = ArrayBuffer.empty[T].iterator.getClass
     data.getClass match {
       case `arrayClass` =>
-        (n: Int) =>
-          { data = data.drop(n) }
+        (n: Int) => { data = data.drop(n) }
       case `arrayBufferClass` =>
-        (n: Int) =>
-          { data = data.drop(n) }
+        (n: Int) => { data = data.drop(n) }
       case _ =>
-        (n: Int) =>
-          {
-            var j = 0
-            while (j < n && data.hasNext) {
-              data.next()
-              j += 1
-            }
+        (n: Int) => {
+          var j = 0
+          while (j < n && data.hasNext) {
+            data.next()
+            j += 1
           }
+        }
     }
   }
 
@@ -313,20 +310,17 @@ private[spark] class GapSamplingReplacementIterator[T: ClassTag](
     val arrayBufferClass = ArrayBuffer.empty[T].iterator.getClass
     data.getClass match {
       case `arrayClass` =>
-        (n: Int) =>
-          { data = data.drop(n) }
+        (n: Int) => { data = data.drop(n) }
       case `arrayBufferClass` =>
-        (n: Int) =>
-          { data = data.drop(n) }
+        (n: Int) => { data = data.drop(n) }
       case _ =>
-        (n: Int) =>
-          {
-            var j = 0
-            while (j < n && data.hasNext) {
-              data.next()
-              j += 1
-            }
+        (n: Int) => {
+          var j = 0
+          while (j < n && data.hasNext) {
+            data.next()
+            j += 1
           }
+        }
     }
   }
 

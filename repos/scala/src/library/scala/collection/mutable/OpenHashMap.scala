@@ -260,7 +260,7 @@ class OpenHashMap[Key, Value](initialSize: Int)
     foreachUndeletedEntry(entry =>
       if (!f(entry.key, entry.value.get)) {
         entry.value = None; size -= 1; deleted += 1
-    })
+      })
     this
   }
 

@@ -66,7 +66,9 @@ private[changeSignature] trait ScalaChangeSignatureUsageHandler {
       case _                 => return
     }
     val member = ScalaPsiUtil.nameContext(usage.namedElement) match {
-      case cl: ScClass            => cl.constructor.getOrElse(return )
+      case cl: ScClass =>
+        cl.constructor.getOrElse(return
+        )
       case m: ScModifierListOwner => m
       case _                      => return
     }

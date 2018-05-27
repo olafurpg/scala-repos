@@ -30,32 +30,23 @@ object HashEqualsArrayWrapper {
 
     val fn = clazz match {
       case c if classOf[Array[Long]].equals(c) =>
-        a: Array[Long] =>
-          new HashEqualsLongArrayWrapper(a)
+        a: Array[Long] => new HashEqualsLongArrayWrapper(a)
       case c if classOf[Array[Int]].equals(c) =>
-        a: Array[Int] =>
-          new HashEqualsIntArrayWrapper(a)
+        a: Array[Int] => new HashEqualsIntArrayWrapper(a)
       case c if classOf[Array[Short]].equals(c) =>
-        a: Array[Short] =>
-          new HashEqualsShortArrayWrapper(a)
+        a: Array[Short] => new HashEqualsShortArrayWrapper(a)
       case c if classOf[Array[Char]].equals(c) =>
-        a: Array[Char] =>
-          new HashEqualsCharArrayWrapper(a)
+        a: Array[Char] => new HashEqualsCharArrayWrapper(a)
       case c if classOf[Array[Byte]].equals(c) =>
-        a: Array[Byte] =>
-          new HashEqualsByteArrayWrapper(a)
+        a: Array[Byte] => new HashEqualsByteArrayWrapper(a)
       case c if classOf[Array[Boolean]].equals(c) =>
-        a: Array[Boolean] =>
-          new HashEqualsBooleanArrayWrapper(a)
+        a: Array[Boolean] => new HashEqualsBooleanArrayWrapper(a)
       case c if classOf[Array[Float]].equals(c) =>
-        a: Array[Float] =>
-          new HashEqualsFloatArrayWrapper(a)
+        a: Array[Float] => new HashEqualsFloatArrayWrapper(a)
       case c if classOf[Array[Double]].equals(c) =>
-        a: Array[Double] =>
-          new HashEqualsDoubleArrayWrapper(a)
+        a: Array[Double] => new HashEqualsDoubleArrayWrapper(a)
       case c =>
-        a: Array[T] =>
-          new HashEqualsObjectArrayWrapper(a)
+        a: Array[T] => new HashEqualsObjectArrayWrapper(a)
     }
 
     fn.asInstanceOf[(Array[T] => HashEqualsArrayWrapper[T])]

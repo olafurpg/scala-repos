@@ -186,7 +186,7 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
           catch {
             case NonFatal(_) =>
               throw ArgsException(s"Invalid value ${value} for -- ${key}")
-        })
+          })
       .getOrElse(default)
   }
 
@@ -207,7 +207,7 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
           catch {
             case NonFatal(_) =>
               throw ArgsException(s"Invalid value ${value} for -- ${key}")
-        })
+          })
       .getOrElse(default)
   }
 
@@ -228,7 +228,7 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
           catch {
             case NonFatal(_) =>
               throw ArgsException(s"Invalid value ${value} for -- ${key}")
-        })
+          })
       .getOrElse(default)
   }
 
@@ -249,7 +249,7 @@ class Args(val m: Map[String, List[String]]) extends java.io.Serializable {
           catch {
             case NonFatal(_) =>
               throw ArgsException(s"Invalid value ${value} for -- ${key}")
-        })
+          })
       .getOrElse(default)
   }
 

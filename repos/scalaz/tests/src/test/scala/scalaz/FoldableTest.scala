@@ -16,7 +16,7 @@ object FoldableTest extends SpecLite {
     else (xs.maximum) must_== Some((xs.max))
   }
   "maximumOf" ! forAll { (xs: List[Int]) =>
-    val f: Int => Double = 1D + _
+    val f: Int => Double = 1d + _
     if (xs.isEmpty) (xs maximumOf f) must_== (None)
     else (xs maximumOf f) must_== (Some((xs.iterator map f).max))
   }
@@ -30,7 +30,7 @@ object FoldableTest extends SpecLite {
     else (xs.minimum) must_== Some(xs.min)
   }
   "minimumOf" ! forAll { (xs: List[Int]) =>
-    val f: Int => Double = 1D + _
+    val f: Int => Double = 1d + _
     if (xs.isEmpty) (xs minimumOf f) must_== None
     else (xs minimumOf f) must_== Some((xs.iterator map f).min)
   }

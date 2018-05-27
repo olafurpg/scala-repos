@@ -153,7 +153,7 @@ trait RawJsonStorageModule[M[+ _]] { self =>
         apiKey: APIKey,
         path: Path,
         version: Version): EitherT[M, ResourceError, Long] = {
-      EitherT.right(M.point(0l))
+      EitherT.right(M.point(0L))
     }
   }
 }

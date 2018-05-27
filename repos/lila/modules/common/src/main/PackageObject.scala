@@ -108,7 +108,7 @@ trait WithPlay { self: PackageObject =>
       (x, y) =>
         x zip y map {
           case (a, b) => a ⊹ b
-      },
+        },
       fuccess(∅[A]))
 
   implicit def LilaFuZero[A: Zero]: Zero[Fu[A]] =

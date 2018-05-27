@@ -43,7 +43,7 @@ object Game extends LilaController {
         err =>
           Env.security.forms.anyCaptcha map { captcha =>
             BadRequest(html.game.export(userId, err, captcha))
-        },
+          },
         _ =>
           fuccess {
             import org.joda.time.DateTime
@@ -56,7 +56,7 @@ object Game extends LilaController {
                 CONTENT_DISPOSITION ->
                   ("attachment; filename=" +
                     s"lichess_${me.username}_$date.pgn"))
-        }
+          }
       )
     else notFound
   }

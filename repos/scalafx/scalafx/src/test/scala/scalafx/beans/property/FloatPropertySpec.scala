@@ -118,7 +118,7 @@ class FloatPropertySpec extends FlatSpec with BeforeAndAfterEach {
   }
 
   it should "support bindable infix addition of constants" in {
-    floatProperty3 <== floatProperty + 35 + 35l + 35f + 35d
+    floatProperty3 <== floatProperty + 35 + 35L + 35f + 35d
     floatProperty() = 21
     floatProperty3() should equal(161)
     floatProperty3.unbind()
@@ -133,7 +133,7 @@ class FloatPropertySpec extends FlatSpec with BeforeAndAfterEach {
   }
 
   it should "support bindable infix subtraction of constants" in {
-    floatProperty3 <== floatProperty - 12 - 12l - 12f - 12d
+    floatProperty3 <== floatProperty - 12 - 12L - 12f - 12d
     floatProperty() = 40
     floatProperty3() should equal(-8)
     floatProperty3.unbind()
@@ -148,7 +148,7 @@ class FloatPropertySpec extends FlatSpec with BeforeAndAfterEach {
   }
 
   it should "support bindable infix multiplication of constants" in {
-    floatProperty3 <== floatProperty * 2 * 2l * 2f * 2d
+    floatProperty3 <== floatProperty * 2 * 2L * 2f * 2d
     floatProperty() = 5
     floatProperty3() should equal(80)
     floatProperty3.unbind()
@@ -163,7 +163,7 @@ class FloatPropertySpec extends FlatSpec with BeforeAndAfterEach {
   }
 
   it should "support bindable infix division of constants" in {
-    floatProperty3 <== floatProperty / 2 / 2l / 5f / 5d
+    floatProperty3 <== floatProperty / 2 / 2L / 5f / 5d
     floatProperty() = 100
     floatProperty3() should equal(1)
     floatProperty3.unbind()

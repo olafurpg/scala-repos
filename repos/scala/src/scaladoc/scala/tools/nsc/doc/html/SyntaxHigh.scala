@@ -210,7 +210,9 @@ private[html] object SyntaxHigh {
       val out = new StringBuilder("'")
       def charlit0(i: Int, bslash: Boolean): Int = {
         if (i == buf.length) i
-        else if (i > j + 6) { out setLength 0; j } else {
+        else if (i > j + 6) {
+          out setLength 0; j
+        } else {
           val ch = buf(i)
           out append ch
           ch match {

@@ -37,8 +37,7 @@ object NamedParam extends NamedParamCreator {
 
   protected val freshName = {
     var counter = 0
-    () =>
-      { counter += 1; "p" + counter }
+    () => { counter += 1; "p" + counter }
   }
 }
 

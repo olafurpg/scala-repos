@@ -25,7 +25,7 @@ class MultiJoinTest extends WordSpec {
   def addKeys[V](t: Seq[V]): Seq[(Int, V)] =
     t.iterator.zipWithIndex.map { case (v, k) => (k, v) }.toSeq
 
-  val doubles = TypedPipe.from(addKeys(List(1.0D, 2.0D, 3.0D)))
+  val doubles = TypedPipe.from(addKeys(List(1.0d, 2.0d, 3.0d)))
   val longs = TypedPipe.from(addKeys(List(10L, 20L, 30L)))
   val strings = TypedPipe.from(addKeys(List("one", "two", "three")))
   val sets = TypedPipe.from(addKeys(List(Set(1), Set(2), Set(3))))

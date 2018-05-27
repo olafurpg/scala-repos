@@ -30,11 +30,11 @@ object ForumTopic extends LilaController with ForumController {
             err =>
               forms.anyCaptcha map { captcha =>
                 BadRequest(html.forum.topic.form(categ, err, captcha))
-            },
+              },
             data =>
               topicApi.makeTopic(categ, data) map { topic =>
                 Redirect(routes.ForumTopic.show(categ.slug, topic.slug, 1))
-            }
+              }
           )
         }
       }

@@ -57,22 +57,23 @@ final class ScriptedTests(
       val g = groupDir.getName
       val n = nme.getName
       val str = s"$g / $n"
-      () =>
-        {
-          println("Running " + str)
-          testResources.readWriteResourceDirectory(g, n) { testDirectory =>
-            val disabled = new File(testDirectory, "disabled").isFile
-            if (disabled) {
-              log.info("D " + str + " [DISABLED]")
-              None
-            } else {
-              try { scriptedTest(str, testDirectory, prescripted, log); None } catch {
-                case _: TestException | _: PendingTestSuccessException =>
-                  Some(str)
-              }
+      () => {
+        println("Running " + str)
+        testResources.readWriteResourceDirectory(g, n) { testDirectory =>
+          val disabled = new File(testDirectory, "disabled").isFile
+          if (disabled) {
+            log.info("D " + str + " [DISABLED]")
+            None
+          } else {
+            try {
+              scriptedTest(str, testDirectory, prescripted, log); None
+            } catch {
+              case _: TestException | _: PendingTestSuccessException =>
+                Some(str)
             }
           }
         }
+      }
     }
   }
 
@@ -129,7 +130,9 @@ final class ScriptedTests(
       case e: Exception =>
         testFailed()
         if (!pending) throw e
-    } finally { buffered.clear() }
+    } finally {
+      buffered.clear()
+    }
   }
 }
 

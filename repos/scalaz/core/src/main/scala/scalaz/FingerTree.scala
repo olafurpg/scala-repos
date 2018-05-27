@@ -489,7 +489,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
               pr1,
               addDigits0(m1, sf1, pr2, m2),
               sf2)
-      )
+        )
     )
   }
 
@@ -514,7 +514,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
               pr1,
               addDigits1(m1, sf1, n, pr2, m2),
               sf2)
-      )
+        )
     )
   }
 
@@ -535,7 +535,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
               pr1,
               addDigits2(m1, sf1, n1, n2, pr2, m2),
               sf2)
-      )
+        )
     )
   }
 
@@ -559,7 +559,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
               pr1,
               addDigits3(m1, sf1, n1, n2, n3, pr2, m2),
               sf2)
-      )
+        )
     )
   }
 
@@ -591,7 +591,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
               pr1,
               addDigits4(m1, sf1, n1, n2, n3, n4, pr2, m2),
               sf2)
-      )
+        )
     )
   }
 
@@ -957,7 +957,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
         pr match {
           case One(v, x) => OnL[FingerTree[V, ?], A](x, rotL(m, sf))
           case _         => OnL[FingerTree[V, ?], A](pr.lhead, deep(pr.ltail, m, sf))
-      }
+        }
     )
 
   def viewr: ViewR[FingerTree[V, ?], A] =
@@ -968,7 +968,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
         sf match {
           case One(v, x) => OnR[FingerTree[V, ?], A](rotR(pr, m), x)
           case _         => OnR[FingerTree[V, ?], A](deep(pr, m, sf.rtail), sf.rhead)
-      }
+        }
     )
 
   /**

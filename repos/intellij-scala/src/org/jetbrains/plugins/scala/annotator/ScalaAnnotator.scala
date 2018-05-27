@@ -1667,7 +1667,7 @@ class ScalaAnnotator
     def parseIntegerNumber(
         text: String,
         isNegative: Boolean): (Option[Long], Byte) = {
-      var value = 0l
+      var value = 0L
       val divider = if (base == 10) 1 else 2
       var statusCode: Byte = 0
       val limit = java.lang.Long.MAX_VALUE

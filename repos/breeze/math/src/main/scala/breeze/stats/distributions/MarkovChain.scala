@@ -240,51 +240,50 @@ object MarkovChain {
         implicit rand: RandBasis = Rand) = {
       val WINDOW = 2;
       val M = 10;
-      (last: Double) =>
-        {
-          new Rand[Double] {
-            def draw() = {
-              // How bad are we willing to tolerate?
-              val prop = log(rand.uniform.draw) + logMeasure(last);
-              val u = rand.uniform.draw;
-              // Find the boundaries
-              var left = last - WINDOW * u;
-              if (!valid(left)) left = last;
-              var right = left + WINDOW;
+      (last: Double) => {
+        new Rand[Double] {
+          def draw() = {
+            // How bad are we willing to tolerate?
+            val prop = log(rand.uniform.draw) + logMeasure(last);
+            val u = rand.uniform.draw;
+            // Find the boundaries
+            var left = last - WINDOW * u;
+            if (!valid(left)) left = last;
+            var right = left + WINDOW;
 
-              var j: Int = (rand.uniform.draw() * M).asInstanceOf[Int];
-              var k = (M - 1) - j;
+            var j: Int = (rand.uniform.draw() * M).asInstanceOf[Int];
+            var k = (M - 1) - j;
 
-              while (prop < logMeasure(left) && j > 0 &&
-                     valid(left - WINDOW)) {
-                left = left - WINDOW;
-                j -= 1;
-              }
-
-              if (!valid(right)) right = last;
-              else
-                while (prop < logMeasure(right) && k > 0 &&
-                       valid(right + WINDOW)) {
-                  right = right + WINDOW;
-                  k -= 1;
-                }
-              var happy = false;
-              var next = Double.NaN;
-              while (!happy) {
-                next = left + rand.uniform.draw * (right - left);
-                if (prop <= logMeasure(next)) {
-                  happy = true;
-                } else if (next < last) {
-                  //close the window
-                  left = next;
-                } else {
-                  right = next;
-                }
-              }
-              next;
+            while (prop < logMeasure(left) && j > 0 &&
+                   valid(left - WINDOW)) {
+              left = left - WINDOW;
+              j -= 1;
             }
+
+            if (!valid(right)) right = last;
+            else
+              while (prop < logMeasure(right) && k > 0 &&
+                     valid(right + WINDOW)) {
+                right = right + WINDOW;
+                k -= 1;
+              }
+            var happy = false;
+            var next = Double.NaN;
+            while (!happy) {
+              next = left + rand.uniform.draw * (right - left);
+              if (prop <= logMeasure(next)) {
+                happy = true;
+              } else if (next < last) {
+                //close the window
+                left = next;
+              } else {
+                right = next;
+              }
+            }
+            next;
           }
         }
+      }
     }
   }
 

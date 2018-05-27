@@ -55,7 +55,7 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val ring = (0L to 100L).zip((1L to 99L) :+ 0L).map {
         case (a, b) => Edge(a, b, 1)
       }
-      val graph = Graph.fromEdges(sc.parallelize(ring), 1.0F)
+      val graph = Graph.fromEdges(sc.parallelize(ring), 1.0f)
       assert(graph.edges.count() === ring.size)
     }
   }
@@ -448,7 +448,7 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         case (a, b) => Edge(a, b, 1)
       }
       val rdd = sc.parallelize(ring)
-      val graph = Graph.fromEdges(rdd, 1.0F)
+      val graph = Graph.fromEdges(rdd, 1.0f)
       assert(!graph.isCheckpointed)
       assert(graph.getCheckpointFiles.size === 0)
       graph.checkpoint()

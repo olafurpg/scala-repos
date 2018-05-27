@@ -1,6 +1,6 @@
-@SerialVersionUID(13l.toLong)
+@SerialVersionUID(13L.toLong)
 class C1 extends Serializable
-@SerialVersionUID(13l)
+@SerialVersionUID(13L)
 class C2 extends Serializable
 @SerialVersionUID(13.asInstanceOf[Long])
 class C3 extends Serializable

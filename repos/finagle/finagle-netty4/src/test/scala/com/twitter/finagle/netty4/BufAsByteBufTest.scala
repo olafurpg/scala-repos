@@ -430,7 +430,7 @@ class BufAsByteBufTest extends FunSuite with BeforeAndAfter {
 
     random.setSeed(seed)
     0.until(Capacity - 3, 4).foreach { i =>
-      val value = random.nextInt() & 0xFFFFFFFFL
+      val value = random.nextInt() & 0XFFFFFFFFL
       assert(value == wrappedBuf.getUnsignedInt(i))
     }
   }
@@ -630,7 +630,7 @@ class BufAsByteBufTest extends FunSuite with BeforeAndAfter {
 
     random.setSeed(seed)
     0.until(Capacity, 4).foreach { i =>
-      val value = random.nextInt() & 0xFFFFFFFFL
+      val value = random.nextInt() & 0XFFFFFFFFL
       assert(i == wrappedBuf.readerIndex)
       assert(wrappedBuf.isReadable)
       assert(value == wrappedBuf.readUnsignedInt())

@@ -228,7 +228,7 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                             .getOrElse(fromType)
                         case _ => Seq.empty
                       }
-                })
+                  })
                 .mkString
 
             val AllOpsTrait =

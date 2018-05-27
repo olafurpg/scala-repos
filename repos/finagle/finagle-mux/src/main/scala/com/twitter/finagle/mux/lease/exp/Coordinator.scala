@@ -36,8 +36,7 @@ private[lease] class Coordinator(
       new BytesAlarm(
         counter, {
           val saved = counter.info.remaining()
-          () =>
-            saved - 1.byte
+          () => saved - 1.byte
         }
       )
     }

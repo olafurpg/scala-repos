@@ -49,8 +49,7 @@ class ClientSessionTest extends FunSuite with MockitoSugar {
           mux.FailureDetector.NullConfig,
           "test",
           NullStatsReceiver)
-        () =>
-          session.status
+        () => session.status
     }
   )
 
@@ -58,8 +57,7 @@ class ClientSessionTest extends FunSuite with MockitoSugar {
     "mux-dispatcher", {
       tr: Transport[mux.transport.Message, mux.transport.Message] =>
         val dispatcher = mux.ClientDispatcher.newRequestResponse(tr)
-        () =>
-          dispatcher.status
+        () => dispatcher.status
     }
   )
 
@@ -68,16 +66,14 @@ class ClientSessionTest extends FunSuite with MockitoSugar {
       val manager = mock[http.codec.ConnectionManager]
       when(manager.shouldClose).thenReturn(false)
       val wrappedT = new http.HttpTransport(tr, manager)
-      () =>
-        wrappedT.status
+      () => wrappedT.status
     }
   )
 
   testSessionStatus(
     "http-dispatcher", { tr: Transport[Any, Any] =>
       val dispatcher = new HttpClientDispatcher(tr)
-      () =>
-        dispatcher.status
+      () => dispatcher.status
     }
   )
 
@@ -91,8 +87,7 @@ class ClientSessionTest extends FunSuite with MockitoSugar {
       tr: Transport[memcached.protocol.Command, memcached.protocol.Response] =>
         val cl: MyClient = new MyClient
         val svc = cl.newDisp(tr)
-        () =>
-          svc.status
+        () => svc.status
     }
   )
 
@@ -101,8 +96,7 @@ class ClientSessionTest extends FunSuite with MockitoSugar {
       tr: Transport[mysql.transport.Packet, mysql.transport.Packet] =>
         val handshake = mysql.Handshake(Some("username"), Some("password"))
         val dispatcher = new mysql.ClientDispatcher(tr, handshake)
-        () =>
-          dispatcher.status
+        () => dispatcher.status
     }
   )
 }

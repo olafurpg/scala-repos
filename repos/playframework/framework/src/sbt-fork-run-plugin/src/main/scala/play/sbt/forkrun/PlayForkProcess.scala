@@ -154,7 +154,7 @@ object PlayForkProcess {
         case LogLine(level, message) =>
           logger.log(Level(level).getOrElse(defaultLevel), message)
         case message => logger.log(defaultLevel, message)
-    }
+      }
 
   def spawn(f: => Unit): Thread = {
     val thread = newThread(f)

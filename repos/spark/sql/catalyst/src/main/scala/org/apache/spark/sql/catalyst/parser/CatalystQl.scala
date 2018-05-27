@@ -232,7 +232,7 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
                       selectExpressions,
                       withWhere)
                   case _ => sys.error("Expect GROUP BY")
-              }),
+                }),
               groupingSetsClause.map(e =>
                 e match {
                   case Token("TOK_GROUPING_SETS", children) =>
@@ -243,7 +243,7 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
                       withWhere,
                       selectExpressions)
                   case _ => sys.error("Expect GROUPING SETS")
-              }),
+                }),
               rollupGroupByClause.map(e =>
                 e match {
                   case Token("TOK_ROLLUP_GROUPBY", children) =>
@@ -252,7 +252,7 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
                       selectExpressions,
                       withWhere)
                   case _ => sys.error("Expect WITH ROLLUP")
-              }),
+                }),
               cubeGroupByClause.map(e =>
                 e match {
                   case Token("TOK_CUBE_GROUPBY", children) =>
@@ -261,7 +261,7 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
                       selectExpressions,
                       withWhere)
                   case _ => sys.error("Expect WITH CUBE")
-              }),
+                }),
               Some(Project(selectExpressions, withWhere))
             ).flatten.head
           }

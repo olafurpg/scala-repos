@@ -38,7 +38,7 @@ class LPMaxFlowTest extends FunSuite {
     }
 
     val lpm = new LPMaxFlow(g)
-    assert((lpm.maxFlow._2 - 4).abs < 1E-5, lpm)
-    assert((lpm.minCostFlow()._2 - 20).abs < 1E-5, lpm)
+    assert((lpm.maxFlow._2 - 4).abs < 1e-5, lpm)
+    assert((lpm.minCostFlow()._2 - 20).abs < 1e-5, lpm)
   }
 }

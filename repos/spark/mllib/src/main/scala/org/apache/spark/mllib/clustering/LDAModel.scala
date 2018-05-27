@@ -328,7 +328,7 @@ class LocalLDAModel private[spark] (
       .map {
         case (id: Long, termCounts: Vector) =>
           val localElogbeta = ElogbetaBc.value
-          var docBound = 0.0D
+          var docBound = 0.0d
           val (gammad: BDV[Double], _) =
             OnlineLDAOptimizer.variationalTopicInference(
               termCounts,

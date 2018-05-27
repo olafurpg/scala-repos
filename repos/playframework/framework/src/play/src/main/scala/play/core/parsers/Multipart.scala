@@ -541,8 +541,7 @@ object Multipart {
         next: (ByteString, Int) ⇒ StateResult): StateResult = {
       state = math.signum(offset - input.length) match {
         case -1 ⇒
-          more ⇒
-            next(input ++ more, offset)
+          more ⇒ next(input ++ more, offset)
         case 0 ⇒ next(_, 0)
         case 1 ⇒ throw new IllegalStateException
       }

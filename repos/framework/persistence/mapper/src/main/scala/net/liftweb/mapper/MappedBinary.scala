@@ -148,7 +148,7 @@ abstract class MappedBinary[T <: Mapper[T]](val fieldOwner: T)
             f.data() = toSet
             f.orgData() = toSet
         }
-    )
+      )
 
   def buildSetLongValue(
       accessor: Method,
@@ -302,7 +302,7 @@ abstract class MappedText[T <: Mapper[T]](val fieldOwner: T)
             f.data() = toSet
             f.orgData() = toSet
         }
-    )
+      )
 
   def buildSetLongValue(
       accessor: Method,
@@ -465,7 +465,7 @@ abstract class MappedFakeClob[T <: Mapper[T]](val fieldOwner: T)
             f.data() = toSet
             f.orgData() = toSet
         }
-    )
+      )
 
   def buildSetLongValue(
       accessor: Method,

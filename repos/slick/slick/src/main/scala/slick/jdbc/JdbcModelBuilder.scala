@@ -340,7 +340,7 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
                 d.getOrElse(throw new SlickException(
                   s"Invalid default value $d for non-nullable column ${tableBuilder.namer.qualifiedName.asString}.$name of type $tpe, meta data: " +
                     meta.toString))
-          ))
+            ))
         }
 
     private def convenientDefault

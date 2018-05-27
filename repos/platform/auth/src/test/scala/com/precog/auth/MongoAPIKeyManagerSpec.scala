@@ -55,7 +55,7 @@ class MongoAPIKeyManagerSpec
     with RealMongoSpecSupport
     with FutureMatchers {
 
-  override def mongoStartupPause = Some(0l)
+  override def mongoStartupPause = Some(0L)
   val timeout = Duration(10, "seconds")
 
   lazy val logger =

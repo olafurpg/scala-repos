@@ -484,82 +484,82 @@ trait CogroupSpec[M[+ _]]
   def testCogroupPathology2 = {
     val s1 = SampleData(
       Stream(
-        toRecord(Array(19, 49, 71), JArray(JNum(-4611686018427387904l) :: Nil)),
-        toRecord(Array(28, 15, 27), JArray(JNum(-4611686018427387904l) :: Nil)),
-        toRecord(Array(33, 11, 79), JArray(JNum(-1330862996622233403l) :: Nil)),
-        toRecord(Array(38, 9, 3), JArray(JNum(483746605685223474l) :: Nil)),
-        toRecord(Array(44, 75, 87), JArray(JNum(4611686018427387903l) :: Nil)),
-        toRecord(Array(46, 47, 10), JArray(JNum(-4611686018427387904l) :: Nil)),
-        toRecord(Array(47, 17, 78), JArray(JNum(3385965380985908250l) :: Nil)),
-        toRecord(Array(47, 89, 84), JArray(JNum(-3713232335731560170l) :: Nil)),
-        toRecord(Array(48, 47, 76), JArray(JNum(4611686018427387903l) :: Nil)),
-        toRecord(Array(49, 66, 33), JArray(JNum(-1592288472435607010l) :: Nil)),
-        toRecord(Array(50, 9, 89), JArray(JNum(-3610518022153967388l) :: Nil)),
-        toRecord(Array(59, 54, 72), JArray(JNum(4178019033671378504l) :: Nil)),
+        toRecord(Array(19, 49, 71), JArray(JNum(-4611686018427387904L) :: Nil)),
+        toRecord(Array(28, 15, 27), JArray(JNum(-4611686018427387904L) :: Nil)),
+        toRecord(Array(33, 11, 79), JArray(JNum(-1330862996622233403L) :: Nil)),
+        toRecord(Array(38, 9, 3), JArray(JNum(483746605685223474L) :: Nil)),
+        toRecord(Array(44, 75, 87), JArray(JNum(4611686018427387903L) :: Nil)),
+        toRecord(Array(46, 47, 10), JArray(JNum(-4611686018427387904L) :: Nil)),
+        toRecord(Array(47, 17, 78), JArray(JNum(3385965380985908250L) :: Nil)),
+        toRecord(Array(47, 89, 84), JArray(JNum(-3713232335731560170L) :: Nil)),
+        toRecord(Array(48, 47, 76), JArray(JNum(4611686018427387903L) :: Nil)),
+        toRecord(Array(49, 66, 33), JArray(JNum(-1592288472435607010L) :: Nil)),
+        toRecord(Array(50, 9, 89), JArray(JNum(-3610518022153967388L) :: Nil)),
+        toRecord(Array(59, 54, 72), JArray(JNum(4178019033671378504L) :: Nil)),
         toRecord(Array(59, 80, 38), JArray(JNum(0) :: Nil)),
-        toRecord(Array(61, 59, 15), JArray(JNum(1056424478602208129l) :: Nil)),
-        toRecord(Array(65, 34, 89), JArray(JNum(4611686018427387903l) :: Nil)),
-        toRecord(Array(73, 52, 67), JArray(JNum(-4611686018427387904l) :: Nil)),
-        toRecord(Array(74, 60, 85), JArray(JNum(-4477191148386604184l) :: Nil)),
-        toRecord(Array(76, 41, 86), JArray(JNum(-2686421995147680512l) :: Nil)),
+        toRecord(Array(61, 59, 15), JArray(JNum(1056424478602208129L) :: Nil)),
+        toRecord(Array(65, 34, 89), JArray(JNum(4611686018427387903L) :: Nil)),
+        toRecord(Array(73, 52, 67), JArray(JNum(-4611686018427387904L) :: Nil)),
+        toRecord(Array(74, 60, 85), JArray(JNum(-4477191148386604184L) :: Nil)),
+        toRecord(Array(76, 41, 86), JArray(JNum(-2686421995147680512L) :: Nil)),
         toRecord(Array(77, 46, 75), JArray(JNum(-1) :: Nil)),
-        toRecord(Array(77, 65, 58), JArray(JNum(-4032275398385636682l) :: Nil)),
-        toRecord(Array(86, 50, 9), JArray(JNum(4163435383002324073l) :: Nil))
+        toRecord(Array(77, 65, 58), JArray(JNum(-4032275398385636682L) :: Nil)),
+        toRecord(Array(86, 50, 9), JArray(JNum(4163435383002324073L) :: Nil))
       ))
 
     val s2 = SampleData(
       Stream(
         toRecord(
           Array(19, 49, 71),
-          JArray(JUndefined :: JNum(2.2447601450142614E38) :: Nil)),
+          JArray(JUndefined :: JNum(2.2447601450142614e38) :: Nil)),
         toRecord(Array(28, 15, 27), JArray(JUndefined :: JNum(-1.0) :: Nil)),
         toRecord(
           Array(33, 11, 79),
-          JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil)),
+          JArray(JUndefined :: JNum(-3.4028234663852886e38) :: Nil)),
         toRecord(
           Array(38, 9, 3),
-          JArray(JUndefined :: JNum(3.4028234663852886E38) :: Nil)),
+          JArray(JUndefined :: JNum(3.4028234663852886e38) :: Nil)),
         toRecord(
           Array(44, 75, 87),
-          JArray(JUndefined :: JNum(3.4028234663852886E38) :: Nil)),
+          JArray(JUndefined :: JNum(3.4028234663852886e38) :: Nil)),
         toRecord(
           Array(46, 47, 10),
-          JArray(JUndefined :: JNum(-7.090379511750481E37) :: Nil)),
+          JArray(JUndefined :: JNum(-7.090379511750481e37) :: Nil)),
         toRecord(
           Array(47, 17, 78),
-          JArray(JUndefined :: JNum(2.646265046453461E38) :: Nil)),
+          JArray(JUndefined :: JNum(2.646265046453461e38) :: Nil)),
         toRecord(Array(47, 89, 84), JArray(JUndefined :: JNum(0.0) :: Nil)),
         toRecord(
           Array(48, 47, 76),
-          JArray(JUndefined :: JNum(1.3605700991092947E38) :: Nil)),
+          JArray(JUndefined :: JNum(1.3605700991092947e38) :: Nil)),
         toRecord(
           Array(49, 66, 33),
-          JArray(JUndefined :: JNum(-1.4787158449349019E38) :: Nil)),
+          JArray(JUndefined :: JNum(-1.4787158449349019e38) :: Nil)),
         toRecord(Array(50, 9, 89), JArray(JUndefined :: JNum(-1.0) :: Nil)),
         toRecord(
           Array(59, 54, 72),
-          JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil)),
+          JArray(JUndefined :: JNum(-3.4028234663852886e38) :: Nil)),
         toRecord(
           Array(59, 80, 38),
-          JArray(JUndefined :: JNum(8.51654525599509E37) :: Nil)),
+          JArray(JUndefined :: JNum(8.51654525599509e37) :: Nil)),
         toRecord(
           Array(61, 59, 15),
-          JArray(JUndefined :: JNum(3.4028234663852886E38) :: Nil)),
+          JArray(JUndefined :: JNum(3.4028234663852886e38) :: Nil)),
         toRecord(Array(65, 34, 89), JArray(JUndefined :: JNum(-1.0) :: Nil)),
         toRecord(
           Array(73, 52, 67),
-          JArray(JUndefined :: JNum(5.692401753312787E37) :: Nil)),
+          JArray(JUndefined :: JNum(5.692401753312787e37) :: Nil)),
         toRecord(
           Array(74, 60, 85),
-          JArray(JUndefined :: JNum(2.5390881291535566E38) :: Nil)),
+          JArray(JUndefined :: JNum(2.5390881291535566e38) :: Nil)),
         toRecord(
           Array(76, 41, 86),
-          JArray(JUndefined :: JNum(-6.05866505535721E37) :: Nil)),
+          JArray(JUndefined :: JNum(-6.05866505535721e37) :: Nil)),
         toRecord(Array(77, 46, 75), JArray(JUndefined :: JNum(0.0) :: Nil)),
         toRecord(Array(77, 65, 58), JArray(JUndefined :: JNum(1.0) :: Nil)),
         toRecord(
           Array(86, 50, 9),
-          JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil))
+          JArray(JUndefined :: JNum(-3.4028234663852886e38) :: Nil))
       ))
 
     testCogroup(s1, s2)

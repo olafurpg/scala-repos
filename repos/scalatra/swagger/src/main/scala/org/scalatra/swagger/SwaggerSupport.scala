@@ -76,8 +76,7 @@ object SwaggerSupportSyntax {
       private def prefixedOptional: Parser[Builder => Builder] =
         ("." | "/") ~ "?:" ~ """\w+""".r ~ "?" ^^ {
           case p ~ "?:" ~ o ~ "?" =>
-            builder =>
-              builder addPrefixedOptional (o, p)
+            builder => builder addPrefixedOptional (o, p)
         }
 
       private def optional: Parser[Builder => Builder] =

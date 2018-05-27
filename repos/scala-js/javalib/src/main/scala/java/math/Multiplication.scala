@@ -137,7 +137,7 @@ private[math] object Multiplication {
       val t = unsignedMultAddAdd(a(i), a(i), res(index), carry)
       res(index) = t.toInt
       index += 1
-      val t2 = (t >>> 32) + (res(index) & 0xFFFFFFFFL)
+      val t2 = (t >>> 32) + (res(index) & 0XFFFFFFFFL)
       res(index) = t2.toInt
       carry = (t2 >>> 32).toInt
       i += 1
@@ -155,8 +155,8 @@ private[math] object Multiplication {
     *  @return value of expression
     */
   def unsignedMultAddAdd(a: Int, b: Int, c: Int, d: Int): Long =
-    (a & 0xFFFFFFFFL) * (b & 0xFFFFFFFFL) + (c & 0xFFFFFFFFL) +
-      (d & 0xFFFFFFFFL)
+    (a & 0XFFFFFFFFL) * (b & 0XFFFFFFFFL) + (c & 0XFFFFFFFFL) +
+      (d & 0XFFFFFFFFL)
 
   /** Performs the multiplication with the Karatsuba's algorithm.
     *

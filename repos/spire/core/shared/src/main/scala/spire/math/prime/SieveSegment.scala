@@ -57,7 +57,7 @@ object SieveSegment {
     val n: Long = b | (b << 30L)
     val arr = new Array[Int](15)
     cfor(0)(_ < 15, _ + 1) { i =>
-      arr(i) = ((n >>> (i * 2)) & 0xffffffffL).toInt
+      arr(i) = ((n >>> (i * 2)) & 0XFFFFFFFFL).toInt
     }
     arr
   }

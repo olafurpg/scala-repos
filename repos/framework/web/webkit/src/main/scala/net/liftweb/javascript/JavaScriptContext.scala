@@ -55,10 +55,9 @@ object JavaScriptContext {
                 ret
 
               case func: Function0[_] =>
-                () =>
-                  {
-                    session.runSourceContext(func(), rule, elem)
-                  }
+                () => {
+                  session.runSourceContext(func(), rule, elem)
+                }
 
               case x => session.runSourceContext(x, rule, elem)
             }

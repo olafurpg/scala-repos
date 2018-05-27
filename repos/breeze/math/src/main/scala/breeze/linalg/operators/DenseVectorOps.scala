@@ -340,7 +340,7 @@ trait DenseVectorOps extends DenseVector_GenericOps {
   @expand
   @expand.valify
   implicit def canDot_DV_DV[@expand.args(Int, Long) T](
-      implicit @expand.sequence[T](0, 0l) zero: T)
+      implicit @expand.sequence[T](0, 0L) zero: T)
     : breeze.linalg.operators.OpMulInner.Impl2[
       DenseVector[T],
       DenseVector[T],
@@ -375,7 +375,7 @@ trait DenseVectorOps extends DenseVector_GenericOps {
   @expand
   @expand.valify
   implicit def canDot_DV_V[@expand.args(Int, Double, Float, Long) T](
-      implicit @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
+      implicit @expand.sequence[T](0, 0.0, 0.0f, 0L) zero: T)
     : breeze.linalg.operators.OpMulInner.Impl2[DenseVector[T], Vector[T], T] = {
     new breeze.linalg.operators.OpMulInner.Impl2[DenseVector[T], Vector[T], T] {
       def apply(a: DenseVector[T], b: Vector[T]) = {

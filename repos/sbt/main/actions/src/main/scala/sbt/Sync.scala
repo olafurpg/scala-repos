@@ -99,7 +99,9 @@ object Sync {
 
   def readInfo[F <: FileInfo](file: File)(
       implicit infoFormat: Format[F]): RelationInfo[F] =
-    try { readUncaught(file)(infoFormat) } catch {
+    try {
+      readUncaught(file)(infoFormat)
+    } catch {
       case e: IOException => (Relation.empty, Map.empty)
     }
 

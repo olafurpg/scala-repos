@@ -29,5 +29,4 @@ private[niocharset] object US_ASCII
         "ANSI_X3.4-1968",
         "iso-ir-6"
       ),
-      maxValue = 0x7f
-    )
+      maxValue = 0x7f)

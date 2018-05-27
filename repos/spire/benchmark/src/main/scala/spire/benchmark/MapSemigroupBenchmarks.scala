@@ -28,7 +28,11 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
       implicit semigroup: Semigroup[V],
       eq: Eq[V]): Map[K, V] = {
     val (big, small, bigOnLeft) =
-      if (x.size > y.size) { (x, y, true) } else { (y, x, false) }
+      if (x.size > y.size) {
+        (x, y, true)
+      } else {
+        (y, x, false)
+      }
     small.foldLeft(big) { (oldMap, kv) =>
       val newV = big
         .get(kv._1)

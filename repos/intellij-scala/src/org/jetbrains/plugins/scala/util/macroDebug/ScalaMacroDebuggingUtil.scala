@@ -149,7 +149,9 @@ object ScalaMacroDebuggingUtil {
   def checkMarkers(fileName: String, markersCount: Int) =
     MARKERS_CACHE get fileName match {
       case Some(oldCount) =>
-        if (oldCount == markersCount) { false } else {
+        if (oldCount == markersCount) {
+          false
+        } else {
           MARKERS_CACHE += (fileName -> markersCount); true
         }
       case None => MARKERS_CACHE += (fileName -> markersCount); true

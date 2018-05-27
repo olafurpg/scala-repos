@@ -38,7 +38,7 @@ class LBFGSB(
     upperBounds: DenseVector[Double],
     maxIter: Int = 100,
     m: Int = 5,
-    tolerance: Double = 1E-8,
+    tolerance: Double = 1e-8,
     maxZoomIter: Int = 64,
     maxLineSearchIter: Int = 64)
     extends FirstOrderMinimizer[
@@ -47,7 +47,7 @@ class LBFGSB(
       LBFGSB
         .defaultConvergenceCheck(lowerBounds, upperBounds, tolerance, maxIter))
     with SerializableLogging {
-  protected val EPS = 2.2E-16
+  protected val EPS = 2.2e-16
 
   /**
     *
@@ -372,7 +372,7 @@ object LBFGSB {
     FirstOrderMinimizer.maxIterationsReached(maxIter)
   }
 
-  protected val PROJ_GRADIENT_EPS = 1E-5
+  protected val PROJ_GRADIENT_EPS = 1e-5
   protected def bfgsbConvergenceTest(
       lowerBounds: DenseVector[Double],
       upperBounds: DenseVector[Double]): ConvergenceCheck[DenseVector[Double]] =

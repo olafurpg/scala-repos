@@ -21,7 +21,7 @@ object Importer extends LilaController {
       failure =>
         fuccess {
           Ok(html.game.importGame(failure))
-      },
+        },
       data =>
         env.importer(data, ctx.userId) flatMap { game =>
           (data.analyse.isDefined && game.analysable) ?? {
@@ -37,7 +37,7 @@ object Importer extends LilaController {
           case e =>
             logger.branch("importer").warn("sendGame", e)
             Redirect(routes.Importer.importGame)
-      }
+        }
     )
   }
 

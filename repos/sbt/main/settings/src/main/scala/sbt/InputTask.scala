@@ -22,7 +22,7 @@ final class InputTask[T] private (val parser: State => Parser[Task[T]]) {
         case Left(msg) =>
           val indented = msg.lines.map("   " + _).mkString("\n")
           Parser.failure(s"Invalid programmatic input:\n$indented")
-    })
+      })
 }
 
 object InputTask {

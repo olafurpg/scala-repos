@@ -88,7 +88,10 @@ case class FiniteHint(rows: BigInt = -1L, cols: BigInt = -1L) extends SizeHint {
       case sp @ SparseHint(_, _, _) => (sp #*# this)
     }
   }
-  def total = if (rows >= 0 && cols >= 0) { Some(rows * cols) } else None
+  def total =
+    if (rows >= 0 && cols >= 0) {
+      Some(rows * cols)
+    } else None
   def setCols(ncols: Long) = FiniteHint(rows, ncols)
   def setRows(nrows: Long) = FiniteHint(nrows, cols)
   def setColsToRows = FiniteHint(rows, rows)

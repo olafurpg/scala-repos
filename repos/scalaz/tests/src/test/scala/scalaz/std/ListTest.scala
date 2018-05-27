@@ -42,8 +42,7 @@ object ListTest extends SpecLite {
       case x :: Nil => x :: Nil
       case h :: t   => h :: a :: intersperse(t, a)
     }
-    (a: List[Int], b: Int) =>
-      (a.intersperse(b) must_=== (intersperse(a, b)))
+    (a: List[Int], b: Int) => (a.intersperse(b) must_=== (intersperse(a, b)))
   }
 
   "groupWhenM[Id].flatten is identity" ! forAll {
@@ -119,7 +118,7 @@ object ListTest extends SpecLite {
             val j = i + (if (f(a)) 0 else 1)
             val done = j >= n
             (j, !done)
-        })
+          })
         .evalZero[Int]
 
     val actual = takeWhileN("/abc/def/hij/klm".toList, 4)(_ != '/').mkString

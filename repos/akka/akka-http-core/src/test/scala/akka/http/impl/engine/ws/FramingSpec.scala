@@ -199,7 +199,7 @@ class FramingSpec extends FreeSpec with Matchers with WithMaterializerSpec {
               xxxxxxxx
               xxxxxxxx=0000000123456789 # length64
           """ should parseTo(
-            FrameHeader(Opcode.Continuation, None, 0x123456789L, fin = false))
+            FrameHeader(Opcode.Continuation, None, 0X123456789L, fin = false))
         }
         "Long.MaxValue" in {
           b"""0000          # flags
@@ -249,7 +249,7 @@ class FramingSpec extends FreeSpec with Matchers with WithMaterializerSpec {
 
       Seq(header, data) should parseMultipleTo(
         FrameStart(
-          FrameHeader(Opcode.Continuation, None, 0xFFFFFFFFL, fin = false),
+          FrameHeader(Opcode.Continuation, None, 0XFFFFFFFFL, fin = false),
           ByteString.empty),
         FrameData(data, lastPart = false))
     }

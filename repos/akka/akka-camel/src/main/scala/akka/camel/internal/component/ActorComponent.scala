@@ -220,7 +220,9 @@ private[camel] class ActorProducer(val endpoint: ActorEndpoint, camel: Camel)
   private def fireAndForget(
       message: CamelMessage,
       exchange: CamelExchangeAdapter): Unit =
-    try { actorFor(endpoint.path) ! message } catch {
+    try {
+      actorFor(endpoint.path) ! message
+    } catch {
       case NonFatal(e) ⇒ exchange.setFailure(new FailureResult(e))
     }
 

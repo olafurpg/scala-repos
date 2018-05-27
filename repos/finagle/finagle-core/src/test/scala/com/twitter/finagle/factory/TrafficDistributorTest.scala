@@ -36,7 +36,7 @@ private object TrafficDistributorTest {
   val weightClass: (Double, Int) => Set[Address] = (w, size) =>
     (0 until size).toSet.map { i: Int =>
       WeightedAddress(WeightedTestAddr(i, w), w)
-  }
+    }
 
   val busyWeight = 2.0
   case class AddressFactory(addr: Address) extends ServiceFactory[Int, Int] {

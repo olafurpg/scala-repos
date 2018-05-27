@@ -189,13 +189,11 @@ trait SpecializedLiftActor[T] extends SimpleActor[T] {
       if (!processing) {
         if (LAScheduler.onSameThread) {
           processing = true
-          () =>
-            processMailbox(true)
+          () => processMailbox(true)
         } else {
           if (startCnt == 0) {
             startCnt += 1
-            () =>
-              LAScheduler.execute(() => processMailbox(false))
+            () => LAScheduler.execute(() => processMailbox(false))
           } else () => {}
         }
       } else () => {}
@@ -214,13 +212,11 @@ trait SpecializedLiftActor[T] extends SimpleActor[T] {
       if (!processing) {
         if (LAScheduler.onSameThread) {
           processing = true
-          () =>
-            processMailbox(true)
+          () => processMailbox(true)
         } else {
           if (startCnt == 0) {
             startCnt += 1
-            () =>
-              LAScheduler.execute(() => processMailbox(false))
+            () => LAScheduler.execute(() => processMailbox(false))
           } else () => {}
         }
       } else () => {}

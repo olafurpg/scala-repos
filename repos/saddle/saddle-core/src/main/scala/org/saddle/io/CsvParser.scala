@@ -241,22 +241,30 @@ object CsvParser {
   }
 
   def parseInt(s: String) =
-    try { java.lang.Integer.parseInt(s) } catch {
+    try {
+      java.lang.Integer.parseInt(s)
+    } catch {
       case _: NumberFormatException => Int.MinValue
     }
 
   def parseLong(s: String) =
-    try { java.lang.Long.parseLong(s) } catch {
+    try {
+      java.lang.Long.parseLong(s)
+    } catch {
       case _: NumberFormatException => Long.MinValue
     }
 
   def parseFloat(s: String) =
-    try { java.lang.Float.parseFloat(s) } catch {
+    try {
+      java.lang.Float.parseFloat(s)
+    } catch {
       case _: NumberFormatException => Float.NaN
     }
 
   def parseDouble(s: String) =
-    try { java.lang.Double.parseDouble(s) } catch {
+    try {
+      java.lang.Double.parseDouble(s)
+    } catch {
       case _: NumberFormatException => Double.NaN
     }
 }

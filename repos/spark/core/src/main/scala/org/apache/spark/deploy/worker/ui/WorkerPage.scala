@@ -75,8 +75,12 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
             <li><strong>
               Master URL:</strong> {workerState.masterUrl}
             </li>
-            <li><strong>Cores:</strong> {workerState.cores} ({workerState.coresUsed} Used)</li>
-            <li><strong>Memory:</strong> {Utils.megabytesToString(workerState.memory)}
+            <li><strong>Cores:</strong> {workerState.cores} ({
+      workerState.coresUsed
+    } Used)</li>
+            <li><strong>Memory:</strong> {
+      Utils.megabytesToString(workerState.memory)
+    }
               ({Utils.megabytesToString(workerState.memoryUsed)} Used)</li>
           </ul>
           <p><a href={workerState.masterWebUiUrl}>Back to Master</a></p>
@@ -87,23 +91,23 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
           <h4> Running Executors ({runningExecutors.size}) </h4>
           {runningExecutorTable}
           {
-            if (runningDrivers.nonEmpty) {
-              <h4> Running Drivers ({runningDrivers.size}) </h4> ++
-              runningDriverTable
-            }
-          }
+      if (runningDrivers.nonEmpty) {
+        <h4> Running Drivers ({runningDrivers.size}) </h4> ++
+          runningDriverTable
+      }
+    }
           {
-            if (finishedExecutors.nonEmpty) {
-              <h4>Finished Executors ({finishedExecutors.size}) </h4> ++
-              finishedExecutorTable
-            }
-          }
+      if (finishedExecutors.nonEmpty) {
+        <h4>Finished Executors ({finishedExecutors.size}) </h4> ++
+          finishedExecutorTable
+      }
+    }
           {
-            if (finishedDrivers.nonEmpty) {
-              <h4> Finished Drivers ({finishedDrivers.size}) </h4> ++
-              finishedDriverTable
-            }
-          }
+      if (finishedDrivers.nonEmpty) {
+        <h4> Finished Drivers ({finishedDrivers.size}) </h4> ++
+          finishedDriverTable
+      }
+    }
         </div>
       </div>;
     UIUtils.basicSparkPage(
@@ -127,10 +131,14 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
         </ul>
       </td>
       <td>
-     <a href={"logPage?appId=%s&executorId=%s&logType=stdout"
-        .format(executor.appId, executor.execId)}>stdout</a>
-     <a href={"logPage?appId=%s&executorId=%s&logType=stderr"
-        .format(executor.appId, executor.execId)}>stderr</a>
+     <a href={
+      "logPage?appId=%s&executorId=%s&logType=stdout"
+        .format(executor.appId, executor.execId)
+    }>stdout</a>
+     <a href={
+      "logPage?appId=%s&executorId=%s&logType=stderr"
+        .format(executor.appId, executor.execId)
+    }>stderr</a>
       </td>
     </tr>
   }

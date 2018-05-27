@@ -345,7 +345,7 @@ package object templates {
               case Some(default) => " = " + default
             }
             .getOrElse("")
-      })
+        })
       .mkString(", ")
 
   /**

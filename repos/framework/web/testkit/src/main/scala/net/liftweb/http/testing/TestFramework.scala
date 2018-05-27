@@ -936,7 +936,10 @@ abstract class BaseResponse(
   } yield new String(b, "UTF-8")
 
   def !@(msg: => String)(implicit errorFunc: ReportFailure): SelfType =
-    if (code == 200) this.asInstanceOf[SelfType] else { errorFunc.fail(msg) }
+    if (code == 200) this.asInstanceOf[SelfType]
+    else {
+      errorFunc.fail(msg)
+    }
 
   def !(msg: => String)(implicit errorFunc: ReportFailure): SelfType =
     this.asInstanceOf[SelfType]

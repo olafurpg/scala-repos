@@ -19,7 +19,7 @@ class AffineScaling extends SerializableLogging {
       c: DenseVector[Double],
       x0: DenseVector[Double],
       gamma: Double = 0.5,
-      eps: Double = 1E-5) = {
+      eps: Double = 1e-5) = {
     var converged = false
     var x = x0
     var cv = x dot c

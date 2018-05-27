@@ -121,31 +121,30 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
           yggConfig.kafkaBufferSize)
 
       actorSystem.actorOf(
-        Props(
-          new KafkaShardIngestActor(
-            shardId = yggConfig.shardId,
-            initialCheckpoint = checkpoint,
-            consumer = consumer,
-            topic = yggConfig.kafkaTopic,
-            permissionsFinder = permissionsFinder,
-            routingActor = routingActor,
-            ingestFailureLog = ingestFailureLog(checkpoint, conf.failureLogRoot),
-            fetchBufferSize = conf.bufferSize,
-            idleDelay = yggConfig.batchStoreDelay,
-            ingestTimeout = conf.batchTimeout,
-            maxCacheSize = conf.maxParallel,
-            maxConsecutiveFailures = conf.maxConsecutiveFailures
-          ) {
+        Props(new KafkaShardIngestActor(
+          shardId = yggConfig.shardId,
+          initialCheckpoint = checkpoint,
+          consumer = consumer,
+          topic = yggConfig.kafkaTopic,
+          permissionsFinder = permissionsFinder,
+          routingActor = routingActor,
+          ingestFailureLog = ingestFailureLog(checkpoint, conf.failureLogRoot),
+          fetchBufferSize = conf.bufferSize,
+          idleDelay = yggConfig.batchStoreDelay,
+          ingestTimeout = conf.batchTimeout,
+          maxCacheSize = conf.maxParallel,
+          maxConsecutiveFailures = conf.maxConsecutiveFailures
+        ) {
 
-            implicit val M = new FutureMonad(
-              ExecutionContext.defaultExecutionContext(actorSystem))
+          implicit val M = new FutureMonad(
+            ExecutionContext.defaultExecutionContext(actorSystem))
 
-            def handleBatchComplete(ck: YggCheckpoint) {
-              logger.debug("Complete up to " + ck)
-              checkpointCoordination.saveYggCheckpoint(yggConfig.shardId, ck)
-              logger.info("Saved checkpoint: " + ck)
-            }
-          }),
+          def handleBatchComplete(ck: YggCheckpoint) {
+            logger.debug("Complete up to " + ck)
+            checkpointCoordination.saveYggCheckpoint(yggConfig.shardId, ck)
+            logger.info("Saved checkpoint: " + ck)
+          }
+        }),
         "ingest"
       )
     }

@@ -523,7 +523,7 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
           PathId.empty,
           mesos.TaskID.newBuilder().setValue("").build,
           mesos.TaskState.TASK_STAGING
-      ))
+        ))
   }
 
   @Named(ModuleNames.STORE_TASK)

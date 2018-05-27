@@ -26,11 +26,11 @@ class BinaryClassificationMetricsSuite
     with MLlibTestSparkContext {
 
   private def areWithinEpsilon(x: (Double, Double)): Boolean =
-    x._1 ~= (x._2) absTol 1E-5
+    x._1 ~= (x._2) absTol 1e-5
 
   private def pairsWithinEpsilon(
       x: ((Double, Double), (Double, Double))): Boolean =
-    (x._1._1 ~= x._2._1 absTol 1E-5) && (x._1._2 ~= x._2._2 absTol 1E-5)
+    (x._1._1 ~= x._2._1 absTol 1e-5) && (x._1._2 ~= x._2._2 absTol 1e-5)
 
   private def assertSequencesMatch(
       left: Seq[Double],
@@ -58,11 +58,11 @@ class BinaryClassificationMetricsSuite
     assertTupleSequencesMatch(metrics.roc().collect(), expectedROCCurve)
     assert(
       metrics.areaUnderROC() ~==
-        AreaUnderCurve.of(expectedROCCurve) absTol 1E-5)
+        AreaUnderCurve.of(expectedROCCurve) absTol 1e-5)
     assertTupleSequencesMatch(metrics.pr().collect(), expectedPRCurve)
     assert(
       metrics.areaUnderPR() ~==
-        AreaUnderCurve.of(expectedPRCurve) absTol 1E-5)
+        AreaUnderCurve.of(expectedPRCurve) absTol 1e-5)
     assertTupleSequencesMatch(
       metrics.fMeasureByThreshold().collect(),
       expectedThresholds.zip(expectedFMeasures1))

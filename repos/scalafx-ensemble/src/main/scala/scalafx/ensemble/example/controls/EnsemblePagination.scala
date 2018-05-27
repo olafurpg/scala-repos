@@ -64,7 +64,7 @@ class EnsemblePagination extends EnsembleExample {
         children =
           List(new ImageView(images(index)), new Label("PAGE " + (index + 1)))
         alignment = Pos.Center
-    }
+      }
 
     // Pagination with 7 pages and index starts at zero
     val pagination = new Pagination(7, 0) {

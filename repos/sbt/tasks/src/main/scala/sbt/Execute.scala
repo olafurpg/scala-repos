@@ -77,7 +77,9 @@ private[sbt] final class Execute[A[_] <: AnyRef](
       callers + "\n\n"
 
   def run[T](root: A[T])(implicit strategy: Strategy): Result[T] =
-    try { runKeep(root)(strategy)(root) } catch {
+    try {
+      runKeep(root)(strategy)(root)
+    } catch {
       case i: Incomplete => Inc(i)
     }
   def runKeep[T](root: A[T])(implicit strategy: Strategy): RMap[A, Result] = {

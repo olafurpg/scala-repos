@@ -262,7 +262,9 @@ object BasicIO {
       if (byteCount > 0) {
         out.write(buffer, 0, byteCount)
         // flush() will throw an exception once the process has terminated
-        val available = try { out.flush(); true } catch {
+        val available = try {
+          out.flush(); true
+        } catch {
           case _: IOException => false
         }
         if (available) loop()

@@ -131,7 +131,9 @@ private[collection] trait Wrappers {
       with Serializable { self =>
     // Note various overrides to avoid performance gotchas.
     override def contains(o: Object): Boolean = {
-      try { underlying.contains(o.asInstanceOf[A]) } catch {
+      try {
+        underlying.contains(o.asInstanceOf[A])
+      } catch {
         case cce: ClassCastException => false
       }
     }

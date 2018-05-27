@@ -192,7 +192,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
             context.loginAccount.exists(x =>
               members.exists { member =>
                 member.userName == x.userName && member.isManager
-            }))
+              }))
         }
 
         // Repositories
@@ -207,7 +207,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
             context.loginAccount.exists(x =>
               members.exists { member =>
                 member.userName == x.userName && member.isManager
-            })
+              })
           )
         }
       }
@@ -484,7 +484,7 @@ trait AccountControllerBase extends AccountManagementControllerBase {
           context.loginAccount.exists(x =>
             members.exists { member =>
               member.userName == x.userName && member.isManager
-          })
+            })
         }
         helper.html.forkrepository(
           repository,

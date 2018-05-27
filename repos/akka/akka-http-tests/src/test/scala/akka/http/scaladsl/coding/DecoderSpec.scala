@@ -61,6 +61,6 @@ class DecoderSpec extends WordSpec with CodecSpecSupport {
                 override def onPull(): Unit = pull(in)
               })
             }
-      }
+        }
   }
 }

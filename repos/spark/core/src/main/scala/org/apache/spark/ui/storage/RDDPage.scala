@@ -95,8 +95,8 @@ private[ui] class RDDPage(parent: StorageTab) extends WebUIPage("rdd") {
 
     val jsForScrollingDownToBlockTable = <script>
         {
-          Unparsed {
-            """
+      Unparsed {
+        """
               |$(function() {
               |  if (/.*&block.sort=.*$/.test(location.search)) {
               |    var topOffset = $("#blocks-section").offset().top;
@@ -104,8 +104,8 @@ private[ui] class RDDPage(parent: StorageTab) extends WebUIPage("rdd") {
               |  }
               |});
             """.stripMargin
-          }
-        }
+      }
+    }
       </script>
 
     val content = <div class="row-fluid">
@@ -138,7 +138,9 @@ private[ui] class RDDPage(parent: StorageTab) extends WebUIPage("rdd") {
       <div class="row-fluid">
         <div class="span12">
           <h4>
-            Data Distribution on {rddStorageInfo.dataDistribution.map(_.size).getOrElse(0)}
+            Data Distribution on {
+      rddStorageInfo.dataDistribution.map(_.size).getOrElse(0)
+    }
             Executors
           </h4>
           {workerTable}

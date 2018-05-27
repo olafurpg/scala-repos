@@ -56,7 +56,7 @@ private[streaming] class PIDRateEstimator(
 
   private var firstRun: Boolean = true
   private var latestTime: Long = -1L
-  private var latestRate: Double = -1D
+  private var latestRate: Double = -1d
   private var latestError: Double = -1L
 
   require(
@@ -127,7 +127,7 @@ private[streaming] class PIDRateEstimator(
         latestTime = time
         if (firstRun) {
           latestRate = processingRate
-          latestError = 0D
+          latestError = 0d
           firstRun = false
           logTrace("First run, rate estimation skipped")
           None

@@ -4,7 +4,9 @@ object Test extends App {
   def newLB = ListBuffer('a, 'b, 'c, 'd, 'e)
 
   def iiobe[A](f: => A) =
-    try { f } catch { case ex: IndexOutOfBoundsException => println(ex) }
+    try {
+      f
+    } catch { case ex: IndexOutOfBoundsException => println(ex) }
 
   val lb0 = newLB
   iiobe(lb0.insert(-1, 'x))

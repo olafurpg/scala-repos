@@ -49,7 +49,7 @@ object BroadcastTest {
       observedSizes.collect().foreach(i => println(i))
       println(
         "Iteration %d took %.0f milliseconds"
-          .format(i, (System.nanoTime - startTime) / 1E6))
+          .format(i, (System.nanoTime - startTime) / 1e6))
     }
 
     sc.stop()

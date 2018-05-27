@@ -162,11 +162,11 @@ trait TestEventService
     val serviceConfig = ServiceConfig(
       localhost,
       localhost,
-      Timeout(10000l),
+      Timeout(10000L),
       500,
       1024,
       tmpdir,
-      Timeout(10000l))
+      Timeout(10000L))
 
     buildServiceState(
       serviceConfig,

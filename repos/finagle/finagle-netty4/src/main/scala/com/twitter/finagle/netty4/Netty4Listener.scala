@@ -86,7 +86,7 @@ private[finagle] case class Netty4Listener[In, Out](
         new ServerBridge(
           transportFactory,
           serveTransport
-      )
+        )
 
       val bossLoop: EventLoopGroup = new NioEventLoopGroup(
         1 /*nThreads*/,

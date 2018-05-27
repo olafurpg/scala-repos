@@ -34,8 +34,8 @@ object GradientTester extends SerializableLogging {
       x: T,
       randFraction: Double = 0.01,
       skipZeros: Boolean = false,
-      epsilon: Double = 1E-8,
-      tolerance: Double = 1E-3,
+      epsilon: Double = 1e-8,
+      tolerance: Double = 1e-3,
       toString: K => String = { (_: K).toString })(
       implicit view2: T <:< NumericOps[T],
       view: T <:< Tensor[K, Double],
@@ -57,7 +57,7 @@ object GradientTester extends SerializableLogging {
       skipZeros: Boolean = false,
       toString: (K) => String = { (_: K).toString },
       epsilon: Double = 1e-8,
-      tolerance: Double = 1E-3)(
+      tolerance: Double = 1e-3)(
       implicit view2: T <:< NumericOps[T],
       view: T <:< Tensor[K, Double],
       copy: CanCopy[T],
@@ -78,7 +78,7 @@ object GradientTester extends SerializableLogging {
         xx(k) -= epsilon
         val relDif =
           (grad -
-            trueGrad(k)).abs / math.max(trueGrad(k).abs, grad.abs).max(1E-4)
+            trueGrad(k)).abs / math.max(trueGrad(k).abs, grad.abs).max(1e-4)
         if (relDif < tolerance) {
           ok += 1
           logger.debug(s"OK: ${toString(k)} $relDif")

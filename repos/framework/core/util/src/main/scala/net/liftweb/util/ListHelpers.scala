@@ -226,7 +226,7 @@ trait ListHelpers {
           (x: @unchecked) match {
             case x :: xs => permuteList(xs).map(x :: _)
             case _       => Nil
-        })
+          })
     }
 
   /**
@@ -245,7 +245,7 @@ trait ListHelpers {
         val ret = rot.flatMap(z =>
           (z: @unchecked) match {
             case x :: xs => permuteList(xs).map(x :: _)
-        })
+          })
         ret ::: rot
           .map(z => (z: @unchecked) match { case x :: xs => xs })
           .flatMap(internal(_))

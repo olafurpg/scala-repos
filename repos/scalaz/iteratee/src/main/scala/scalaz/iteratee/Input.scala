@@ -123,7 +123,7 @@ sealed abstract class InputInstances {
             empty = elInput(xa),
             el = ya => elInput(A.append(xa, ya)),
             eof = eofInput
-        ),
+          ),
         eof = eofInput
       )
     }

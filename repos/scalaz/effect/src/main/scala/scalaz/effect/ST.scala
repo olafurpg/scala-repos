@@ -131,13 +131,13 @@ sealed abstract class ST[S, A] {
     st(s =>
       apply(s) match {
         case (ns, a) => g(a)(ns)
-    })
+      })
 
   def map[B](g: A => B): ST[S, B] =
     st(s =>
       apply(s) match {
         case (ns, a) => (ns, g(a))
-    })
+      })
 }
 
 object ST extends STInstances {

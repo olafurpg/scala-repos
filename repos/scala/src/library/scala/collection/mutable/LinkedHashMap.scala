@@ -70,7 +70,9 @@ class LinkedHashMap[A, B]
   override def put(key: A, value: B): Option[B] = {
     val e = findOrAddEntry(key, value)
     if (e eq null) None
-    else { val v = e.value; e.value = value; Some(v) }
+    else {
+      val v = e.value; e.value = value; Some(v)
+    }
   }
 
   override def remove(key: A): Option[B] = {
@@ -99,7 +101,9 @@ class LinkedHashMap[A, B]
     private var cur = firstEntry
     def hasNext = cur ne null
     def next =
-      if (hasNext) { val res = (cur.key, cur.value); cur = cur.later; res } else
+      if (hasNext) {
+        val res = (cur.key, cur.value); cur = cur.later; res
+      } else
         Iterator.empty.next()
   }
 
@@ -127,7 +131,9 @@ class LinkedHashMap[A, B]
     private var cur = firstEntry
     def hasNext = cur ne null
     def next =
-      if (hasNext) { val res = cur.key; cur = cur.later; res } else
+      if (hasNext) {
+        val res = cur.key; cur = cur.later; res
+      } else
         Iterator.empty.next()
   }
 
@@ -135,7 +141,9 @@ class LinkedHashMap[A, B]
     private var cur = firstEntry
     def hasNext = cur ne null
     def next =
-      if (hasNext) { val res = cur.value; cur = cur.later; res } else
+      if (hasNext) {
+        val res = cur.value; cur = cur.later; res
+      } else
         Iterator.empty.next()
   }
 
@@ -158,7 +166,9 @@ class LinkedHashMap[A, B]
   protected def createNewEntry[B1](key: A, value: B1): Entry = {
     val e = new Entry(key, value.asInstanceOf[B])
     if (firstEntry eq null) firstEntry = e
-    else { lastEntry.later = e; e.earlier = lastEntry }
+    else {
+      lastEntry.later = e; e.earlier = lastEntry
+    }
     lastEntry = e
     e
   }

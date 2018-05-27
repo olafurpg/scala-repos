@@ -86,7 +86,7 @@ object NameTree {
   case class Weighted[+T](weight: Double, tree: NameTree[T])
 
   object Weighted {
-    val defaultWeight = 1D
+    val defaultWeight = 1d
   }
 
   /**

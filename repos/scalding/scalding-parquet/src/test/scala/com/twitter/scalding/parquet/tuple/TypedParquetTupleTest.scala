@@ -43,18 +43,18 @@ object TestValues {
   val values = Seq(
     SampleClassB(
       "B1",
-      Some(4.0D),
-      SampleClassA(bool = true, 5, 1L, 1.2F, 1),
+      Some(4.0d),
+      SampleClassA(bool = true, 5, 1L, 1.2f, 1),
       List(1, 2),
       List(SampleClassD(1, "1"), SampleClassD(2, "2")),
-      Set(1D, 2D),
-      Set(SampleClassF(1, 1F)),
+      Set(1d, 2d),
+      Set(SampleClassF(1, 1f)),
       Map(1 -> "foo")
     ),
     SampleClassB(
       "B2",
-      Some(3.0D),
-      SampleClassA(bool = false, 4, 2L, 2.3F, 2),
+      Some(3.0d),
+      SampleClassA(bool = false, 4, 2L, 2.3f, 2),
       List(3, 4),
       Nil,
       Set(3, 4),
@@ -67,19 +67,19 @@ object TestValues {
     SampleClassB(
       "B3",
       None,
-      SampleClassA(bool = true, 6, 3L, 3.4F, 3),
+      SampleClassA(bool = true, 6, 3L, 3.4f, 3),
       List(5, 6),
       List(SampleClassD(3, "3"), SampleClassD(4, "4")),
       Set(5, 6),
-      Set(SampleClassF(2, 2F))),
+      Set(SampleClassF(2, 2f))),
     SampleClassB(
       "B4",
-      Some(5.0D),
-      SampleClassA(bool = false, 7, 4L, 4.5F, 4),
+      Some(5.0d),
+      SampleClassA(bool = false, 7, 4L, 4.5f, 4),
       Nil,
       List(SampleClassD(5, "5"), SampleClassD(6, "6")),
       Set(),
-      Set(SampleClassF(3, 3F), SampleClassF(5, 4F)),
+      Set(SampleClassF(3, 3f), SampleClassF(5, 4f)),
       Map(3 -> "foo2"),
       Map(SampleClassD(0, "q") -> SampleClassF(4, 3))
     )

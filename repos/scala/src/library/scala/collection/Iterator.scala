@@ -50,7 +50,9 @@ object Iterator {
     private var hasnext = true
     def hasNext: Boolean = hasnext
     def next(): A =
-      if (hasnext) { hasnext = false; elem } else empty.next()
+      if (hasnext) {
+        hasnext = false; elem
+      } else empty.next()
   }
 
   /** Creates an iterator with given elements.
@@ -71,7 +73,9 @@ object Iterator {
     private var i = 0
     def hasNext: Boolean = i < len
     def next(): A =
-      if (hasNext) { i += 1; elem } else empty.next()
+      if (hasNext) {
+        i += 1; elem
+      } else empty.next()
   }
 
   /** Creates an iterator producing the values of a given function over a range of integer values starting from 0.
@@ -85,7 +89,9 @@ object Iterator {
       private var i = 0
       def hasNext: Boolean = i < end
       def next(): A =
-        if (hasNext) { val result = f(i); i += 1; result } else empty.next()
+        if (hasNext) {
+          val result = f(i); i += 1; result
+        } else empty.next()
     }
 
   /** Creates nn iterator returning successive values in some integer interval.
@@ -109,7 +115,9 @@ object Iterator {
       private var i = start
       def hasNext: Boolean = (step <= 0 || i < end) && (step >= 0 || i > end)
       def next(): Int =
-        if (hasNext) { val result = i; i += step; result } else empty.next()
+        if (hasNext) {
+          val result = i; i += step; result
+        } else empty.next()
     }
 
   /** Creates an infinite iterator that repeatedly applies a given function to the previous result.
@@ -513,7 +521,10 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
       true
     }
 
-    def next() = if (hasNext) { hdDefined = false; hd } else empty.next()
+    def next() =
+      if (hasNext) {
+        hdDefined = false; hd
+      } else empty.next()
   }
 
   /** Tests whether every element of this iterator relates to the
@@ -589,7 +600,9 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
         status == 1 /*Found*/
       }
       def next() =
-        if (hasNext) { status = 0 /*Seek*/; pf(hd) } else Iterator.empty.next()
+        if (hasNext) {
+          status = 0 /*Seek*/; pf(hd)
+        } else Iterator.empty.next()
     }
 
   /** Produces a collection containing cumulative results of applying the
@@ -654,7 +667,10 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
       else tail = Iterator.empty
       hdDefined
     }
-    def next() = if (hasNext) { hdDefined = false; hd } else empty.next()
+    def next() =
+      if (hasNext) {
+        hdDefined = false; hd
+      } else empty.next()
   }
 
   /** Partitions this iterator in two iterators according to a predicate.
@@ -678,7 +694,9 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
       def hasNext = !lookahead.isEmpty || { skip(); self.hasNext }
       def next() =
         if (!lookahead.isEmpty) lookahead.dequeue()
-        else { skip(); self.next() }
+        else {
+          skip(); self.next()
+        }
     }
     val l = new PartitionIterator(p)
     val r = new PartitionIterator(!p(_))
@@ -728,7 +746,9 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
       }
       def next() = {
         if (hasNext) {
-          if (status == 1) { status = 0; hd } else lookahead.dequeue()
+          if (status == 1) {
+            status = 0; hd
+          } else lookahead.dequeue()
         } else empty.next()
       }
       def finish(): Boolean = {

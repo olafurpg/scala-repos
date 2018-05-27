@@ -30,8 +30,8 @@ sealed trait RandomAccessFileTest extends FunSuite {
     val stream = new RAF(file, "rw")
     stream.writeDouble(0.0)
     stream.writeDouble(
-      Array[Double](3.141592653589793, 2.718281828459045, 6.02214E23))
-    stream.writeDouble(1.6726231000000002E-24)
+      Array[Double](3.141592653589793, 2.718281828459045, 6.02214e23))
+    stream.writeDouble(1.6726231000000002e-24)
     stream.close
 
     val stream2 = new RAF(file, "r")
@@ -40,26 +40,26 @@ sealed trait RandomAccessFileTest extends FunSuite {
     assert(result2(0) === 0.0)
     assert(result2(1) === 3.141592653589793)
     assert(result2(2) === 2.718281828459045)
-    assert(stream2.readDouble === 6.02214E23)
-    assert(stream2.readDouble === 1.6726231000000002E-24)
+    assert(stream2.readDouble === 6.02214e23)
+    assert(stream2.readDouble === 1.6726231000000002e-24)
     stream2.close
   }
 
   test("writeFloat") {
     val file = getResource(fileHead + "Float")
     val stream = new RAF(file, "rw")
-    stream.writeFloat(0.0F)
-    stream.writeFloat(Array[Float](3.1415927F, 2.7182817F, 6.02214E23F))
-    stream.writeFloat(1.6726232E-24F)
+    stream.writeFloat(0.0f)
+    stream.writeFloat(Array[Float](3.1415927f, 2.7182817f, 6.02214e23f))
+    stream.writeFloat(1.6726232e-24f)
     stream.close
 
     val stream2 = new RAF(file, "r")
     val result2 = stream2.readFloat(3)
-    assert(result2(0) === 0.0F)
-    assert(result2(1) === 3.1415927F)
-    assert(result2(2) === 2.7182817F)
-    assert(stream2.readFloat === 6.02214E23F)
-    assert(stream2.readFloat === 1.6726232E-24F)
+    assert(result2(0) === 0.0f)
+    assert(result2(1) === 3.1415927f)
+    assert(result2(2) === 2.7182817f)
+    assert(stream2.readFloat === 6.02214e23f)
+    assert(stream2.readFloat === 1.6726232e-24f)
     stream2.close
   }
 

@@ -319,19 +319,17 @@ object mon {
   private def inc(name: String): Inc = metrics.counter(name).increment _
   private def incX(name: String): IncX = {
     val count = metrics.counter(name)
-    value =>
-      {
-        if (value < 0) logger.warn(s"Negative increment value: $name=$value")
-        else count.increment(value)
-      }
+    value => {
+      if (value < 0) logger.warn(s"Negative increment value: $name=$value")
+      else count.increment(value)
+    }
   }
   private def rec(name: String): Rec = {
     val hist = metrics.histogram(name)
-    value =>
-      {
-        if (value < 0) logger.warn(s"Negative histogram value: $name=$value")
-        else hist.record(value)
-      }
+    value => {
+      if (value < 0) logger.warn(s"Negative histogram value: $name=$value")
+      else hist.record(value)
+    }
   }
 
   private def nodots(s: String) = s.replace(".", "_")

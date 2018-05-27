@@ -190,7 +190,7 @@ private[scalding] object InternalService {
                 val newFn = (e: Any) =>
                   fn(e).flatMap { r =>
                     cfn(r)
-                }
+                  }
                 recurse(prod, Some(newFn))
               }
               case None => recurse(prod, Some(fn))

@@ -44,22 +44,26 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
     <div class="legend-area">
       <svg>
         {
-          val legendPairs = List(("scheduler-delay-proportion", "Scheduler Delay"),
-            ("deserialization-time-proportion", "Task Deserialization Time"),
-            ("shuffle-read-time-proportion", "Shuffle Read Time"),
-            ("executor-runtime-proportion", "Executor Computing Time"),
-            ("shuffle-write-time-proportion", "Shuffle Write Time"),
-            ("serialization-time-proportion", "Result Serialization Time"),
-            ("getting-result-time-proportion", "Getting Result Time"))
+      val legendPairs = List(
+        ("scheduler-delay-proportion", "Scheduler Delay"),
+        ("deserialization-time-proportion", "Task Deserialization Time"),
+        ("shuffle-read-time-proportion", "Shuffle Read Time"),
+        ("executor-runtime-proportion", "Executor Computing Time"),
+        ("shuffle-write-time-proportion", "Shuffle Write Time"),
+        ("serialization-time-proportion", "Result Serialization Time"),
+        ("getting-result-time-proportion", "Getting Result Time")
+      )
 
-          legendPairs.zipWithIndex.map {
-            case ((classAttr, name), index) =>
-              <rect x={5 + (index / 3) * 210 + "px"} y={10 + (index % 3) * 15 + "px"}
+      legendPairs.zipWithIndex.map {
+        case ((classAttr, name), index) =>
+          <rect x={5 + (index / 3) * 210 + "px"} y={
+            10 + (index % 3) * 15 + "px"
+          }
                 width="10px" height="10px" class={classAttr}></rect>
                 <text x={25 + (index / 3) * 210 + "px"}
                   y={20 + (index % 3) * 15 + "px"}>{name}</text>
-          }
-        }
+      }
+    }
       </svg>
     </div>
   }
@@ -127,7 +131,9 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
       val stageHeader = s"Details for Stage $stageId (Attempt $stageAttemptId)"
       if (stageDataOption.isEmpty) {
         val content = <div id="no-info">
-            <p>No information to display for Stage {stageId} (Attempt {stageAttemptId})</p>
+            <p>No information to display for Stage {stageId} (Attempt {
+          stageAttemptId
+        })</p>
           </div>
         return UIUtils.headerSparkPage(stageHeader, content, parent)
       }
@@ -160,34 +166,51 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
               <strong>Locality Level Summary: </strong>
               {getLocalitySummaryString(stageData)}
             </li>
-            {if (stageData.hasInput) {
-              <li>
+            {
+        if (stageData.hasInput) {
+          <li>
                 <strong>Input Size / Records: </strong>
-                {s"${Utils.bytesToString(stageData.inputBytes)} / ${stageData.inputRecords}"}
+                {
+            s"${Utils.bytesToString(stageData.inputBytes)} / ${stageData.inputRecords}"
+          }
               </li>
-            }}
-            {if (stageData.hasOutput) {
-              <li>
+        }
+      }
+            {
+        if (stageData.hasOutput) {
+          <li>
                 <strong>Output: </strong>
-                {s"${Utils.bytesToString(stageData.outputBytes)} / ${stageData.outputRecords}"}
+                {
+            s"${Utils.bytesToString(stageData.outputBytes)} / ${stageData.outputRecords}"
+          }
               </li>
-            }}
-            {if (stageData.hasShuffleRead) {
-              <li>
+        }
+      }
+            {
+        if (stageData.hasShuffleRead) {
+          <li>
                 <strong>Shuffle Read: </strong>
-                {s"${Utils.bytesToString(stageData.shuffleReadTotalBytes)} / " +
-                 s"${stageData.shuffleReadRecords}"}
+                {
+            s"${Utils.bytesToString(stageData.shuffleReadTotalBytes)} / " +
+              s"${stageData.shuffleReadRecords}"
+          }
               </li>
-            }}
-            {if (stageData.hasShuffleWrite) {
-              <li>
+        }
+      }
+            {
+        if (stageData.hasShuffleWrite) {
+          <li>
                 <strong>Shuffle Write: </strong>
-                 {s"${Utils.bytesToString(stageData.shuffleWriteBytes)} / " +
-                 s"${stageData.shuffleWriteRecords}"}
+                 {
+            s"${Utils.bytesToString(stageData.shuffleWriteBytes)} / " +
+              s"${stageData.shuffleWriteRecords}"
+          }
               </li>
-            }}
-            {if (stageData.hasBytesSpilled) {
-              <li>
+        }
+      }
+            {
+        if (stageData.hasBytesSpilled) {
+          <li>
                 <strong>Shuffle Spill (Memory): </strong>
                 {Utils.bytesToString(stageData.memoryBytesSpilled)}
               </li>
@@ -195,7 +218,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
                 <strong>Shuffle Spill (Disk): </strong>
                 {Utils.bytesToString(stageData.diskBytesSpilled)}
               </li>
-            }}
+        }
+      }
           </ul>
         </div>
 
@@ -213,56 +237,74 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
               <li>
                 <span data-toggle="tooltip"
                       title={ToolTips.SCHEDULER_DELAY} data-placement="right">
-                  <input type="checkbox" name={TaskDetailsClassNames.SCHEDULER_DELAY}/>
+                  <input type="checkbox" name={
+        TaskDetailsClassNames.SCHEDULER_DELAY
+      }/>
                   <span class="additional-metric-title">Scheduler Delay</span>
                 </span>
               </li>
               <li>
                 <span data-toggle="tooltip"
                       title={ToolTips.TASK_DESERIALIZATION_TIME} data-placement="right">
-                  <input type="checkbox" name={TaskDetailsClassNames.TASK_DESERIALIZATION_TIME}/>
+                  <input type="checkbox" name={
+        TaskDetailsClassNames.TASK_DESERIALIZATION_TIME
+      }/>
                   <span class="additional-metric-title">Task Deserialization Time</span>
                 </span>
               </li>
-              {if (stageData.hasShuffleRead) {
-                <li>
+              {
+        if (stageData.hasShuffleRead) {
+          <li>
                   <span data-toggle="tooltip"
                         title={ToolTips.SHUFFLE_READ_BLOCKED_TIME} data-placement="right">
-                    <input type="checkbox" name={TaskDetailsClassNames.SHUFFLE_READ_BLOCKED_TIME}/>
+                    <input type="checkbox" name={
+            TaskDetailsClassNames.SHUFFLE_READ_BLOCKED_TIME
+          }/>
                     <span class="additional-metric-title">Shuffle Read Blocked Time</span>
                   </span>
                 </li>
                 <li>
                   <span data-toggle="tooltip"
                         title={ToolTips.SHUFFLE_READ_REMOTE_SIZE} data-placement="right">
-                    <input type="checkbox" name={TaskDetailsClassNames.SHUFFLE_READ_REMOTE_SIZE}/>
+                    <input type="checkbox" name={
+            TaskDetailsClassNames.SHUFFLE_READ_REMOTE_SIZE
+          }/>
                     <span class="additional-metric-title">Shuffle Remote Reads</span>
                   </span>
                 </li>
-              }}
+        }
+      }
               <li>
                 <span data-toggle="tooltip"
                       title={ToolTips.RESULT_SERIALIZATION_TIME} data-placement="right">
-                  <input type="checkbox" name={TaskDetailsClassNames.RESULT_SERIALIZATION_TIME}/>
+                  <input type="checkbox" name={
+        TaskDetailsClassNames.RESULT_SERIALIZATION_TIME
+      }/>
                   <span class="additional-metric-title">Result Serialization Time</span>
                 </span>
               </li>
               <li>
                 <span data-toggle="tooltip"
                       title={ToolTips.GETTING_RESULT_TIME} data-placement="right">
-                  <input type="checkbox" name={TaskDetailsClassNames.GETTING_RESULT_TIME}/>
+                  <input type="checkbox" name={
+        TaskDetailsClassNames.GETTING_RESULT_TIME
+      }/>
                   <span class="additional-metric-title">Getting Result Time</span>
                 </span>
               </li>
-              {if (displayPeakExecutionMemory) {
-                <li>
+              {
+        if (displayPeakExecutionMemory) {
+          <li>
                   <span data-toggle="tooltip"
                         title={ToolTips.PEAK_EXECUTION_MEMORY} data-placement="right">
-                    <input type="checkbox" name={TaskDetailsClassNames.PEAK_EXECUTION_MEMORY}/>
+                    <input type="checkbox" name={
+            TaskDetailsClassNames.PEAK_EXECUTION_MEMORY
+          }/>
                     <span class="additional-metric-title">Peak Execution Memory</span>
                   </span>
                 </li>
-              }}
+        }
+      }
             </ul>
           </div>
         </div>
@@ -324,8 +366,9 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
       }
 
       val jsForScrollingDownToTaskTable = <script>
-          {Unparsed {
-            """
+          {
+        Unparsed {
+          """
               |$(function() {
               |  if (/.*&task.sort=.*$/.test(location.search)) {
               |    var topOffset = $("#tasks-section").offset().top;
@@ -333,8 +376,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
               |  }
               |});
             """.stripMargin
-           }
-          }
+        }
+      }
         </script>
 
       val taskIdsInPage =
@@ -366,7 +409,9 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
               metrics.get.executorDeserializeTime.toDouble
           }
           val deserializationQuantiles = <td>
-              <span data-toggle="tooltip" title={ToolTips.TASK_DESERIALIZATION_TIME}
+              <span data-toggle="tooltip" title={
+            ToolTips.TASK_DESERIALIZATION_TIME
+          }
                     data-placement="right">
                 Task Deserialization Time
               </span>
@@ -440,7 +485,9 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
               records: Seq[Double]): Seq[Elem] = {
             val recordDist = getDistributionQuantiles(records).iterator
             getDistributionQuantiles(data).map(d =>
-              <td>{s"${Utils.bytesToString(d.toLong)} / ${recordDist.next().toLong}"}</td>)
+              <td>{
+                s"${Utils.bytesToString(d.toLong)} / ${recordDist.next().toLong}"
+              }</td>)
           }
 
           val inputSizes = validTasks.map {
@@ -573,7 +620,9 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
 
           val listings: Seq[Seq[Node]] = Seq(
             <tr>{serviceQuantiles}</tr>,
-            <tr class={TaskDetailsClassNames.SCHEDULER_DELAY}>{schedulerDelayQuantiles}</tr>,
+            <tr class={TaskDetailsClassNames.SCHEDULER_DELAY}>{
+              schedulerDelayQuantiles
+            }</tr>,
             <tr class={TaskDetailsClassNames.TASK_DESERIALIZATION_TIME}>
               {deserializationQuantiles}
             </tr>
@@ -581,7 +630,9 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
             <tr class={TaskDetailsClassNames.RESULT_SERIALIZATION_TIME}>
               {serializationQuantiles}
             </tr>,
-            <tr class={TaskDetailsClassNames.GETTING_RESULT_TIME}>{gettingResultQuantiles}</tr>,
+            <tr class={TaskDetailsClassNames.GETTING_RESULT_TIME}>{
+              gettingResultQuantiles
+            }</tr>,
             if (displayPeakExecutionMemory) {
               <tr class={TaskDetailsClassNames.PEAK_EXECUTION_MEMORY}>
                 {peakExecutionMemoryQuantiles}
@@ -589,8 +640,14 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
             } else {
               Nil
             },
-            if (stageData.hasInput) <tr>{inputQuantiles}</tr> else Nil,
-            if (stageData.hasOutput) <tr>{outputQuantiles}</tr> else Nil,
+            if (stageData.hasInput) <tr>{
+              inputQuantiles
+            }</tr>
+            else Nil,
+            if (stageData.hasOutput) <tr>{
+              outputQuantiles
+            }</tr>
+            else Nil,
             if (stageData.hasShuffleRead) {
               <tr class={TaskDetailsClassNames.SHUFFLE_READ_BLOCKED_TIME}>
                 {shuffleReadBlockedQuantiles}
@@ -603,13 +660,19 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
               Nil
             },
             if (stageData.hasShuffleWrite)
-              <tr>{shuffleWriteQuantiles}</tr>
+              <tr>{
+                shuffleWriteQuantiles
+              }</tr>
             else Nil,
             if (stageData.hasBytesSpilled)
-              <tr>{memoryBytesSpilledQuantiles}</tr>
+              <tr>{
+                memoryBytesSpilledQuantiles
+              }</tr>
             else Nil,
             if (stageData.hasBytesSpilled)
-              <tr>{diskBytesSpilledQuantiles}</tr>
+              <tr>{
+                diskBytesSpilledQuantiles
+              }</tr>
             else Nil
           )
 
@@ -635,7 +698,9 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
       val executorTable = new ExecutorTable(stageId, stageAttemptId, parent)
 
       val maybeAccumulableTable: Seq[Node] =
-        if (hasAccumulators) { <h4>Accumulators</h4> ++ accumulableTable } else
+        if (hasAccumulators) {
+          <h4>Accumulators</h4> ++ accumulableTable
+        } else
           Seq()
 
       val content =
@@ -643,7 +708,9 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
           // Only show the tasks in the table
           stageData.taskData.values.toSeq
             .filter(t => taskIdsInPage.contains(t.taskInfo.taskId)),
-          currentTime) ++ <h4>Summary Metrics for {numCompleted} Completed Tasks</h4> ++ <div>{summaryTable.getOrElse("No tasks have reported metrics yet.")}</div> ++ <h4>Aggregated Metrics by Executor</h4> ++ executorTable.toNodeSeq ++ maybeAccumulableTable ++ <h4 id="tasks-section">Tasks</h4> ++ taskTableHTML ++ jsForScrollingDownToTaskTable
+          currentTime) ++ <h4>Summary Metrics for {numCompleted} Completed Tasks</h4> ++ <div>{
+          summaryTable.getOrElse("No tasks have reported metrics yet.")
+        }</div> ++ <h4>Aggregated Metrics by Executor</h4> ++ executorTable.toNodeSeq ++ maybeAccumulableTable ++ <h4 id="tasks-section">Tasks</h4> ++ taskTableHTML ++ jsForScrollingDownToTaskTable
       UIUtils.headerSparkPage(
         stageHeader,
         content,
@@ -817,16 +884,16 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
       <a>Event Timeline</a>
     </span> ++ <div id="task-assignment-timeline" class="collapsed">
       {
-        if (MAX_TIMELINE_TASKS < tasks.size) {
-          <strong>
+      if (MAX_TIMELINE_TASKS < tasks.size) {
+        <strong>
             This stage has more than the maximum number of tasks that can be shown in the
             visualization! Only the most recent {MAX_TIMELINE_TASKS} tasks
             (of {tasks.size} total) are shown.
           </strong>
-        } else {
-          Seq.empty
-        }
+      } else {
+        Seq.empty
       }
+    }
       <div class="control-panel">
         <div id="task-assignment-timeline-zoom-lock">
           <input type="checkbox"></input>
@@ -835,8 +902,10 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
       </div>
       {TIMELINE_LEGEND}
     </div> ++ <script type="text/javascript">
-      {Unparsed(s"drawTaskAssignmentTimeline(" +
-      s"$groupArrayStr, $executorsArrayStr, $minLaunchTime, $maxFinishTime)")}
+      {
+      Unparsed(s"drawTaskAssignmentTimeline(" +
+        s"$groupArrayStr, $executorsArrayStr, $minLaunchTime, $maxFinishTime)")
+    }
     </script>
   }
 }
@@ -1538,7 +1607,10 @@ private[ui] class TaskPagedTable(
     <tr>
       <td>{task.index}</td>
       <td>{task.taskId}</td>
-      <td>{if (task.speculative) s"${task.attempt} (speculative)" else task.attempt.toString}</td>
+      <td>{
+      if (task.speculative) s"${task.attempt} (speculative)"
+      else task.attempt.toString
+    }</td>
       <td>{task.status}</td>
       <td>{task.taskLocality}</td>
       <td>{task.executorIdAndHost}</td>
@@ -1559,21 +1631,30 @@ private[ui] class TaskPagedTable(
       <td class={TaskDetailsClassNames.GETTING_RESULT_TIME}>
         {UIUtils.formatDuration(task.gettingResultTime)}
       </td>
-      {if (displayPeakExecutionMemory) {
+      {
+      if (displayPeakExecutionMemory) {
         <td class={TaskDetailsClassNames.PEAK_EXECUTION_MEMORY}>
           {Utils.bytesToString(task.peakExecutionMemoryUsed)}
         </td>
-      }}
-      {if (task.accumulators.nonEmpty) {
+      }
+    }
+      {
+      if (task.accumulators.nonEmpty) {
         <td>{Unparsed(task.accumulators.get)}</td>
-      }}
-      {if (task.input.nonEmpty) {
+      }
+    }
+      {
+      if (task.input.nonEmpty) {
         <td>{task.input.get.inputReadable}</td>
-      }}
-      {if (task.output.nonEmpty) {
+      }
+    }
+      {
+      if (task.output.nonEmpty) {
         <td>{task.output.get.outputReadable}</td>
-      }}
-      {if (task.shuffleRead.nonEmpty) {
+      }
+    }
+      {
+      if (task.shuffleRead.nonEmpty) {
         <td class={TaskDetailsClassNames.SHUFFLE_READ_BLOCKED_TIME}>
           {task.shuffleRead.get.shuffleReadBlockedTimeReadable}
         </td>
@@ -1581,15 +1662,20 @@ private[ui] class TaskPagedTable(
         <td class={TaskDetailsClassNames.SHUFFLE_READ_REMOTE_SIZE}>
           {task.shuffleRead.get.shuffleReadRemoteReadable}
         </td>
-      }}
-      {if (task.shuffleWrite.nonEmpty) {
+      }
+    }
+      {
+      if (task.shuffleWrite.nonEmpty) {
         <td>{task.shuffleWrite.get.writeTimeReadable}</td>
         <td>{task.shuffleWrite.get.shuffleWriteReadable}</td>
-      }}
-      {if (task.bytesSpilled.nonEmpty) {
+      }
+    }
+      {
+      if (task.bytesSpilled.nonEmpty) {
         <td>{task.bytesSpilled.get.memoryBytesSpilledReadable}</td>
         <td>{task.bytesSpilled.get.diskBytesSpilledReadable}</td>
-      }}
+      }
+    }
       {errorMessageCell(task.error)}
     </tr>
   }

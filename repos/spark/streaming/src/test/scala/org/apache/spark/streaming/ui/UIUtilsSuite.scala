@@ -49,7 +49,7 @@ class UIUtilsSuite extends SparkFunSuite with Matchers {
       expectedUnit: TimeUnit,
       input: Long): Unit = {
     val (time, unit) = UIUtils.normalizeDuration(input)
-    time should be(expectedTime +- 1E-6)
+    time should be(expectedTime +- 1e-6)
     unit should be(expectedUnit)
   }
 
@@ -74,7 +74,7 @@ class UIUtilsSuite extends SparkFunSuite with Matchers {
       milliseconds: Long,
       unit: TimeUnit): Unit = {
     val convertedTime = UIUtils.convertToTimeUnit(milliseconds, unit)
-    convertedTime should be(expectedTime +- 1E-6)
+    convertedTime should be(expectedTime +- 1e-6)
   }
 
   test("formatBatchTime") {

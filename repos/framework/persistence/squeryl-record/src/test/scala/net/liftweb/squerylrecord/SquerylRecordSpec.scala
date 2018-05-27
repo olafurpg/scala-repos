@@ -332,7 +332,7 @@ class SquerylRecordSpec extends Specification with AroundExample {
         bridge.save
         val id = company.id
         company.isPersisted must_== true
-        id must be_>(0l)
+        id must be_>(0L)
         company.postCode("10001")
         bridge.save
         val company2 = Company.findForParam(id.toString)

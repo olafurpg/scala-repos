@@ -30,5 +30,5 @@ private[deploy] object DriverState extends Enumeration {
   // FAILED: The driver exited non-zero and was not supervised
   // ERROR: Unable to run or restart due to an unrecoverable error (e.g. missing jar file)
   val SUBMITTED, RUNNING, FINISHED, RELAUNCHING, UNKNOWN, KILLED, FAILED,
-  ERROR = Value
+      ERROR = Value
 }

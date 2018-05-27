@@ -77,7 +77,7 @@ object JsonValidSpec extends Specification {
       Json
         .obj("key1" -> 5.123, "key2" -> 3.543)
         .validate[Map[String, Float]] must equalTo(
-        JsSuccess(Map("key1" -> 5.123F, "key2" -> 3.543F)))
+        JsSuccess(Map("key1" -> 5.123f, "key2" -> 3.543f)))
       Json
         .obj("key1" -> 5.123, "key2" -> 3.543)
         .validate[Map[String, Double]] must equalTo(
@@ -471,19 +471,19 @@ object JsonValidSpec extends Specification {
       implicit val numbersFormat = ((__ \ 'i)
         .format[Int](Reads.min(5) andKeep Reads.max(100)) and (__ \ 'l)
         .format[Long](Reads.min(5L) andKeep Reads.max(100L)) and (__ \ 'f)
-        .format[Float](Reads.min(13.0F) andKeep Reads.max(14.0F)) and
+        .format[Float](Reads.min(13.0f) andKeep Reads.max(14.0f)) and
         (__ \ 'd).format[Double](Reads.min(0.1) andKeep Reads.max(1.0)) and
         (__ \ 'bd).format[BigDecimal](Reads.min(BigDecimal(5)) andKeep Reads
           .max(BigDecimal(100))))(Numbers.apply _, unlift(Numbers.unapply))
 
-      val ok = Numbers(42, 55L, 13.5F, 0.3, BigDecimal(33.5))
-      val fail = Numbers(42, 55L, 10.5F, 1.3, BigDecimal(33.5))
+      val ok = Numbers(42, 55L, 13.5f, 0.3, BigDecimal(33.5))
+      val fail = Numbers(42, 55L, 10.5f, 1.3, BigDecimal(33.5))
       val jsOk = Json.toJson(ok)
       val jsFail = Json.toJson(fail)
 
       jsOk.validate[Numbers] must equalTo(JsSuccess(ok))
       jsFail.validate[Numbers] must equalTo(
-        JsError((__ \ 'f), ValidationError("error.min", 13.0F)) ++ JsError(
+        JsError((__ \ 'f), ValidationError("error.min", 13.0f)) ++ JsError(
           (__ \ 'd),
           ValidationError("error.max", 1.0))
       )
@@ -779,7 +779,7 @@ object JsonValidSpec extends Specification {
         .obj(
           "field1" -> "val1",
           "field2" -> 123L,
-          "field3" -> 123.456F,
+          "field3" -> 123.456f,
           "field4" -> true,
           "field5" -> Json.arr("alpha", "beta"),
           "field6" -> "val6",
@@ -795,7 +795,7 @@ object JsonValidSpec extends Specification {
           (
             "val1",
             123L,
-            123.456F,
+            123.456f,
             true,
             List("alpha", "beta"),
             "val6",
@@ -885,7 +885,7 @@ object JsonValidSpec extends Specification {
               Seq("msg1.msg11", "msg1.msg12"),
               "arg11",
               123L,
-              123.456F),
+              123.456f),
             ValidationError("msg2.msg21.msg22", 456, 123.456, true, 123)
           ),
           (__ \ 'field2 \ 'field21) -> Seq(
@@ -898,7 +898,7 @@ object JsonValidSpec extends Specification {
         "obj.field1.field11" -> Json.arr(
           Json.obj(
             "msg" -> Json.arr("msg1.msg11", "msg1.msg12"),
-            "args" -> Json.arr("arg11", 123, 123.456F)
+            "args" -> Json.arr("arg11", 123, 123.456f)
           ),
           Json.obj(
             "msg" -> Json.arr("msg2.msg21.msg22"),

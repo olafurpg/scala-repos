@@ -131,12 +131,18 @@ trait MutatingMedianOf5 {
     var i4 = offset + 4 * stride
     var t = i0
 
-    if (o.gt(data(i3), data(i4))) { t = i3; i3 = i4; i4 = t }
-    if (o.gt(data(i1), data(i2))) { t = i1; i1 = i2; i2 = t }
+    if (o.gt(data(i3), data(i4))) {
+      t = i3; i3 = i4; i4 = t
+    }
+    if (o.gt(data(i1), data(i2))) {
+      t = i1; i1 = i2; i2 = t
+    }
     val i =
       if (o.lt(data(i4), data(i2))) {
         // Ignore 2. 3 < 4.
-        if (o.lt(data(i1), data(i0))) { t = i0; i0 = i1; i1 = t }
+        if (o.lt(data(i1), data(i0))) {
+          t = i0; i0 = i1; i1 = t
+        }
         if (o.lt(data(i4), data(i1))) {
           // Ignore 1. 3 < 4
           if (o.lt(data(i4), data(i0))) i0 else i4
@@ -146,7 +152,9 @@ trait MutatingMedianOf5 {
         }
       } else {
         // Ignore 4. 1 < 2.
-        if (o.lt(data(i3), data(i0))) { t = i0; i0 = i3; i3 = t }
+        if (o.lt(data(i3), data(i0))) {
+          t = i0; i0 = i3; i3 = t
+        }
         if (o.lt(data(i3), data(i2))) {
           // Ignore 2. 0 < 3
           if (o.lt(data(i3), data(i1))) i1 else i3

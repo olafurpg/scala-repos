@@ -264,7 +264,7 @@ object ShardCoordinator {
     /**
       * `ShardRegion` replies with this message for [[HostShard]] requests which lead to it hosting the shard
       */
-    @SerialVersionUID(1l)
+    @SerialVersionUID(1L)
     final case class ShardStarted(shard: ShardId) extends CoordinatorMessage
 
     /**

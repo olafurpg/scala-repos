@@ -47,8 +47,7 @@ object ThreadPoolConfig {
 
   def reusableQueue(queueFactory: QueueFactory): QueueFactory = {
     val queue = queueFactory()
-    () =>
-      queue
+    () => queue
   }
 }
 

@@ -2731,7 +2731,7 @@ trait Typers
                 case vd @ ValDef(_, _, _, _) if vd.symbol.isLazy =>
                   namer.addDerivedTrees(Typer.this, vd)
                 case _ => stat :: Nil
-            })
+              })
         val stats2 = typedStats(stats1, context.owner)
         val expr1 = typed(block.expr, mode &~ (FUNmode | QUALmode), pt)
         treeCopy
@@ -4199,7 +4199,9 @@ trait Typers
             else if (!annType.typeSymbol.isSubClass(ClassfileAnnotationClass))
               reportAnnotationError(NestedAnnotationError(ann, annType))
 
-            if (annInfo.atp.isErroneous) { hasError = true; None } else
+            if (annInfo.atp.isErroneous) {
+              hasError = true; None
+            } else
               Some(NestedAnnotArg(annInfo))
 
           // use of Array.apply[T: ClassTag](xs: T*): Array[T]
@@ -5188,20 +5190,20 @@ trait Typers
           def treesInResult(tree: Tree): List[Tree] =
             tree ::
               (tree match {
-              case Block(_, r)                        => treesInResult(r)
-              case Match(_, cases)                    => cases
-              case CaseDef(_, _, r)                   => treesInResult(r)
-              case Annotated(_, r)                    => treesInResult(r)
-              case If(_, t, e)                        => treesInResult(t) ++ treesInResult(e)
-              case Try(b, catches, _)                 => treesInResult(b) ++ catches
-              case Typed(r, Function(Nil, EmptyTree)) => treesInResult(r)
-              case Select(qual, name)                 => treesInResult(qual)
-              case Apply(fun, args) =>
-                treesInResult(fun) ++ args.flatMap(treesInResult)
-              case TypeApply(fun, args) =>
-                treesInResult(fun) ++ args.flatMap(treesInResult)
-              case _ => Nil
-            })
+                case Block(_, r)                        => treesInResult(r)
+                case Match(_, cases)                    => cases
+                case CaseDef(_, _, r)                   => treesInResult(r)
+                case Annotated(_, r)                    => treesInResult(r)
+                case If(_, t, e)                        => treesInResult(t) ++ treesInResult(e)
+                case Try(b, catches, _)                 => treesInResult(b) ++ catches
+                case Typed(r, Function(Nil, EmptyTree)) => treesInResult(r)
+                case Select(qual, name)                 => treesInResult(qual)
+                case Apply(fun, args) =>
+                  treesInResult(fun) ++ args.flatMap(treesInResult)
+                case TypeApply(fun, args) =>
+                  treesInResult(fun) ++ args.flatMap(treesInResult)
+                case _ => Nil
+              })
           def errorInResult(tree: Tree) =
             treesInResult(tree) exists
               (err => typeErrors.exists(_.errPos == err.pos))

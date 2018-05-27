@@ -88,7 +88,9 @@ class LazyStrictTestsJVM {
     val (ccTC3SO, genTC3SO, listTC3SO) = {
       import TC3._
       def throwsStackOverflow[T](f: => T): Boolean =
-        try { f; false } catch { case _: StackOverflowError => true }
+        try {
+          f; false
+        } catch { case _: StackOverflowError => true }
 
       (
         throwsStackOverflow(TC[CC]),

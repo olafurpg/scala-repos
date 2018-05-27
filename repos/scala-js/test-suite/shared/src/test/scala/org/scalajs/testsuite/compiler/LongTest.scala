@@ -33,9 +33,9 @@ class LongTest {
   }
 
   @Test def `should_correctly_dispatch_binary_ops_on_Longs`(): Unit = {
-    assertEquals(25F, 5L * 5F, 0F)
-    assertEquals(1F, 5L % 4F, 0F)
-    assertEquals(20F, 5F * 4L, 0F)
+    assertEquals(25f, 5L * 5f, 0f)
+    assertEquals(1f, 5L % 4f, 0f)
+    assertEquals(20f, 5f * 4L, 0f)
   }
 
   @Test def `should_support_shifts_with_Longs_#622`(): Unit = {

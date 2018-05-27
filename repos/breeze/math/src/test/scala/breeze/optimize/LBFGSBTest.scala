@@ -24,7 +24,7 @@ import org.scalatest.junit.JUnitRunner
   */
 @RunWith(classOf[JUnitRunner])
 class LBFGSBTest extends OptimizeTestBase {
-  val EPS = 1E-4;
+  val EPS = 1e-4;
 
   test("L-BFGS-B should solve with bound constraint") {
     val solver = new LBFGSB(

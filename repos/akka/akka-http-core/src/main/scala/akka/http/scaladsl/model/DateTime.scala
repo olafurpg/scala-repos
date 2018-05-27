@@ -225,19 +225,25 @@ object DateTime {
 
     var dn = (s / 86400).toInt
     s %= 86400 // positive seconds since beginning of day
-    if (s < 0) { s += 86400; dn -= 1 }
+    if (s < 0) {
+      s += 86400; dn -= 1
+    }
     dn += 1969 * 365 + 492 - 19 + 4 // days since "1 Jan, year 1"
 
     // convert days since 1 Jan, year 1 to year/yearday
     var y = 400 * (dn / 146097) + 1
     var d = dn % 146097
-    if (d == 146096) { y += 399; d = 365 } // last year of 400 is long
+    if (d == 146096) {
+      y += 399; d = 365
+    } // last year of 400 is long
     else {
       y += 100 * (d / 36524)
       d %= 36524
       y += (d / 1461) << 2
       d %= 1461
-      if (d == 1460) { y += 3; d = 365 } // last year out of 4 is long
+      if (d == 1460) {
+        y += 3; d = 365
+      } // last year out of 4 is long
       else {
         y += d / 365
         d %= 365

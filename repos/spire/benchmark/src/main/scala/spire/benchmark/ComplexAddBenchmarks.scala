@@ -46,7 +46,7 @@ class ComplexAddBenchmarks extends MyBenchmark {
   }
 
   def addFastComplexes(data: Array[Long]): Long = {
-    var total = FastComplex(0.0F, 0.0F)
+    var total = FastComplex(0.0f, 0.0f)
     var i = 0
     val len = data.length
     while (i < len) { total = FastComplex.add(total, data(i)); i += 1 }
@@ -54,7 +54,7 @@ class ComplexAddBenchmarks extends MyBenchmark {
   }
 
   def addFloatComplexesBoxed(data: Array[FloatComplex]): FloatComplex = {
-    var total = FloatComplex(0.0F, 0.0F)
+    var total = FloatComplex(0.0f, 0.0f)
     var i = 0
     val len = fcs.length
     while (i < len) { total += fcs(i); i += 1 }
@@ -62,7 +62,7 @@ class ComplexAddBenchmarks extends MyBenchmark {
   }
 
   def addFloatComplexesUnboxed(data: Array[Long]): FloatComplex = {
-    var total = FloatComplex(0.0F, 0.0F)
+    var total = FloatComplex(0.0f, 0.0f)
     var i = 0
     val len = fcs.length
     while (i < len) { total += new FloatComplex(longs(i)); i += 1 }

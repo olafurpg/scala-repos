@@ -191,7 +191,7 @@ final class JsonView(
     (id: String) =>
       TournamentRepo byId id flatten s"No such tournament: $id" flatMap {
         computeStanding(_, 1)
-    },
+      },
     timeToLive = 1 second)
 
   private val cachableData = lila.memo.AsyncCache[String, CachableData](

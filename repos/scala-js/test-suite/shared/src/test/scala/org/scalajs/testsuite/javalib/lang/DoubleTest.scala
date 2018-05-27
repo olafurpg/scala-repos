@@ -179,61 +179,61 @@ class DoubleTest {
     import JDouble.{longBitsToDouble => f}
 
     // Specials
-    assertEquals(Double.PositiveInfinity, f(0x7ff0000000000000L), 0.0)
-    assertEquals(Double.NegativeInfinity, f(0xfff0000000000000L), 0.0)
-    assertTrue(isZero(f(0x0000000000000000L), false))
-    assertTrue(isZero(f(0x8000000000000000L), true))
-    assertTrue(f(0x7ff8000000000000L).isNaN) // canonical NaN
+    assertEquals(Double.PositiveInfinity, f(0X7FF0000000000000L), 0.0)
+    assertEquals(Double.NegativeInfinity, f(0XFFF0000000000000L), 0.0)
+    assertTrue(isZero(f(0X0000000000000000L), false))
+    assertTrue(isZero(f(0X8000000000000000L), true))
+    assertTrue(f(0X7FF8000000000000L).isNaN) // canonical NaN
 
     // Non-canonical NaNs
-    assertTrue(f(0x7ff0000000000001L).isNaN) // smallest positive NaN
-    assertTrue(f(0x7ff15ab515d3cca1L).isNaN) // an arbitrary positive NaN
-    assertTrue(f(0x7fffffffffffffffL).isNaN) // largest positive NaN
-    assertTrue(f(0xfff0000000000001L).isNaN) // smallest negative NaN
-    assertTrue(f(0xfff15ab515d3cca1L).isNaN) // an arbitrary negative NaN
-    assertTrue(f(0xffffffffffffffffL).isNaN) // largest negative NaN
+    assertTrue(f(0X7FF0000000000001L).isNaN) // smallest positive NaN
+    assertTrue(f(0X7FF15AB515D3CCA1L).isNaN) // an arbitrary positive NaN
+    assertTrue(f(0X7FFFFFFFFFFFFFFFL).isNaN) // largest positive NaN
+    assertTrue(f(0XFFF0000000000001L).isNaN) // smallest negative NaN
+    assertTrue(f(0XFFF15AB515D3CCA1L).isNaN) // an arbitrary negative NaN
+    assertTrue(f(0XFFFFFFFFFFFFFFFFL).isNaN) // largest negative NaN
 
     // Normal forms
-    assertEquals(2.2250738585072014e-308, f(0x0010000000000000L), 0.0) // smallest pos normal form
-    assertEquals(1.7976931348623157e308, f(0x7fefffffffffffffL), 0.0) // largest pos normal form
-    assertEquals(1.8790766677624813e63, f(0x4d124568bc6584caL), 0.0) // an arbitrary pos normal form
-    assertEquals(-2.2250738585072014e-308, f(0x8010000000000000L), 0.0) // smallest neg normal form
-    assertEquals(-1.7976931348623157e308, f(0xffefffffffffffffL), 0.0) // largest neg normal form
-    assertEquals(-1.8790766677624813e63, f(0xcd124568bc6584caL), 0.0) // an arbitrary neg normal form
+    assertEquals(2.2250738585072014e-308, f(0X0010000000000000L), 0.0) // smallest pos normal form
+    assertEquals(1.7976931348623157e308, f(0X7FEFFFFFFFFFFFFFL), 0.0) // largest pos normal form
+    assertEquals(1.8790766677624813e63, f(0X4D124568BC6584CAL), 0.0) // an arbitrary pos normal form
+    assertEquals(-2.2250738585072014e-308, f(0X8010000000000000L), 0.0) // smallest neg normal form
+    assertEquals(-1.7976931348623157e308, f(0XFFEFFFFFFFFFFFFFL), 0.0) // largest neg normal form
+    assertEquals(-1.8790766677624813e63, f(0XCD124568BC6584CAL), 0.0) // an arbitrary neg normal form
 
     // Subnormal forms
-    assertEquals(Double.MinPositiveValue, f(0x0000000000000001L), 0.0) // smallest pos subnormal form
-    assertEquals(2.225073858507201e-308, f(0x000fffffffffffffL), 0.0) // largest pos subnormal form
-    assertEquals(1.719471609939382e-308, f(0x000c5d44ae45cb60L), 0.0) // an arbitrary pos subnormal form
-    assertEquals(-Double.MinPositiveValue, f(0x8000000000000001L), 0.0) // smallest neg subnormal form
-    assertEquals(-2.225073858507201e-308, f(0x800fffffffffffffL), 0.0) // largest neg subnormal form
-    assertEquals(-1.719471609939382e-308, f(0x800c5d44ae45cb60L), 0.0) // an arbitrary neg subnormal form
+    assertEquals(Double.MinPositiveValue, f(0X0000000000000001L), 0.0) // smallest pos subnormal form
+    assertEquals(2.225073858507201e-308, f(0X000FFFFFFFFFFFFFL), 0.0) // largest pos subnormal form
+    assertEquals(1.719471609939382e-308, f(0X000C5D44AE45CB60L), 0.0) // an arbitrary pos subnormal form
+    assertEquals(-Double.MinPositiveValue, f(0X8000000000000001L), 0.0) // smallest neg subnormal form
+    assertEquals(-2.225073858507201e-308, f(0X800FFFFFFFFFFFFFL), 0.0) // largest neg subnormal form
+    assertEquals(-1.719471609939382e-308, f(0X800C5D44AE45CB60L), 0.0) // an arbitrary neg subnormal form
   }
 
   @Test def doubleToLongBits(): Unit = {
     import JDouble.{doubleToLongBits => f}
 
     // Specials
-    assertEquals(0x7ff0000000000000L, f(Double.PositiveInfinity))
-    assertEquals(0xfff0000000000000L, f(Double.NegativeInfinity))
-    assertEquals(0x0000000000000000L, f(0.0))
-    assertEquals(0x8000000000000000L, f(-0.0))
-    assertEquals(0x7ff8000000000000L, f(Double.NaN)) // canonical NaN
+    assertEquals(0X7FF0000000000000L, f(Double.PositiveInfinity))
+    assertEquals(0XFFF0000000000000L, f(Double.NegativeInfinity))
+    assertEquals(0X0000000000000000L, f(0.0))
+    assertEquals(0X8000000000000000L, f(-0.0))
+    assertEquals(0X7FF8000000000000L, f(Double.NaN)) // canonical NaN
 
     // Normal forms
-    assertEquals(0x0010000000000000L, f(2.2250738585072014e-308)) // smallest pos normal form
-    assertEquals(0x7fefffffffffffffL, f(1.7976931348623157e308)) // largest pos normal form
-    assertEquals(0x4d124568bc6584caL, f(1.8790766677624813e63)) // an arbitrary pos normal form
-    assertEquals(0x8010000000000000L, f(-2.2250738585072014e-308)) // smallest neg normal form
-    assertEquals(0xffefffffffffffffL, f(-1.7976931348623157e308)) // largest neg normal form
-    assertEquals(0xcd124568bc6584caL, f(-1.8790766677624813e63)) // an arbitrary neg normal form
+    assertEquals(0X0010000000000000L, f(2.2250738585072014e-308)) // smallest pos normal form
+    assertEquals(0X7FEFFFFFFFFFFFFFL, f(1.7976931348623157e308)) // largest pos normal form
+    assertEquals(0X4D124568BC6584CAL, f(1.8790766677624813e63)) // an arbitrary pos normal form
+    assertEquals(0X8010000000000000L, f(-2.2250738585072014e-308)) // smallest neg normal form
+    assertEquals(0XFFEFFFFFFFFFFFFFL, f(-1.7976931348623157e308)) // largest neg normal form
+    assertEquals(0XCD124568BC6584CAL, f(-1.8790766677624813e63)) // an arbitrary neg normal form
 
     // Subnormal forms
-    assertEquals(0x0000000000000001L, f(Double.MinPositiveValue)) // smallest pos subnormal form
-    assertEquals(0x000fffffffffffffL, f(2.225073858507201e-308)) // largest pos subnormal form
-    assertEquals(0x000c5d44ae45cb60L, f(1.719471609939382e-308)) // an arbitrary pos subnormal form
-    assertEquals(0x8000000000000001L, f(-Double.MinPositiveValue)) // smallest neg subnormal form
-    assertEquals(0x800fffffffffffffL, f(-2.225073858507201e-308)) // largest neg subnormal form
-    assertEquals(0x800c5d44ae45cb60L, f(-1.719471609939382e-308)) // an arbitrary neg subnormal form
+    assertEquals(0X0000000000000001L, f(Double.MinPositiveValue)) // smallest pos subnormal form
+    assertEquals(0X000FFFFFFFFFFFFFL, f(2.225073858507201e-308)) // largest pos subnormal form
+    assertEquals(0X000C5D44AE45CB60L, f(1.719471609939382e-308)) // an arbitrary pos subnormal form
+    assertEquals(0X8000000000000001L, f(-Double.MinPositiveValue)) // smallest neg subnormal form
+    assertEquals(0X800FFFFFFFFFFFFFL, f(-2.225073858507201e-308)) // largest neg subnormal form
+    assertEquals(0X800C5D44AE45CB60L, f(-1.719471609939382e-308)) // an arbitrary neg subnormal form
   }
 }

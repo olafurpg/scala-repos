@@ -93,7 +93,9 @@ final class SbtHandler(
       override def run() = { p.exitValue(); server.close() }
     }
     thread.start()
-    try { receive("Remote sbt initialization failed", server) } catch {
+    try {
+      receive("Remote sbt initialization failed", server)
+    } catch {
       case e: java.net.SocketException =>
         throw new TestFailed("Remote sbt initialization failed")
     }

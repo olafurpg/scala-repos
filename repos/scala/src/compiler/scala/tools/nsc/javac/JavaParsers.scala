@@ -171,7 +171,9 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
 
     def skipTo(tokens: Int*) {
       while (!(tokens contains in.token) && in.token != EOF) {
-        if (in.token == LBRACE) { skipAhead(); accept(RBRACE) } else if (in.token == LPAREN) {
+        if (in.token == LBRACE) {
+          skipAhead(); accept(RBRACE)
+        } else if (in.token == LPAREN) {
           skipAhead(); accept(RPAREN)
         } else in.nextToken()
       }
@@ -307,9 +309,13 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
           val pos = in.currentPos
           in.nextToken()
           val hi =
-            if (in.token == EXTENDS) { in.nextToken(); typ() } else EmptyTree
+            if (in.token == EXTENDS) {
+              in.nextToken(); typ()
+            } else EmptyTree
           val lo =
-            if (in.token == SUPER) { in.nextToken(); typ() } else EmptyTree
+            if (in.token == SUPER) {
+              in.nextToken(); typ()
+            } else EmptyTree
           val tdef = atPos(pos) {
             TypeDef(
               Modifiers(Flags.JAVA | Flags.DEFERRED),
@@ -348,7 +354,9 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       */
     def annotation() {
       qualId()
-      if (in.token == LPAREN) { skipAhead(); accept(RPAREN) } else if (in.token == LBRACE) {
+      if (in.token == LPAREN) {
+        skipAhead(); accept(RPAREN)
+      } else if (in.token == LBRACE) {
         skipAhead(); accept(RBRACE)
       }
     }
@@ -421,7 +429,9 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       atPos(in.currentPos) {
         val name = identForType()
         val hi =
-          if (in.token == EXTENDS) { in.nextToken(); bound() } else EmptyTree
+          if (in.token == EXTENDS) {
+            in.nextToken(); bound()
+          } else EmptyTree
         TypeDef(
           Modifiers(Flags.JAVA | Flags.DEFERRED | Flags.PARAM),
           name,
@@ -875,7 +885,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       )
       accept(RBRACE)
       val superclazz = AppliedTypeTree(javaLangDot(tpnme.Enum), List(enumType))
-      val finalFlag = if (enumIsFinal) Flags.FINAL else 0l
+      val finalFlag = if (enumIsFinal) Flags.FINAL else 0L
       addCompanionObject(
         consts ::: statics ::: predefs,
         atPos(pos) {

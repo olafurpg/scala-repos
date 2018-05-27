@@ -443,7 +443,8 @@ object ScalaExtractMethodUtils {
       outputName: ExtractMethodOutput => String) {
     val element = elements
       .find(elem => elem.isInstanceOf[ScalaPsiElement])
-      .getOrElse(return )
+      .getOrElse(return
+      )
     val manager = element.getManager
     val processor = new CompletionProcessor(
       StdKinds.refExprLastRef,

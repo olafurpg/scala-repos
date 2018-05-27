@@ -346,11 +346,11 @@ trait ShardServiceCombinators
       implicit inj: JValue => B,
       M: Monad[Future]): HttpService[A, APIKey => Future[HttpResponse[B]]] = {
     val service0 =
-      service map { (f: ((APIKey, AccountDetails)) => Future[
-        HttpResponse[B]]) =>
-        { (v: Validation[String, (APIKey, AccountDetails)]) =>
-          v.fold(msg => M.point(forbidden(msg) map inj), f)
-        }
+      service map {
+        (f: ((APIKey, AccountDetails)) => Future[HttpResponse[B]]) =>
+          { (v: Validation[String, (APIKey, AccountDetails)]) =>
+            v.fold(msg => M.point(forbidden(msg) map inj), f)
+          }
       }
     new FindAccountService(accountFinder)(service0)
   }

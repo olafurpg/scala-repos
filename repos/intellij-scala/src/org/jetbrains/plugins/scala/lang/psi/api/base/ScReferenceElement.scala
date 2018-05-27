@@ -382,7 +382,7 @@ trait ScReferenceElement
                       case p: ScPackage  => p.getQualifiedName == qualifiedName
                       case p: PsiPackage => p.getQualifiedName == qualifiedName
                       case _             => false
-                  })
+                    })
               }
             case _ => false
           }

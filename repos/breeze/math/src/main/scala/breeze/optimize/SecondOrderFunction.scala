@@ -31,7 +31,7 @@ trait SecondOrderFunction[T, H] extends DiffFunction[T] {
 }
 
 object SecondOrderFunction {
-  def empirical[T, I](f: DiffFunction[T], eps: Double = 1E-5)(
+  def empirical[T, I](f: DiffFunction[T], eps: Double = 1e-5)(
       implicit vs: VectorSpace[T, Double])
     : SecondOrderFunction[T, EmpiricalHessian[T]] = {
     new SecondOrderFunction[T, EmpiricalHessian[T]] {
@@ -47,7 +47,7 @@ object SecondOrderFunction {
 
   def minibatchEmpirical[T, I](
       f: BatchDiffFunction[T],
-      eps: Double = 1E-5,
+      eps: Double = 1e-5,
       batchSize: Int = 30000)(implicit vs: InnerProductVectorSpace[T, Double])
     : SecondOrderFunction[T, EmpiricalHessian[T]] = {
     new SecondOrderFunction[T, EmpiricalHessian[T]] {
@@ -84,7 +84,7 @@ class EmpiricalHessian[T](
     df: DiffFunction[T],
     x: T,
     grad: T,
-    eps: Double = 1E-5)(implicit vs: VectorSpace[T, Double]) {
+    eps: Double = 1e-5)(implicit vs: VectorSpace[T, Double]) {
 
   import vs._
 
@@ -119,7 +119,7 @@ object EmpiricalHessian {
   def hessian(
       df: DiffFunction[DenseVector[Double]],
       x: DenseVector[Double],
-      eps: Double = 1E-5)(
+      eps: Double = 1e-5)(
       implicit vs: VectorSpace[DenseVector[Double], Double],
       copy: CanCopy[DenseVector[Double]]): DenseMatrix[Double] = {
     import vs._

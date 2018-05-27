@@ -13,10 +13,10 @@ class BacktrackingLineSearch(
     maxIterations: Int = 20,
     shrinkStep: Double = 0.5,
     growStep: Double = 2.1,
-    cArmijo: Double = 1E-4,
+    cArmijo: Double = 1e-4,
     cWolfe: Double = 0.9,
-    minAlpha: Double = 1E-10,
-    maxAlpha: Double = 1E10,
+    minAlpha: Double = 1e-10,
+    maxAlpha: Double = 1e10,
     enforceWolfeConditions: Boolean = true,
     enforceStrongWolfeConditions: Boolean = true)
     extends ApproximateLineSearch {

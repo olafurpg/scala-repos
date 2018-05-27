@@ -127,8 +127,7 @@ class RelationalGroupedDataset protected[sql] (
           UnresolvedFunction(name, inputExpr :: Nil, isDistinct = false)
       }
     }
-    (inputExpr: Expression) =>
-      exprToFunc(inputExpr)
+    (inputExpr: Expression) => exprToFunc(inputExpr)
   }
 
   /**

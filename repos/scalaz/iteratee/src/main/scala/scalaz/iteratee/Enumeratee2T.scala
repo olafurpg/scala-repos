@@ -105,7 +105,7 @@ trait Enumeratee2TFunctions {
                 in.flatMap(_.middleOr(emptyInput[(J, K)]) { elInput(_) })
 
               contf(nextInput) >>== (s => cstep(s).pointI)
-          },
+            },
           done = (a, r) =>
             sdone(
               sdone(a, if (r.isEof) eofInput else emptyInput),
@@ -175,7 +175,7 @@ trait Enumeratee2TFunctions {
                 }
 
               contf(nextInput) >>== (s => cstep(s).pointI)
-          },
+            },
           done = (a, r) =>
             sdone(
               sdone(a, if (r.isEof) eofInput else emptyInput),

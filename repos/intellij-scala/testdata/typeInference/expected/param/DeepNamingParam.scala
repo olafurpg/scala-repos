@@ -5,7 +5,7 @@ class DeepNamingParam {
     2;
     x =>
       /*start*/
-    x /*end*/
+      x /*end*/
   }, y = 34)
 }
 //Int

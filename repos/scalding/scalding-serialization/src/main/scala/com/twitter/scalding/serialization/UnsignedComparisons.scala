@@ -27,7 +27,7 @@ object UnsignedComparisons {
       else -1
     }
   final def unsignedIntCompare(a: Int, b: Int): Int =
-    java.lang.Long.compare(a.toLong & 0xFFFFFFFFL, b.toLong & 0xFFFFFFFFL)
+    java.lang.Long.compare(a.toLong & 0XFFFFFFFFL, b.toLong & 0XFFFFFFFFL)
 
   final def unsignedShortCompare(a: Short, b: Short): Int =
     Integer.compare(a & 0xFFFF, b & 0xFFFF)

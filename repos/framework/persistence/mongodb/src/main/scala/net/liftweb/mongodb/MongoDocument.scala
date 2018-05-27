@@ -85,7 +85,7 @@ trait MongoDocumentMeta[BaseDocument]
         case dbo => {
           Some(create(dbo))
         }
-    })
+      })
   }
 
   /**

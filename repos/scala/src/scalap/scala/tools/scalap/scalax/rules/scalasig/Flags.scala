@@ -57,16 +57,16 @@ trait Flags {
   def isMonomorphic =
     hasFlag(0x40000000) // for type symbols: does not have type parameters
   def isLazy =
-    hasFlag(0x80000000L) // symbol is a lazy val. can't have MUTABLE unless transformed by typer
+    hasFlag(0X80000000L) // symbol is a lazy val. can't have MUTABLE unless transformed by typer
 
-  def isError = hasFlag(0x100000000L)
-  def isOverloaded = hasFlag(0x200000000L)
-  def isLifted = hasFlag(0x400000000L)
+  def isError = hasFlag(0X100000000L)
+  def isOverloaded = hasFlag(0X200000000L)
+  def isLifted = hasFlag(0X400000000L)
 
-  def isMixedIn = hasFlag(0x800000000L)
-  def isExistential = hasFlag(0x800000000L)
+  def isMixedIn = hasFlag(0X800000000L)
+  def isExistential = hasFlag(0X800000000L)
 
-  def isExpandedName = hasFlag(0x1000000000L)
-  def isImplementationClass = hasFlag(0x2000000000L)
-  def isPreSuper = hasFlag(0x2000000000L)
+  def isExpandedName = hasFlag(0X1000000000L)
+  def isImplementationClass = hasFlag(0X2000000000L)
+  def isPreSuper = hasFlag(0X2000000000L)
 }

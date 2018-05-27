@@ -32,5 +32,5 @@ sealed trait LowerPriorityGenericUnmarshallers {
       implicit mat ⇒ {
         case Some(a) ⇒ um(a)
         case None ⇒ FastFuture.failed(Unmarshaller.NoContentException)
-    })
+      })
 }

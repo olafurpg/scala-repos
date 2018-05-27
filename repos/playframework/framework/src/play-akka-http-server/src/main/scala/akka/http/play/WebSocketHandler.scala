@@ -181,7 +181,7 @@ object WebSocketHandler {
                   closing = true
                   ctx.push(Right(close))
               }
-        }),
+          }),
       Merge(2, eagerComplete = true)
     )
   }

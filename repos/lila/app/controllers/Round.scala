@@ -206,7 +206,7 @@ object Round extends LilaController with TheftPrevention {
             Env.api.roundApi
               .watcher(pov, apiVersion, tv = none, withOpening = false) map {
               Ok(_)
-          }
+            }
         ) map NoCache
     }
 

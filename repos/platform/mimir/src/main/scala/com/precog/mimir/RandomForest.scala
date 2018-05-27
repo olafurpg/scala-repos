@@ -56,7 +56,7 @@ private object MissingSpireOps {
         case Nil       => sum / count
       }
 
-    loop(0D, 0D, xs)
+    loop(0d, 0d, xs)
   }
 }
 
@@ -287,7 +287,7 @@ class RegressionTreeMaker extends TreeMaker[Double] {
 
   protected type Region = SquaredError
   object Region extends RegionCompanion {
-    def empty = new SquaredError(0D, 0D, 0)
+    def empty = new SquaredError(0d, 0d, 0)
   }
 }
 
@@ -315,12 +315,12 @@ class ClassificationTreeMaker[K] extends TreeMaker[K] {
 
     def error: Double = {
       val iter = m.values().iterator()
-      var sumSqP = 0D
+      var sumSqP = 0d
       while (iter.hasNext) {
         val p = iter.next().toDouble / n
         sumSqP += p * p
       }
-      1D - sumSqP
+      1d - sumSqP
     }
 
     def value: K = m.asScala.maxBy(_._2)._1
@@ -504,10 +504,10 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       }
 
       def findError(actual: Array[RValue], predicted: Array[RValue]): Double = {
-        var correct = 0D
+        var correct = 0d
         var i = 0
         while (i < actual.length) {
-          correct += (if (actual(i) == predicted(i)) 1D else 0D)
+          correct += (if (actual(i) == predicted(i)) 1d else 0d)
           i += 1
         }
         correct / actual.length
@@ -526,8 +526,7 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
         extract[Double](table0) {
           case col: DoubleColumn =>
-            (row: Int) =>
-              col(row)
+            (row: Int) => col(row)
         }
       }
 
@@ -559,7 +558,7 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
         val diffs = actual - predicted
         val num = diffs dot diffs
 
-        var den = 0D
+        var den = 0d
         var i = 0
         while (i < actual.length) {
           val dx = actual(i) - actualMean
@@ -567,7 +566,7 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
           i += 1
         }
 
-        1D - num / den
+        1d - num / den
       }
     }
 
@@ -666,7 +665,7 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
             def variance(values: List[Double]): Double = {
               val mean = meanSeq(values)
-              val sumSq = values.foldLeft(0D) { (acc, x) =>
+              val sumSq = values.foldLeft(0d) { (acc, x) =>
                 val dx = x - mean
                 acc + dx * dx
               }

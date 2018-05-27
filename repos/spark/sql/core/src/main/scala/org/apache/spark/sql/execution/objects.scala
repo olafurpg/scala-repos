@@ -37,8 +37,7 @@ trait ObjectOperator extends SparkPlan {
       inputSchema: Seq[Attribute]): InternalRow => Any = {
     val objectProjection =
       GenerateSafeProjection.generate(objExpr :: Nil, inputSchema)
-    (i: InternalRow) =>
-      objectProjection(i).get(0, objExpr.dataType)
+    (i: InternalRow) => objectProjection(i).get(0, objExpr.dataType)
   }
 
   def generateToRow(serializer: Seq[Expression]): Any => InternalRow = {
@@ -52,11 +51,10 @@ trait ObjectOperator extends SparkPlan {
       case b: BoundReference => b.dataType
     }.head
     val outputRow = new SpecificMutableRow(inputType :: Nil)
-    (o: Any) =>
-      {
-        outputRow(0) = o
-        outputProjection(outputRow)
-      }
+    (o: Any) => {
+      outputRow(0) = o
+      outputProjection(outputRow)
+    }
   }
 }
 

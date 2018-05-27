@@ -1429,7 +1429,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 
@@ -1474,7 +1474,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 
@@ -1521,7 +1521,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 
@@ -1570,7 +1570,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 
@@ -1621,7 +1621,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 
@@ -1675,7 +1675,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 
@@ -1731,7 +1731,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 
@@ -1789,7 +1789,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 
@@ -1849,7 +1849,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 
@@ -1911,7 +1911,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 
@@ -1997,7 +1997,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 
@@ -2086,7 +2086,7 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
               _: Any),
           returnType,
           e
-      )
+        )
     )
   }
 

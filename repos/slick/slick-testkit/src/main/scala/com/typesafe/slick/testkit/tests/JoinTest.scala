@@ -131,8 +131,8 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
       q5 = ((xs joinLeft ys on (_.b === _.b)) joinLeft ys on (_._1.b === _.b))
         .to[Set]
       r5 <- mark("q5", q5.result)
-      r5t: Set[(((Int, String), Option[(Int, String)]),
-      Option[(Int, String)])] = r5
+      r5t: Set[
+        (((Int, String), Option[(Int, String)]), Option[(Int, String)])] = r5
       _ = r5 shouldBe Set(
         (((1, "a"), Some((1, "a"))), Some((1, "a"))),
         (((2, "b"), Some((2, "b"))), Some((2, "b"))),
@@ -196,8 +196,8 @@ class JoinTest extends AsyncTest[RelationalTestDB] {
       q10 = ((ys joinRight xs on (_.b === _.b)) joinRight xs on
         (_._1.map(_.b) === _.b)).to[Set]
       r10 <- mark("q10", q10.result)
-      r10t: Set[(Option[(Option[(Int, String)], (Int, String))],
-      (Int, String))] = r10
+      r10t: Set[
+        (Option[(Option[(Int, String)], (Int, String))], (Int, String))] = r10
       _ = r10 shouldBe Set(
         (Some((Some((1, "a")), (1, "a"))), (1, "a")),
         (Some((Some((2, "b")), (2, "b"))), (2, "b")),

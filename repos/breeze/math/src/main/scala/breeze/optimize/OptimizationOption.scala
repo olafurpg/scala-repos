@@ -45,7 +45,7 @@ case class StepSizeScale(alpha: Double = 1.0) extends OptimizationOption {
   }
 }
 
-case class Tolerance(fvalTolerance: Double = 1E-5, gvalTolerance: Double = 1e-6)
+case class Tolerance(fvalTolerance: Double = 1e-5, gvalTolerance: Double = 1e-6)
     extends OptimizationOption {
   def apply(params: OptParams): OptParams = {
     // TODO: gvaltolerance

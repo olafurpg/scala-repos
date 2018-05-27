@@ -81,7 +81,7 @@ class MyRDD(
       .map(i =>
         new Partition {
           override def index: Int = i
-      })
+        })
       .toArray
 
   override def getPreferredLocations(partition: Partition): Seq[String] = {

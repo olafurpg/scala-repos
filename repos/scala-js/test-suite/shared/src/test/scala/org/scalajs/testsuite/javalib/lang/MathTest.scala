@@ -85,8 +85,8 @@ class MathTest {
     assertEquals(3.0, Math.cbrt(27.0), 0.0)
     assertEquals(100.0, Math.cbrt(1000000.0), 0.0)
     assertEquals(1000.0, Math.cbrt(1000000000.0), 0.0)
-    assertEquals(-100000000.0, Math.cbrt(-1.0E24), 0.0)
-    assertEquals(-4039.0E8, Math.cbrt(-65890311319.0E24), 0.0)
+    assertEquals(-100000000.0, Math.cbrt(-1.0e24), 0.0)
+    assertEquals(-4039.0e8, Math.cbrt(-65890311319.0e24), 0.0)
   }
 
   @Test def log1p(): Unit = {
@@ -140,7 +140,7 @@ class MathTest {
     assertEquals(9007199254740992.0, Math.nextUp(9007199254740991.0), 0.0)
     assertEquals(9007199254740994.0, Math.nextUp(9007199254740992.0), 0.0)
     assertEquals(
-      1 + 2.2204460492503130808472633361816E-16,
+      1 + 2.2204460492503130808472633361816e-16,
       Math.nextUp(1.0),
       0.0)
   }
@@ -180,8 +180,8 @@ class MathTest {
   }
 
   @Test def ulp_for_Double(): Unit = {
-    assertEquals(4.440892098500626E-16, Math.ulp(3.4), 0.0)
-    assertEquals(4.1718496795330275E93, Math.ulp(3.423E109), 0.0)
+    assertEquals(4.440892098500626e-16, Math.ulp(3.4), 0.0)
+    assertEquals(4.1718496795330275e93, Math.ulp(3.423e109), 0.0)
     assertEquals(Double.MinPositiveValue, Math.ulp(0.0), 0.0)
   }
 
@@ -200,13 +200,13 @@ class MathTest {
     assertEquals(0.0, Math.expm1(-0.0), 0.01)
     assertEquals(19.085536923187668, Math.expm1(3.0), 0.01)
     assertEquals(3269016.3724721107, Math.expm1(15.0), 0.01)
-    assertEquals(Double.PositiveInfinity, Math.expm1(1.8E10), 0.0)
+    assertEquals(Double.PositiveInfinity, Math.expm1(1.8e10), 0.0)
     assertEquals(
       Double.PositiveInfinity,
       Math.expm1(Double.PositiveInfinity),
       0.0)
     assertEquals(-1.0, Math.expm1(Double.NegativeInfinity), 0.01)
-    assertEquals(4.9E-324, Math.expm1(4.9E-324), 0.01)
+    assertEquals(4.9e-324, Math.expm1(4.9e-324), 0.01)
   }
 
   @Test def sinh(): Unit = {

@@ -3,7 +3,7 @@ import scala.collection.mutable
 /** All contexts where objects can be embedded. */
 object Contexts extends Enumeration {
   val Class, Object, Trait, Method, PrivateMethod, Anonfun, ClassConstructor,
-  TraitConstructor, LazyVal, Val = Value
+      TraitConstructor, LazyVal, Val = Value
 
   val topLevel = List(Class, Object, Trait)
 }
@@ -136,7 +136,9 @@ object Test {
       if (shouldBeTopLevel) Contexts.topLevel else Contexts.values.toList
 
     if (depth == 0) {
-      if (p(nested)) { bodies += body; triggers += trigger }
+      if (p(nested)) {
+        bodies += body; triggers += trigger
+      }
     } else {
       for (ctx <- enums) {
         val (body1, trigger1) = ctx match {

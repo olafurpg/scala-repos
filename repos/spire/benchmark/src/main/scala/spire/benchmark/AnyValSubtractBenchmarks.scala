@@ -76,7 +76,7 @@ class AnyValSubtractBenchmarks extends MyBenchmark {
   }
 
   def subtractFloatsDirect(data: Array[Float]): Float = {
-    var total = 0.0F
+    var total = 0.0f
     var i = 0
     val len = data.length
     while (i < len) { total = (data(i) - total); i += 1 }

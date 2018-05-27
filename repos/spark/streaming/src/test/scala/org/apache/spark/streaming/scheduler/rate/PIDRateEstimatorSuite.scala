@@ -89,8 +89,8 @@ class PIDRateEstimatorSuite extends SparkFunSuite with Matchers {
   }
 
   test("estimate is never less than min rate") {
-    val minRate = 5D
-    val p = new PIDRateEstimator(20, 1D, 1D, 0D, minRate)
+    val minRate = 5d
+    val p = new PIDRateEstimator(20, 1d, 1d, 0d, minRate)
     // prepare a series of batch updates, one every 20ms, 0 processed elements, 2ms of processing
     // this might point the estimator to try and decrease the bound, but we test it never
     // goes below the min rate, which would be nonsensical.
@@ -106,7 +106,7 @@ class PIDRateEstimatorSuite extends SparkFunSuite with Matchers {
 
   test(
     "with no accumulated or positive error, |I| > 0, follow the processing speed") {
-    val p = new PIDRateEstimator(20, 1D, 1D, 0D, 10)
+    val p = new PIDRateEstimator(20, 1d, 1d, 0d, 10)
     // prepare a series of batch updates, one every 20ms with an increasing number of processed
     // elements in each batch, but constant processing time, and no accumulated error. Even though
     // the integral part is non-zero, the estimated rate should follow only the proportional term
@@ -117,12 +117,12 @@ class PIDRateEstimatorSuite extends SparkFunSuite with Matchers {
     val res = for (i <- List.range(0, 50))
       yield p.compute(times(i), elements(i), proc(i), sched(i))
     res.head should equal(None)
-    res.tail should equal(List.tabulate(50)(x => Some((x + 1) * 1000D)).tail)
+    res.tail should equal(List.tabulate(50)(x => Some((x + 1) * 1000d)).tail)
   }
 
   test(
     "with no accumulated but some positive error, |I| > 0, follow the processing speed") {
-    val p = new PIDRateEstimator(20, 1D, 1D, 0D, 10)
+    val p = new PIDRateEstimator(20, 1d, 1d, 0d, 10)
     // prepare a series of batch updates, one every 20ms with an decreasing number of processed
     // elements in each batch, but constant processing time, and no accumulated error. Even though
     // the integral part is non-zero, the estimated rate should follow only the proportional term,
@@ -134,13 +134,13 @@ class PIDRateEstimatorSuite extends SparkFunSuite with Matchers {
     val res = for (i <- List.range(0, 50))
       yield p.compute(times(i), elements(i), proc(i), sched(i))
     res.head should equal(None)
-    res.tail should equal(List.tabulate(50)(x => Some((50 - x) * 1000D)).tail)
+    res.tail should equal(List.tabulate(50)(x => Some((50 - x) * 1000d)).tail)
   }
 
   test(
     "with some accumulated and some positive error, |I| > 0, stay below the processing speed") {
-    val minRate = 10D
-    val p = new PIDRateEstimator(20, 1D, .01D, 0D, minRate)
+    val minRate = 10d
+    val p = new PIDRateEstimator(20, 1d, .01d, 0d, minRate)
     val times = List.tabulate(50)(x => x * 20) // every 20ms
     val rng = new Random()
     val elements = List.tabulate(50)(x => rng.nextInt(1000) + 1000)
@@ -162,6 +162,6 @@ class PIDRateEstimatorSuite extends SparkFunSuite with Matchers {
   }
 
   private def createDefaultEstimator(): PIDRateEstimator = {
-    new PIDRateEstimator(20, 1D, 0D, 0D, 10)
+    new PIDRateEstimator(20, 1d, 0d, 0d, 10)
   }
 }

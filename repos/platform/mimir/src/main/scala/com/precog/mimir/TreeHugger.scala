@@ -77,7 +77,7 @@ class Code extends UsefulStuff {
       (DEF("_mathlib1") withFlags (Flags.OVERRIDE) :=
         REF("super._mathlib1") SEQ_++ (sym.Set UNAPPLY (ID(m1)))) ::
         (DEF("_mathlib2") withFlags (Flags.OVERRIDE) := REF("super._mathlib2") SEQ_++
-        (sym.Set UNAPPLY (ID(m2)))) :: methodsAll: _*
+          (sym.Set UNAPPLY (ID(m2)))) :: methodsAll: _*
     )
   }
 

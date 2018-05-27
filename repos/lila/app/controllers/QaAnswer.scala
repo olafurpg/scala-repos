@@ -20,7 +20,7 @@ object QaAnswer extends QaController {
             Redirect(
               routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
                 answer.id)
-        }
+          }
       )
     }
   }
@@ -49,7 +49,7 @@ object QaAnswer extends QaController {
                   vote,
                   true))
             case None => NotFound
-        }
+          }
       )
   }
 
@@ -66,7 +66,7 @@ object QaAnswer extends QaController {
                 Redirect(
                   routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
                     a2.id)
-          }
+            }
         )
       }
   }

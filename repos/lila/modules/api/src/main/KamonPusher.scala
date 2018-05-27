@@ -56,8 +56,7 @@ class KeepDotsMetricKeyGenerator(config: Config)
   override def createNormalizer(strategy: String): Normalizer =
     strategy match {
       case "keep-dots" =>
-        (s: String) ⇒
-          s.replace(": ", "-").replace(" ", "_").replace("/", ".")
+        (s: String) ⇒ s.replace(": ", "-").replace(" ", "_").replace("/", ".")
       case _ => super.createNormalizer(strategy)
     }
 }

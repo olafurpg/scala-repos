@@ -31,7 +31,7 @@ class RankingMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
       ),
       2
     )
-    val eps: Double = 1E-5
+    val eps: Double = 1e-5
 
     val metrics = new RankingMetrics(predictionAndLabels)
     val map = metrics.meanAveragePrecision

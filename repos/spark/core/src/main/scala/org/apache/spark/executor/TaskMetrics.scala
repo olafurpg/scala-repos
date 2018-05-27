@@ -385,7 +385,9 @@ class TaskMetrics private[spark] (initialAccums: Seq[Accumulator[_]])
     if (hasShuffleWrite) {
       _shuffleWriteMetrics = Some(new ShuffleWriteMetrics(initialAccumsMap))
     }
-    if (hasInput) { _inputMetrics = Some(new InputMetrics(initialAccumsMap)) }
+    if (hasInput) {
+      _inputMetrics = Some(new InputMetrics(initialAccumsMap))
+    }
     if (hasOutput) {
       _outputMetrics = Some(new OutputMetrics(initialAccumsMap))
     }

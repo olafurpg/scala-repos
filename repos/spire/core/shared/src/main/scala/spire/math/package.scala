@@ -93,7 +93,7 @@ package object math {
     * round
     */
   final def round(a: Float): Float =
-    if (Math.abs(a) >= 16777216.0F) a else Math.round(a).toFloat
+    if (Math.abs(a) >= 16777216.0f) a else Math.round(a).toFloat
   final def round(a: Double): Double =
     if (Math.abs(a) >= 4503599627370496.0) a else Math.round(a).toDouble
   final def round(a: BigDecimal): BigDecimal =

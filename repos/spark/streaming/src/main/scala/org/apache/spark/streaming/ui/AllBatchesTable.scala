@@ -29,10 +29,16 @@ private[ui] abstract class BatchTableBase(
     <th>Batch Time</th>
       <th>Input Size</th>
       <th>Scheduling Delay
-        {SparkUIUtils.tooltip("Time taken by Streaming scheduler to submit jobs of a batch", "top")}
+        {
+      SparkUIUtils.tooltip(
+        "Time taken by Streaming scheduler to submit jobs of a batch",
+        "top")
+    }
       </th>
       <th>Processing Time
-        {SparkUIUtils.tooltip("Time taken to process all jobs of a batch", "top")}</th>
+        {
+      SparkUIUtils.tooltip("Time taken to process all jobs of a batch", "top")
+    }</th>
   }
 
   /**
@@ -77,7 +83,9 @@ private[ui] abstract class BatchTableBase(
       </a>
     </td>
       <td sorttable_customkey={eventCount.toString}>{eventCount.toString} events</td>
-      <td sorttable_customkey={schedulingDelay.getOrElse(Long.MaxValue).toString}>
+      <td sorttable_customkey={
+      schedulingDelay.getOrElse(Long.MaxValue).toString
+    }>
         {formattedSchedulingDelay}
       </td>
       <td sorttable_customkey={processingTime.getOrElse(Long.MaxValue).toString}>
@@ -110,7 +118,7 @@ private[ui] abstract class BatchTableBase(
         failed = batch.numFailedOutputOp,
         skipped = 0,
         total = batch.outputOperations.size)
-      }
+    }
     </td>
   }
 
@@ -176,7 +184,9 @@ private[ui] class CompletedBatchTable(
   private val firstFailureReason = getFirstFailureReason(batches)
 
   override protected def columns: Seq[Node] = super.columns ++ {
-    <th>Total Delay {SparkUIUtils.tooltip("Total time taken to handle a batch", "top")}</th>
+    <th>Total Delay {
+      SparkUIUtils.tooltip("Total time taken to handle a batch", "top")
+    }</th>
       <th>Output Ops: Succeeded/Total</th> ++ {
       if (firstFailureReason.nonEmpty) {
         <th>Error</th>

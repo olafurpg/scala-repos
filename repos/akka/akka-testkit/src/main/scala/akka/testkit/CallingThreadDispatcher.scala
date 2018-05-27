@@ -68,7 +68,7 @@ private[testkit] class CallingThreadDispatcherQueues extends Extension {
 
   private var queues =
     Map[CallingThreadMailbox, Set[WeakReference[MessageQueue]]]()
-  private var lastGC = 0l
+  private var lastGC = 0L
 
   // we have to forget about long-gone threads sometime
   private def gc(): Unit = {
@@ -91,7 +91,7 @@ private[testkit] class CallingThreadDispatcherQueues extends Extension {
       queues += mbox -> Set(new WeakReference(q))
     }
     val now = System.nanoTime
-    if (now - lastGC > 1000000000l) {
+    if (now - lastGC > 1000000000L) {
       lastGC = now
       gc()
     }

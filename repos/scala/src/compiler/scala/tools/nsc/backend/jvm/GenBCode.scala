@@ -137,7 +137,9 @@ abstract class GenBCode extends BCodeSyncAndTry {
             q2 add poison2
             return
           } else {
-            try { withCurrentUnit(item.cunit)(visit(item)) } catch {
+            try {
+              withCurrentUnit(item.cunit)(visit(item))
+            } catch {
               case ex: Throwable =>
                 ex.printStackTrace()
                 error(

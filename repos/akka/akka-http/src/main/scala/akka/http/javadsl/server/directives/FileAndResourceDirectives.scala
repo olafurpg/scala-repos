@@ -64,8 +64,8 @@ object FileAndResourceRoute {
     */
   private[http] def forFixedName(fileName: String)(
       f: ContentType ⇒ Route): FileAndResourceRoute =
-    new FileAndResourceRouteWithDefaultResolver(
-      resolver ⇒ f(resolver.resolve(fileName))) with FileAndResourceRoute {
+    new FileAndResourceRouteWithDefaultResolver(resolver ⇒
+      f(resolver.resolve(fileName))) with FileAndResourceRoute {
       def withContentType(contentType: ContentType): Route =
         resolveContentTypeWith(StaticContentTypeResolver(contentType))
       def resolveContentTypeWith(resolver: ContentTypeResolver): Route =

@@ -61,7 +61,9 @@ trait ParsersCommon extends ScannersCommon { self =>
     }
     @inline final def inParensOrError[T](body: => T, alt: T): T =
       if (in.token == LPAREN) inParens(body)
-      else { accept(LPAREN); alt }
+      else {
+        accept(LPAREN); alt
+      }
 
     @inline final def inParensOrUnit[T](body: => Tree): Tree =
       inParensOrError(body, literalUnit)
@@ -76,7 +78,9 @@ trait ParsersCommon extends ScannersCommon { self =>
     }
     @inline final def inBracesOrError[T](body: => T, alt: T): T =
       if (in.token == LBRACE) inBraces(body)
-      else { accept(LBRACE); alt }
+      else {
+        accept(LBRACE); alt
+      }
 
     @inline final def inBracesOrNil[T](body: => List[T]): List[T] =
       inBracesOrError(body, Nil)
@@ -1310,7 +1314,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         atPos(t.pos.start, dotOffset) { SingletonTypeTree(t) }
       } else {
         val t1 = selector(t)
-        if (in.token == DOT) { selectors(t1, typeOK, in.skipToken()) } else t1
+        if (in.token == DOT) {
+          selectors(t1, typeOK, in.skipToken())
+        } else t1
       }
 
     /** {{{
@@ -1337,7 +1343,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     def qualId(): Tree = {
       val start = in.offset
       val id = atPos(start) { Ident(ident()) }
-      if (in.token == DOT) { selectors(id, typeOK = false, in.skipToken()) } else
+      if (in.token == DOT) {
+        selectors(id, typeOK = false, in.skipToken())
+      } else
         id
     }
 
@@ -1489,7 +1497,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       *  }}}
       */
     def typedOpt(): Tree =
-      if (in.token == COLON) { in.nextToken(); typ() } else TypeTree()
+      if (in.token == COLON) {
+        in.nextToken(); typ()
+      } else TypeTree()
 
     def typeOrInfixType(location: Location): Tree =
       if (location == Local) typ()
@@ -1569,7 +1579,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
             newLinesOpt()
             val thenp = expr()
             val elsep =
-              if (in.token == ELSE) { in.nextToken(); expr() } else literalUnit
+              if (in.token == ELSE) {
+                in.nextToken(); expr()
+              } else literalUnit
             If(cond, thenp, elsep)
           }
           parseIf
@@ -1942,7 +1954,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       *  }}}
       */
     def guard(): Tree =
-      if (in.token == IF) { in.nextToken(); stripParens(postfixExpr()) } else
+      if (in.token == IF) {
+        in.nextToken(); stripParens(postfixExpr())
+      } else
         EmptyTree
 
     /** {{{
@@ -2059,7 +2073,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       def pattern(): Tree = {
         val start = in.offset
         def loop(): List[Tree] = pattern1() :: {
-          if (isRawBar) { in.nextToken(); loop() } else Nil
+          if (isRawBar) {
+            in.nextToken(); loop()
+          } else Nil
         }
         loop() match {
           case pat :: Nil => pat
@@ -2317,7 +2333,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
         in.nextToken()
         if (mods.hasAccessBoundary)
           syntaxError("duplicate private/protected qualifier", skipIt = false)
-        result = if (in.token == THIS) { in.nextToken(); mods | Flags.LOCAL } else
+        result = if (in.token == THIS) {
+          in.nextToken(); mods | Flags.LOCAL
+        } else
           Modifiers(mods.flags, identForType())
         accept(RBRACKET)
       }
@@ -2626,7 +2644,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     }
 
     def bound(tok: Token): Tree =
-      if (in.token == tok) { in.nextToken(); typ() } else EmptyTree
+      if (in.token == tok) {
+        in.nextToken(); typ()
+      } else EmptyTree
 
     /* -------- DEFS ------------------------------------------- */
 
@@ -2712,7 +2732,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
     }
 
     def wildcardOrIdent() = {
-      if (in.token == USCORE) { in.nextToken(); nme.WILDCARD } else ident()
+      if (in.token == USCORE) {
+        in.nextToken(); nme.WILDCARD
+      } else ident()
     }
 
     /** {{{
@@ -2984,7 +3006,9 @@ trait Parsers extends Scanners with MarkupParsers with ParsersCommon { self =>
       atPos(in.skipToken()) {
         val stats =
           selfInvocation(vparamss) :: {
-            if (isStatSep) { in.nextToken(); blockStatSeq() } else Nil
+            if (isStatSep) {
+              in.nextToken(); blockStatSeq()
+            } else Nil
           }
         accept(RBRACE)
         Block(stats, literalUnit)

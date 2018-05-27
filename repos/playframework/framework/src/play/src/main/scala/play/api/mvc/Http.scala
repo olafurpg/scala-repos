@@ -992,7 +992,7 @@ package play.api.mvc {
                 Option(cookie.domain),
                 cookie.isSecure,
                 cookie.isHttpOnly
-            ))
+              ))
         }
       }.getOrElse {
         logger.debug(

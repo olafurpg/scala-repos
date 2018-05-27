@@ -18,7 +18,7 @@ class UByte(val signed: Byte)
   override def toChar: Char = (signed & 0xff).toChar
   override def toShort: Short = (signed & 0xff).toShort
   override def toInt: Int = signed & 0xff
-  override def toLong: Long = signed & 0xffL
+  override def toLong: Long = signed & 0XFFL
   override def toFloat: Float = toInt.toFloat
   override def toDouble: Double = toInt.toDouble
   def toBigInt: BigInt = BigInt(toInt)

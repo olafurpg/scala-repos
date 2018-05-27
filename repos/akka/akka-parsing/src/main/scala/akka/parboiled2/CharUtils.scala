@@ -40,7 +40,7 @@ object CharUtils {
     * (fast branchless implementation)
     */
   def lowerHexDigit(long: Long): Char =
-    lowerHexDigit_internal((long & 0x0FL).toInt)
+    lowerHexDigit_internal((long & 0X0FL).toInt)
 
   /**
     * Returns the lower-case hex digit corresponding to the last 4 bits of the given Int.
@@ -56,7 +56,7 @@ object CharUtils {
     * (fast branchless implementation)
     */
   def upperHexDigit(long: Long): Char =
-    upperHexDigit_internal((long & 0x0FL).toInt)
+    upperHexDigit_internal((long & 0X0FL).toInt)
 
   /**
     * Returns the upper-case hex digit corresponding to the last 4 bits of the given Int.

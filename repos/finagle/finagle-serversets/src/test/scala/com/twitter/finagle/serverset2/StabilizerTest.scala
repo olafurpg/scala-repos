@@ -15,9 +15,9 @@ class StabilizerTest extends FunSuite {
     val addr1 = Address(1)
     val addr2 = Address(2)
     val addr3 = Address(3)
-    val waddr1 = WeightedAddress(addr1, 1D)
-    val waddr2 = WeightedAddress(addr1, 2D)
-    val waddr3 = WeightedAddress(addr2, 2D)
+    val waddr1 = WeightedAddress(addr1, 1d)
+    val waddr2 = WeightedAddress(addr1, 2d)
+    val waddr3 = WeightedAddress(addr2, 2d)
 
     val va = Var[Addr](Addr.Pending)
     val removalEvent = Event[Unit]()

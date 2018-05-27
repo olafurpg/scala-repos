@@ -1366,17 +1366,18 @@ object Build extends sbt.Build {
         if (shouldPartest.value)
           Def.task {
             val _ = (fetchScalaSource in partest).value
-            Seq(new sbt.TestDefinition(
-              s"partest-${scalaVersion.value}",
-              // marker fingerprint since there are no test classes
-              // to be discovered by sbt:
-              new sbt.testing.AnnotatedFingerprint {
-                def isModule = true
-                def annotationName = "partest"
-              },
-              true,
-              Array()
-            ))
+            Seq(
+              new sbt.TestDefinition(
+                s"partest-${scalaVersion.value}",
+                // marker fingerprint since there are no test classes
+                // to be discovered by sbt:
+                new sbt.testing.AnnotatedFingerprint {
+                  def isModule = true
+                  def annotationName = "partest"
+                },
+                true,
+                Array()
+              ))
           } else {
           Def.task(Seq())
         }

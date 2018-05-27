@@ -658,7 +658,11 @@ case class InconsistentDatabase(
 
   def htmlDescription: String = {
 
-    <span>An evolution has not been applied properly. Please check the problem and resolve it manually{ sentenceEnd } -</span>
-    <input name="evolution-button" type="button" value={ buttonLabel } onclick={ redirectJavascript }/>
+    <span>An evolution has not been applied properly. Please check the problem and resolve it manually{
+      sentenceEnd
+    } -</span>
+    <input name="evolution-button" type="button" value={buttonLabel} onclick={
+      redirectJavascript
+    }/>
   }.mkString
 }

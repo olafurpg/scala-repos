@@ -62,7 +62,9 @@ object CurrentOrigin {
   def withOrigin[A](o: Origin)(f: => A): A = {
     set(o)
     val ret = try f
-    finally { reset() }
+    finally {
+      reset()
+    }
     reset()
     ret
   }

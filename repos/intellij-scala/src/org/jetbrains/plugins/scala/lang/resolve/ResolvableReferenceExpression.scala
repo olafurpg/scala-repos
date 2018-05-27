@@ -467,7 +467,8 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
         val tp: ScType = clazz
           .asInstanceOf[ScClass]
           .getType(TypingContext.empty)
-          .getOrElse(return )
+          .getOrElse(return
+          )
         val typeArgs: Seq[ScTypeElement] = Seq.empty
         val arguments = s.arguments
         val secondaryConstructors = (c: ScClass) => {
@@ -482,7 +483,10 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
         processConstructor(s, tp, typeArgs, arguments, secondaryConstructors)
       case constr: ScConstructor =>
         val tp: ScType =
-          constr.typeElement.getType(TypingContext.empty).getOrElse(return )
+          constr.typeElement
+            .getType(TypingContext.empty)
+            .getOrElse(return
+            )
         val typeArgs: Seq[ScTypeElement] =
           constr.typeArgList.map(_.typeArgs).getOrElse(Seq())
         val arguments = constr.arguments

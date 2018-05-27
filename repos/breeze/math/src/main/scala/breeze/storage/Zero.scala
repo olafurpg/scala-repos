@@ -22,7 +22,7 @@ import breeze.math.Semiring
   *
   * @author dlwh
   */
-@SerialVersionUID(1l)
+@SerialVersionUID(1L)
 trait Zero[@specialized T] extends Serializable {
   def zero: T
 }
@@ -52,7 +52,7 @@ object Zero extends ZeroLowPriority {
   }
 
   implicit object LongZero extends Zero[Long] {
-    override def zero = 0l
+    override def zero = 0L
   }
 
   implicit object ByteZero extends Zero[Byte] {

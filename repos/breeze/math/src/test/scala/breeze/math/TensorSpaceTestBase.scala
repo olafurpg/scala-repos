@@ -55,7 +55,7 @@ trait TensorSpaceTestBase[V, I, S] extends MutableModuleTestBase[V, S] {
     check(Prop.forAll { (trip: (V, V, V)) =>
       val (a, b, c) = trip
       val res =
-        scalars.close(scalars.+(a dot b, a dot c), (a dot (b + c)), 1E-3)
+        scalars.close(scalars.+(a dot b, a dot c), (a dot (b + c)), 1e-3)
       if (!res) println(scalars.+(a dot b, a dot c) + " " + (a dot (b + c)))
       res
     })

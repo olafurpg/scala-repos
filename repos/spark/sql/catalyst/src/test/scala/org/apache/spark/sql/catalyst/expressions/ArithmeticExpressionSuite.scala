@@ -293,7 +293,7 @@ class ArithmeticExpressionSuite
       checkEvaluation(Remainder(left, Literal(convert(0))), null) // mod by 0
     }
     checkEvaluation(Pmod(Literal(-7), Literal(3)), 2)
-    checkEvaluation(Pmod(Literal(7.2D), Literal(4.1D)), 3.1000000000000005)
+    checkEvaluation(Pmod(Literal(7.2d), Literal(4.1d)), 3.1000000000000005)
     checkEvaluation(
       Pmod(Literal(Decimal(0.7)), Literal(Decimal(0.2))),
       Decimal(0.1))

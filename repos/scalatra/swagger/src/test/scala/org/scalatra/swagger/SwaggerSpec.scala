@@ -58,7 +58,12 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
     * Sets the port to listen on.  0 means listen on any available port.
     */
   override lazy val port: Int = {
-    val s = new ServerSocket(0); try { s.getLocalPort } finally { s.close() }
+    val s = new ServerSocket(0);
+    try {
+      s.getLocalPort
+    } finally {
+      s.close()
+    }
   } //58468
 
   val listResourceJValue =
@@ -310,7 +315,9 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
           def countsmatch =
             (af.size must_== ef.size)
               .setMessage("The count for the responseMessages is different")
-          if (r.nonEmpty) { countsmatch and (r reduce (_ and _)) } else
+          if (r.nonEmpty) {
+            countsmatch and (r reduce (_ and _))
+          } else
             countsmatch
         case "parameters" =>
           val JArray(af) = act \ fn

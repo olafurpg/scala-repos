@@ -6,34 +6,28 @@ class Test {
 
   def test4 = {
     val c = new Capture;
-    (i: Int) =>
-      { (c, Test.this.toString); 42 }
+    (i: Int) => { (c, Test.this.toString); 42 }
   }
   def test5 = {
     val c = new Capture;
-    (i: VC) =>
-      (c, Test.this.toString)
+    (i: VC) => (c, Test.this.toString)
   }
   def test6 = {
     val c = new Capture;
-    (i: Int) =>
-      (c, Test.this.toString)
+    (i: Int) => (c, Test.this.toString)
   }
 
   def test7 = {
     val vc = new Capture;
-    (i: Int) =>
-      vc
+    (i: Int) => vc
   }
   def test8 = {
     val c = 42;
-    (s: String) =>
-      (s, c)
+    (s: String) => (s, c)
   }
   def test9 = {
     val c = 42;
-    (s: String) =>
-      ()
+    (s: String) => ()
   }
 }
 

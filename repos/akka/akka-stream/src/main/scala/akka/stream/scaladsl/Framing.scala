@@ -131,7 +131,7 @@ object Framing {
             ctx.push(header ++ message)
           }
         }
-    })
+      })
 
   class FramingException(msg: String) extends RuntimeException(msg)
 

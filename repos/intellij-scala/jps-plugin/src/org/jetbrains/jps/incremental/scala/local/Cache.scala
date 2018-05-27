@@ -12,7 +12,7 @@ class Cache[K, V](capacity: Int) {
   private val lock = new Object()
 
   private val map =
-    new util.LinkedHashMap[K, SoftReference[V]](capacity, 0.75F, true) {
+    new util.LinkedHashMap[K, SoftReference[V]](capacity, 0.75f, true) {
       override def removeEldestEntry(eldest: Entry[K, SoftReference[V]]) =
         size > capacity
     }

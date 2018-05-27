@@ -245,7 +245,7 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
                 clock.now(),
                 0,
                 Some(failure.toString)): PrecogUnit
-          },
+            },
           storedQueryResult => {
             consumeStream(0, storedQueryResult.data) map { totalSize =>
               ourself ! TaskComplete(task.id, clock.now(), totalSize, None)

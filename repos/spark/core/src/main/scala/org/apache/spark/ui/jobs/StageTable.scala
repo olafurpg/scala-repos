@@ -37,7 +37,9 @@ private[ui] class StageTableBase(
 
   protected def columns: Seq[Node] = {
     <th>Stage Id</th> ++ {
-      if (isFairScheduler) { <th>Pool Name</th> } else Seq.empty
+      if (isFairScheduler) {
+        <th>Pool Name</th>
+      } else Seq.empty
     } ++ <th>Description</th>
     <th>Submitted</th>
     <th>Duration</th>
@@ -49,7 +51,9 @@ private[ui] class StageTableBase(
       <!-- Place the shuffle write tooltip on the left (rather than the default position
         of on top) because the shuffle write column is the last column on the right side and
         the tooltip is wider than the column, so it doesn't fit on top. -->
-      <span data-toggle="tooltip" data-placement="left" title={ToolTips.SHUFFLE_WRITE}>
+      <span data-toggle="tooltip" data-placement="left" title={
+      ToolTips.SHUFFLE_WRITE
+    }>
         Shuffle Write
       </span>
     </th>
@@ -106,12 +110,14 @@ private[ui] class StageTableBase(
             class="expand-details">
         +details
       </span> ++ <div class="stage-details collapsed">
-        {if (cachedRddInfos.nonEmpty) {
-          Text("RDD: ") ++
-          cachedRddInfos.map { i =>
-            <a href={s"$basePathUri/storage/rdd?id=${i.id}"}>{i.name}</a>
+        {
+          if (cachedRddInfos.nonEmpty) {
+            Text("RDD: ") ++
+              cachedRddInfos.map { i =>
+                <a href={s"$basePathUri/storage/rdd?id=${i.id}"}>{i.name}</a>
+              }
           }
-        }}
+        }
         <pre>{s.details}</pre>
       </div>
       }
@@ -127,7 +133,9 @@ private[ui] class StageTableBase(
 
   protected def missingStageRow(stageId: Int): Seq[Node] = {
     <td>{stageId}</td> ++ {
-      if (isFairScheduler) { <td>-</td> } else Seq.empty
+      if (isFairScheduler) {
+        <td>-</td>
+      } else Seq.empty
     } ++ <td>No data available for this stage</td> ++ // Description
       <td></td> ++ // Submitted
       <td></td> ++ // Duration
@@ -191,8 +199,10 @@ private[ui] class StageTableBase(
     } ++ {
       if (isFairScheduler) {
         <td>
-        <a href={"%s/stages/pool?poolname=%s"
-          .format(UIUtils.prependBaseUri(basePath), stageData.schedulingPool)}>
+        <a href={
+          "%s/stages/pool?poolname=%s"
+            .format(UIUtils.prependBaseUri(basePath), stageData.schedulingPool)
+        }>
           {stageData.schedulingPool}
         </a>
       </td>
@@ -203,11 +213,18 @@ private[ui] class StageTableBase(
     <td sorttable_customkey={s.submissionTime.getOrElse(0).toString} valign="middle">
       {submissionTime}
     </td>
-    <td sorttable_customkey={duration.getOrElse(-1).toString}>{formattedDuration}</td>
+    <td sorttable_customkey={duration.getOrElse(-1).toString}>{
+      formattedDuration
+    }</td>
     <td class="progress-cell">
-      {UIUtils.makeProgressBar(started = stageData.numActiveTasks,
-        completed = stageData.completedIndices.size, failed = stageData.numFailedTasks,
-        skipped = 0, total = s.numTasks)}
+      {
+      UIUtils.makeProgressBar(
+        started = stageData.numActiveTasks,
+        completed = stageData.completedIndices.size,
+        failed = stageData.numFailedTasks,
+        skipped = 0,
+        total = s.numTasks)
+    }
     </td>
     <td sorttable_customkey={inputRead.toString}>{inputReadWithUnit}</td>
     <td sorttable_customkey={outputWrite.toString}>{outputWriteWithUnit}</td>

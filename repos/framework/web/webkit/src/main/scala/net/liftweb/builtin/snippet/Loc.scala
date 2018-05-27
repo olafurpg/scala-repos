@@ -53,11 +53,9 @@ import net.liftweb.common._
 object Loc extends DispatchSnippet {
   def dispatch: DispatchIt = {
     case "i" =>
-      ns =>
-        i(ns)
+      ns => i(ns)
     case s =>
-      ns =>
-        render(s, ns)
+      ns => render(s, ns)
   }
 
   def i(ns: NodeSeq): NodeSeq = {

@@ -714,35 +714,35 @@ trait AbstractScreen extends Factory with Loggable {
       s match {
         case null => null
         case s    => s.replaceAll(regEx, "")
-    }
+      }
 
   protected def toLower: String => String =
     s =>
       s match {
         case null => null
         case s    => s.toLowerCase
-    }
+      }
 
   protected def toUpper: String => String =
     s =>
       s match {
         case null => null
         case s    => s.toUpperCase
-    }
+      }
 
   protected def trim: String => String =
     s =>
       s match {
         case null => null
         case s    => s.trim
-    }
+      }
 
   protected def notNull: String => String =
     s =>
       s match {
         case null => ""
         case x    => x
-    }
+      }
 
   /**
     * A validation helper.  Make sure the string is at least a particular
@@ -759,7 +759,7 @@ trait AbstractScreen extends Factory with Loggable {
             FieldError(
               currentField.box openOr new FieldIdentifier {},
               Text(msg)))
-    }
+      }
 
   /**
     * A validation helper.  Make sure the string is no more than a particular
@@ -776,7 +776,7 @@ trait AbstractScreen extends Factory with Loggable {
             FieldError(
               currentField.box openOr new FieldIdentifier {},
               Text(msg)))
-    }
+      }
 
   /**
     * Make sure the field matches a regular expression
@@ -792,7 +792,7 @@ trait AbstractScreen extends Factory with Loggable {
             FieldError(
               currentField.box openOr new FieldIdentifier {},
               Text(msg)))
-    }
+      }
 
   protected def minVal[T](len: => T, msg: => String)(
       implicit f: T => Number): T => List[FieldError] =
@@ -1417,37 +1417,45 @@ trait ScreenWizardRendered extends Loggable {
 
       val ret =
         (<form id={nextId._1} action={url}
-               method="post">{S.formGroup(-1)(SHtml.hidden(() =>
-          snapshot.restore()) % liftScreenAttr("restoreAction"))}{fields}{
-          S.formGroup(4)(
-            SHtml.hidden(() =>
-            {val res = nextId._2();
-              if (!ajax_?) {
-                val localSnapshot = createSnapshot
-                S.seeOther(url, () => {
-                  localSnapshot.restore
-                })}
-              res
-            })) % liftScreenAttr("nextAction") }</form> % theScreen.additionalAttributes) ++ prevId.toList
+               method="post">{
+          S.formGroup(-1)(
+            SHtml.hidden(() => snapshot.restore()) % liftScreenAttr(
+              "restoreAction"))
+        }{fields}{
+          S.formGroup(4)(SHtml.hidden(() => {
+            val res = nextId._2();
+            if (!ajax_?) {
+              val localSnapshot = createSnapshot
+              S.seeOther(url, () => {
+                localSnapshot.restore
+              })
+            }
+            res
+          })) % liftScreenAttr("nextAction")
+        }</form> % theScreen.additionalAttributes) ++ prevId.toList
           .map {
             case (id, func) =>
               <form id={id} action={url} method="post">{
-              SHtml.hidden(() => {snapshot.restore();
-                val res = func();
-                if (!ajax_?) {
-                  val localSnapshot = createSnapshot;
-                  S.seeOther(url, () => localSnapshot.restore)
-                }
-                res
-              }) % liftScreenAttr("restoreAction")}</form>
-          } ++ <form id={cancelId._1} action={url} method="post">{SHtml.hidden(() => {
+                SHtml.hidden(() => {
+                  snapshot.restore();
+                  val res = func();
+                  if (!ajax_?) {
+                    val localSnapshot = createSnapshot;
+                    S.seeOther(url, () => localSnapshot.restore)
+                  }
+                  res
+                }) % liftScreenAttr("restoreAction")
+              }</form>
+          } ++ <form id={cancelId._1} action={url} method="post">{
+          SHtml.hidden(() => {
             snapshot.restore();
             val res = cancelId._2() // WizardRules.deregisterWizardSession(CurrentSession.is)
             if (!ajax_?) {
               S.seeOther(Referer.get)
             }
             res
-          }) % liftScreenAttr("restoreAction")}</form>
+          }) % liftScreenAttr("restoreAction")
+        }</form>
 
       if (ajax_?) {
         SHtml.makeFormsAjax(ret)
@@ -1644,11 +1652,10 @@ trait LiftScreen
     with ScreenWizardRendered {
   def dispatch = {
     case _ =>
-      template =>
-        {
-          _defaultXml.set(template)
-          this.toForm
-        }
+      template => {
+        _defaultXml.set(template)
+        this.toForm
+      }
   }
 
   protected object SavedDefaultXml extends ScreenVar[NodeSeq](defaultXml) {

@@ -88,37 +88,37 @@ private[ui] class AllStagesPage(parent: StagesTab) extends WebUIPage("") {
       val summary: NodeSeq = <div>
           <ul class="unstyled">
             {
-              if (shouldShowActiveStages) {
-                <li>
+        if (shouldShowActiveStages) {
+          <li>
                   <a href="#active"><strong>Active Stages:</strong></a>
                   {activeStages.size}
                 </li>
-              }
-            }
+        }
+      }
             {
-              if (shouldShowPendingStages) {
-                <li>
+        if (shouldShowPendingStages) {
+          <li>
                   <a href="#pending"><strong>Pending Stages:</strong></a>
                   {pendingStages.size}
                 </li>
-              }
-            }
+        }
+      }
             {
-              if (shouldShowCompletedStages) {
-                <li id="completed-summary">
+        if (shouldShowCompletedStages) {
+          <li id="completed-summary">
                   <a href="#completed"><strong>Completed Stages:</strong></a>
                   {completedStageNumStr}
                 </li>
-              }
-            }
+        }
+      }
             {
-              if (shouldShowFailedStages) {
-                <li>
+        if (shouldShowFailedStages) {
+          <li>
                   <a href="#failed"><strong>Failed Stages:</strong></a>
                   {numFailedStages}
                 </li>
-              }
-            }
+        }
+      }
           </ul>
         </div>
 

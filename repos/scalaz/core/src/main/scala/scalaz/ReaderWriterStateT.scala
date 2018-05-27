@@ -15,7 +15,7 @@ sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
     IndexedStateT((s: S1) =>
       F.map(run(r, s)) {
         case (w, a, s1) => (s1, a)
-    })
+      })
 
   /** Calls `run` using `Monoid[S].zero` as the initial state */
   def runZero[S <: S1](
@@ -55,7 +55,7 @@ sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
               case (w2, b, s3) => (W.append(w1, w2), b, s3)
             }
           }
-    })
+        })
 }
 
 object IndexedReaderWriterStateT
@@ -212,7 +212,7 @@ private trait ReaderWriterStateTBindRec[F[_], R, W, S]
       F.bind(f(a).run(r, s)) {
         case (w, -\/(a0), s0) => F.tailrecM(go(r))(w, a0, s0)
         case (w, \/-(b), s0)  => A.point((w, b, s0))
-    })
+      })
   }
 }
 

@@ -131,7 +131,7 @@ trait OptimizationSpaceTest[M, V, S] extends TensorSpaceTestBase[V, Int, S] {
   test("Scalar mult distributes over field addition - Matrix") {
     check(Prop.forAll { (trip: (M, M, M), s: S, t: S) =>
       val (a, _, _) = trip
-      closeM((a) :* scalars.+(s, t), (a :* s) + (a :* t), 1E-4)
+      closeM((a) :* scalars.+(s, t), (a :* s) + (a :* t), 1e-4)
     })
 
     check(Prop.forAll { (trip: (M, M, M), s: S, t: S) =>
@@ -200,7 +200,7 @@ trait OptimizationSpaceTest[M, V, S] extends TensorSpaceTestBase[V, Int, S] {
   }
 
   // norm
-  val TOLM = 1E-3
+  val TOLM = 1e-3
   test("norm positive homogeneity - Matrix") {
     check(Prop.forAll { (trip: (M, M, M), s: S) =>
       val (a, b, c) = trip
@@ -228,7 +228,7 @@ trait OptimizationSpaceTest[M, V, S] extends TensorSpaceTestBase[V, Int, S] {
     check(Prop.forAll { (trip: (M, M, M)) =>
       val (a, b, c) = trip
       val res =
-        scalars.close(scalars.+(a dot b, a dot c), (a dot (b + c)), 1E-3)
+        scalars.close(scalars.+(a dot b, a dot c), (a dot (b + c)), 1e-3)
       if (!res) println(scalars.+(a dot b, a dot c) + " " + (a dot (b + c)))
       res
     })
@@ -299,9 +299,9 @@ class DenseOptimizationSpaceTest_Double
     (DenseMatrix[Double], DenseMatrix[Double], DenseMatrix[Double])] = {
     Arbitrary {
       for {
-        x <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
-        y <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
-        z <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
+        x <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
+        y <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
+        z <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
       } yield {
         (
           DenseMatrix.fill(N, N)(math.random * x),
@@ -315,9 +315,9 @@ class DenseOptimizationSpaceTest_Double
     (DenseVector[Double], DenseVector[Double], DenseVector[Double])] = {
     Arbitrary {
       for {
-        x <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
-        y <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
-        z <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
+        x <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
+        y <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
+        z <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
       } yield {
         (
           DenseVector.fill(N)(math.random * x),
@@ -328,7 +328,7 @@ class DenseOptimizationSpaceTest_Double
   }
 
   def genScalar: Arbitrary[Double] =
-    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1E10 })
+    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1e10 })
 }
 
 class SparseOptimizationSpaceTest_Double
@@ -347,7 +347,7 @@ class SparseOptimizationSpaceTest_Double
   val M = 30
 
   def genScalar: Arbitrary[Double] =
-    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1E10 })
+    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1e10 })
 
   val arbColIndex = Arbitrary(Gen.choose[Int](0, N - 1))
   val arbRowIndex = Arbitrary(Gen.choose[Int](0, M - 1))
@@ -355,7 +355,7 @@ class SparseOptimizationSpaceTest_Double
   implicit val arbEntry = Arbitrary.arbTuple3[Int, Int, Double](
     arbRowIndex,
     arbColIndex,
-    Arbitrary(Arbitrary.arbitrary[Double].map(_ % 1E100)))
+    Arbitrary(Arbitrary.arbitrary[Double].map(_ % 1e100)))
   implicit val arbVals = Arbitrary(
     genAS flatMap
       (
@@ -396,13 +396,13 @@ class SparseOptimizationSpaceTest_Double
       for {
         xAS <- Gen.chooseNum[Int](0, N)
         xi <- Gen.pick(xAS, indices)
-        xv <- Gen.listOfN(xAS, Arbitrary.arbitrary[Double].map(_ % 1E100))
+        xv <- Gen.listOfN(xAS, Arbitrary.arbitrary[Double].map(_ % 1e100))
         yAS <- Gen.chooseNum[Int](0, N)
         yi <- Gen.pick(yAS, indices)
-        yv <- Gen.listOfN(yAS, Arbitrary.arbitrary[Double].map(_ % 1E100))
+        yv <- Gen.listOfN(yAS, Arbitrary.arbitrary[Double].map(_ % 1e100))
         zAS <- Gen.chooseNum[Int](0, N)
         zi <- Gen.pick(zAS, indices)
-        zv <- Gen.listOfN(zAS, Arbitrary.arbitrary[Double].map(_ % 1E100))
+        zv <- Gen.listOfN(zAS, Arbitrary.arbitrary[Double].map(_ % 1e100))
       } yield {
         (
           SparseVector(N)(xi.zip(xv.map(_ * math.random)): _*),

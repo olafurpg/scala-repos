@@ -149,12 +149,11 @@ class TungstenAggregationIterator(
       val unsafeRowJoiner =
         GenerateUnsafeRowJoiner.create(groupingKeySchema, bufferSchema)
 
-      (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) =>
-        {
-          unsafeRowJoiner.join(
-            currentGroupingKey,
-            currentBuffer.asInstanceOf[UnsafeRow])
-        }
+      (currentGroupingKey: UnsafeRow, currentBuffer: MutableRow) => {
+        unsafeRowJoiner.join(
+          currentGroupingKey,
+          currentBuffer.asInstanceOf[UnsafeRow])
+      }
     } else {
       super.generateResultProjection()
     }

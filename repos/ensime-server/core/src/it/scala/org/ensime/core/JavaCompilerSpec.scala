@@ -28,7 +28,7 @@ class JavaCompilerSpec
         "class Test1 {",
         "  ksjdfkdjsf @1@",
         "}") { (sf, p, label, cc) =>
-        }
+      }
       store.notes should not be empty
     }
   }

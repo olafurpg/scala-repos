@@ -233,7 +233,9 @@ trait ModelFactoryTypeSupport {
             nameBuffer append " forSome {"
             var first = true
             for (sym <- quantified) {
-              if (!first) { nameBuffer append ", " } else first = false
+              if (!first) {
+                nameBuffer append ", "
+              } else first = false
               if (sym.isSingletonExistential) {
                 nameBuffer append "val "
                 nameBuffer append tpnme.dropSingletonName(sym.name)
@@ -259,7 +261,9 @@ trait ModelFactoryTypeSupport {
               var first = true
               val qset = quantified.toSet
               for (arg <- args) {
-                if (!first) { nameBuffer append ", " } else first = false
+                if (!first) {
+                  nameBuffer append ", "
+                } else first = false
                 arg match {
                   case TypeRef(_, sym, _) if (qset contains sym) =>
                     nameBuffer append "_"

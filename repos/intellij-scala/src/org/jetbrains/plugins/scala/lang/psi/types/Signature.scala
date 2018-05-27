@@ -40,12 +40,10 @@ case class TypeAliasSignature(
     def updateTypeParam(tp: TypeParameter): TypeParameter = {
       new TypeParameter(tp.name, tp.typeParams.map(updateTypeParam), {
         val res = fun(tp.lowerType())
-        () =>
-          res
+        () => res
       }, {
         val res = fun(tp.upperType())
-        () =>
-          res
+        () => res
       }, tp.ptp)
     }
     val res = TypeAliasSignature(

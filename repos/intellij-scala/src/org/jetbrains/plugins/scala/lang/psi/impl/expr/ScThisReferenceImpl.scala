@@ -79,7 +79,7 @@ object ScThisReferenceImpl {
         td.selfType match {
           case Some(selfType) => Bounds.glb(tp, selfType)
           case _              => tp
-      })
+        })
 
     // SLS 6.5:  If the expression’s expected type is a stable type,
     // or C .this occurs as the prefix of a selection, its type is C.this.type,

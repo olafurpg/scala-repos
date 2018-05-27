@@ -733,7 +733,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
           case e: IOException =>
             logWarning(s"Cannot delete checkpoint file $file:", e)
         }
-    }
+      }
     if (implicitPrefs) {
       for (iter <- 1 to maxIter) {
         userFactors

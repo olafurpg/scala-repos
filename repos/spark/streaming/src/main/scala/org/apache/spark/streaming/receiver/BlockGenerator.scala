@@ -99,7 +99,7 @@ private[streaming] class BlockGenerator(
   private object GeneratorState extends Enumeration {
     type GeneratorState = Value
     val Initialized, Active, StoppedAddingData, StoppedGeneratingBlocks,
-    StoppedAll = Value
+        StoppedAll = Value
   }
   import GeneratorState._
 

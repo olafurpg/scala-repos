@@ -32,7 +32,7 @@ object Complex extends ComplexInstances {
     new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n: Long): Complex[Double] =
     new Complex(n.toDouble, 0.0)
-  implicit def floatToComplex(n: Float): Complex[Float] = new Complex(n, 0.0F)
+  implicit def floatToComplex(n: Float): Complex[Float] = new Complex(n, 0.0f)
   implicit def doubleToComplex(n: Double): Complex[Double] =
     new Complex(n, 0.0)
 
@@ -494,7 +494,7 @@ class FloatComplex(val u: Long) extends AnyVal {
   final def **(b: FloatComplex): FloatComplex = pow(b)
 
   final def pow(b: Int): FloatComplex =
-    new FloatComplex(FastComplex.pow(u, FastComplex(b.toFloat, 0.0F)))
+    new FloatComplex(FastComplex.pow(u, FastComplex(b.toFloat, 0.0f)))
   final def **(b: Int): FloatComplex = pow(b)
 }
 
@@ -548,13 +548,13 @@ object FastComplex {
   @inline final def imag(d: Long): Float = bits((d >>> 32).toInt)
 
   // define some handy constants
-  final val i: Long = encode(0.0F, 1.0F)
-  final val one: Long = encode(1.0F, 0.0F)
-  final val zero: Long = encode(0.0F, 0.0F)
+  final val i: Long = encode(0.0f, 1.0f)
+  final val one: Long = encode(1.0f, 0.0f)
+  final val zero: Long = encode(0.0f, 0.0f)
 
   // encode two floats representing a complex number
   @inline final def encode(real: Float, imag: Float): Long =
-    (bits(real) & 0xffffffffL) | ((bits(imag) & 0xffffffffL) << 32)
+    (bits(real) & 0XFFFFFFFFL) | ((bits(imag) & 0XFFFFFFFFL) << 32)
 
   // encode two floats representing a complex number in polar form
   @inline final def polar(magnitude: Float, angle: Float): Long =
@@ -582,15 +582,15 @@ object FastComplex {
 
   // see if the complex number is a whole value
   final def isWhole(d: Long): Boolean =
-    real(d) % 1.0F == 0.0F && imag(d) % 1.0F == 0.0F
+    real(d) % 1.0f == 0.0f && imag(d) % 1.0f == 0.0f
 
   // get the sign of the complex number
-  final def signum(d: Long): Int = real(d) compare 0.0F
+  final def signum(d: Long): Int = real(d) compare 0.0f
 
   // get the complex sign of the complex number
   final def complexSignum(d: Long): Long = {
     val m = abs(d)
-    if (m == 0.0F) zero else divide(d, encode(m, 0.0F))
+    if (m == 0.0f) zero else divide(d, encode(m, 0.0f))
   }
 
   // negation
@@ -624,12 +624,12 @@ object FastComplex {
     val abs_im_b = Math.abs(im_b)
 
     if (abs_re_b >= abs_im_b) {
-      if (abs_re_b == 0.0F) throw new ArithmeticException("/0")
+      if (abs_re_b == 0.0f) throw new ArithmeticException("/0")
       val ratio = im_b / re_b
       val denom = re_b + im_b * ratio
       encode((re_a + im_a * ratio) / denom, (im_a - re_a * ratio) / denom)
     } else {
-      if (abs_im_b == 0.0F) throw new ArithmeticException("/0")
+      if (abs_im_b == 0.0f) throw new ArithmeticException("/0")
       val ratio = re_b / im_b
       val denom = re_b * ratio + im_b
       encode((re_a * ratio + im_a) / denom, (im_a * ratio - re_a) / denom)
@@ -637,7 +637,7 @@ object FastComplex {
   }
 
   final def quot(a: Long, b: Long): Long =
-    encode(Math.floor(real(divide(a, b))).toFloat, 0.0F)
+    encode(Math.floor(real(divide(a, b))).toFloat, 0.0f)
 
   final def mod(a: Long, b: Long): Long = subtract(a, multiply(b, quot(a, b)))
 
@@ -649,12 +649,12 @@ object FastComplex {
   // exponentiation
   final def pow(a: Long, b: Long): Long =
     if (b == zero) {
-      encode(1.0F, 0.0F)
+      encode(1.0f, 0.0f)
     } else if (a == zero) {
-      if (imag(b) != 0.0F || real(b) < 0.0F)
+      if (imag(b) != 0.0f || real(b) < 0.0f)
         throw new Exception("raising 0 to negative/complex power")
       zero
-    } else if (imag(b) != 0.0F) {
+    } else if (imag(b) != 0.0f) {
       val im_b = imag(b)
       val re_b = real(b)
       val len = (Math.pow(abs(a), re_b) / exp((angle(a) * im_b))).toFloat

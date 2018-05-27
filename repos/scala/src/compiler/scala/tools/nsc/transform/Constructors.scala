@@ -654,7 +654,7 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
       */
     def triageStats = {
       val defBuf, auxConstructorBuf, constrPrefixBuf, constrStatBuf,
-      classInitStatBuf = new mutable.ListBuffer[Tree]
+          classInitStatBuf = new mutable.ListBuffer[Tree]
 
       // The early initialized field definitions of the class (these are the class members)
       val presupers = treeInfo.preSuperFields(stats)

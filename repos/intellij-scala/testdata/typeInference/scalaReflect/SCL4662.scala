@@ -23,7 +23,7 @@ object SCL4662 {
         } catch {
           case e: Throwable =>
             e.printStackTrace(); None
-      }) /*end*/
+        }) /*end*/
     }
   }
 }

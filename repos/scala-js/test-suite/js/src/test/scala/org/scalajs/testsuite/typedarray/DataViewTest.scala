@@ -126,10 +126,10 @@ class DataViewTest {
     view.setUint8(7, 0xBD)
     view.setUint8(8, 0xAF)
 
-    assertEquals(0x01FFB3301A745CBDL, view.getInt64(0))
-    assertEquals(0xBD5C741A30B3FF01L, view.getInt64(0, true))
-    assertEquals(0xFFB3301A745CBDAFL, view.getInt64(1))
-    assertEquals(0xAFBD5C741A30B3FFL, view.getInt64(1, true))
+    assertEquals(0X01FFB3301A745CBDL, view.getInt64(0))
+    assertEquals(0XBD5C741A30B3FF01L, view.getInt64(0, true))
+    assertEquals(0XFFB3301A745CBDAFL, view.getInt64(1))
+    assertEquals(0XAFBD5C741A30B3FFL, view.getInt64(1, true))
   }
 
   @Test def getUint32(): Unit = {
@@ -143,7 +143,7 @@ class DataViewTest {
 
     assertEquals(0x01FFB330, view.getUint32(0))
     assertEquals(0x30B3FF01, view.getUint32(0, true))
-    assertEquals(0xFFB3301AL.toDouble, view.getUint32(1))
+    assertEquals(0XFFB3301AL.toDouble, view.getUint32(1))
     assertEquals(0x1A30B3FF, view.getUint32(1, true))
   }
 
@@ -152,10 +152,10 @@ class DataViewTest {
 
     view.setFloat32(0, 0.1f)
 
-    assertEquals(0.1, view.getFloat32(0), 1E-7)
-    assertNotEquals(0.1, view.getFloat32(1), 1E-7)
-    assertNotEquals(0.1, view.getFloat32(0, true), 1E-7)
-    assertNotEquals(0.1, view.getFloat32(1, true), 1E-7)
+    assertEquals(0.1, view.getFloat32(0), 1e-7)
+    assertNotEquals(0.1, view.getFloat32(1), 1e-7)
+    assertNotEquals(0.1, view.getFloat32(0, true), 1e-7)
+    assertNotEquals(0.1, view.getFloat32(1, true), 1e-7)
   }
 
   @Test def getFloat64(): Unit = {
@@ -248,7 +248,7 @@ class DataViewTest {
     val view = new DataView(new ArrayBuffer(8))
 
     view.setUint32(0, 0x7F3B8342, true)
-    view.setUint32(3, 0xFCBA1020L.toDouble)
+    view.setUint32(3, 0XFCBA1020L.toDouble)
 
     assertEquals(0x42, view.getUint8(0))
     assertEquals(0x83, view.getUint8(1))
@@ -263,8 +263,8 @@ class DataViewTest {
   @Test def setInt64_through_DataViewExt(): Unit = {
     val view = new DataView(new ArrayBuffer(16))
 
-    view.setInt64(0, 0x01FFB3301A745CBDL, true)
-    view.setInt64(8, 0xFCBA1020547DE1B5L)
+    view.setInt64(0, 0X01FFB3301A745CBDL, true)
+    view.setInt64(8, 0XFCBA1020547DE1B5L)
 
     assertEquals(0xBD, view.getUint8(0))
     assertEquals(0x5C, view.getUint8(1))
@@ -291,14 +291,14 @@ class DataViewTest {
     view.setFloat32(0, 0.1f)
     view.setFloat32(1, 0.4f)
 
-    assertEquals(0.4, view.getFloat32(1), 1E-7)
-    assertNotEquals(0.1, view.getFloat32(0), 1E-7)
+    assertEquals(0.4, view.getFloat32(1), 1e-7)
+    assertNotEquals(0.1, view.getFloat32(0), 1e-7)
 
     view.setFloat32(0, 0.1f, true)
     view.setFloat32(1, 0.4f, true)
 
-    assertNotEquals(0.1, view.getFloat32(0, true), 1E-7)
-    assertEquals(0.4, view.getFloat32(1, true), 1E-7)
+    assertNotEquals(0.1, view.getFloat32(0, true), 1e-7)
+    assertEquals(0.4, view.getFloat32(1, true), 1e-7)
   }
 
   @Test def setFloat64(): Unit = {

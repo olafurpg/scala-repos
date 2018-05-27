@@ -1,8 +1,7 @@
 class M(val t: Int) extends AnyVal {
   def lazyString = {
     object X
-    () =>
-      X
+    () => X
   }
 }
 

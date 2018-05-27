@@ -29,9 +29,8 @@ import scala.collection.breakOut
 object ClientMergeable {
   def apply[K, V](
       offlineStore: ReadableStore[K, (BatchID, V)],
-      onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[
-        (K, BatchID),
-        V],
+      onlineStore: ReadableStore[(K, BatchID), V]
+        with Mergeable[(K, BatchID), V],
       batchesToKeep: Int)(
       implicit batcher: Batcher,
       monoid: Semigroup[V]): ClientMergeable[K, V] =

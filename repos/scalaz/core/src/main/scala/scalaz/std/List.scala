@@ -58,8 +58,7 @@ trait ListInstances extends ListInstances0 {
           case (ah :: at, bh :: bt) =>
             loop(at, bt, f(\&/.Both(ah, bh)) :: accum)
         }
-      (a, b) =>
-        loop(a, b, Nil)
+      (a, b) => loop(a, b, Nil)
     }
     def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(
         implicit F: Applicative[F]) = {
@@ -163,9 +162,9 @@ trait ListInstances extends ListInstances0 {
         }
       "[" +:
         (as match {
-        case Nil     => Cord()
-        case x :: xs => commaSep(xs, Show[A].show(x))
-      }) :+ "]"
+          case Nil     => Cord()
+          case x :: xs => commaSep(xs, Show[A].show(x))
+        }) :+ "]"
     }
   }
 

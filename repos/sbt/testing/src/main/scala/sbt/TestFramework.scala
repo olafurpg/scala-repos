@@ -151,7 +151,7 @@ object TestFramework {
         try f(i)
         catch {
           case e: Exception => log.trace(e); log.error(e.toString)
-      })
+        })
 
   private[sbt] def hashCode(f: Fingerprint): Int = f match {
     case s: SubclassFingerprint  => (s.isModule, s.superclassName).hashCode
@@ -253,7 +253,9 @@ object TestFramework {
   private[this] def withContextLoader[T](loader: ClassLoader)(eval: => T): T = {
     val oldLoader = Thread.currentThread.getContextClassLoader
     Thread.currentThread.setContextClassLoader(loader)
-    try { eval } finally {
+    try {
+      eval
+    } finally {
       Thread.currentThread.setContextClassLoader(oldLoader)
     }
   }

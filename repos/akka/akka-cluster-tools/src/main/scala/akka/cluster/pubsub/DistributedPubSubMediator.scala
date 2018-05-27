@@ -567,12 +567,11 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
   // the version is a timestamp because it is also used when pruning removed entries
   val nextVersion = {
     var version = 0L
-    () ⇒
-      {
-        val current = System.currentTimeMillis
-        version = if (current > version) current else version + 1
-        version
-      }
+    () ⇒ {
+      val current = System.currentTimeMillis
+      version = if (current > version) current else version + 1
+      version
+    }
   }
 
   override def preStart(): Unit = {

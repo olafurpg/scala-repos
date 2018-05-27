@@ -32,20 +32,19 @@ trait LilaSocket { self: LilaController =>
         f(ctx).map { resultOrSocket =>
           resultOrSocket.right.map {
             case (readIn, writeOut) =>
-              (e, i) =>
-                {
-                  writeOut |>> i
-                  e &> Enumeratee.mapInputM { in =>
-                    consumer(ip).map { credit =>
-                      if (credit >= 0) in
-                      else {
-                        logger.info(
-                          s"socket:$name socket close $ip $userInfo $in")
-                        Input.EOF
-                      }
+              (e, i) => {
+                writeOut |>> i
+                e &> Enumeratee.mapInputM { in =>
+                  consumer(ip).map { credit =>
+                    if (credit >= 0) in
+                    else {
+                      logger.info(
+                        s"socket:$name socket close $ip $userInfo $in")
+                      Input.EOF
                     }
-                  } |>> readIn
-                }
+                  }
+                } |>> readIn
+              }
           }
         }
       }

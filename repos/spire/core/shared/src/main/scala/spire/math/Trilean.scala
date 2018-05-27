@@ -142,8 +142,7 @@ object Trilean {
 
   final def liftPf[A](p0: PartialFunction[A, Boolean]): A => Trilean = {
     val p = p0.andThen(Trilean(_))
-    (a: A) =>
-      p.applyOrElse(a, (_: A) => Unknown)
+    (a: A) => p.applyOrElse(a, (_: A) => Unknown)
   }
 
   final def testRef[A <: AnyRef](a: A)(f: A => Boolean): Trilean =

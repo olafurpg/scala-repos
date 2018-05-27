@@ -823,8 +823,8 @@ private[log] class Cleaner(
   */
 private case class CleanerStats(time: Time = SystemTime) {
   var startTime, mapCompleteTime, endTime, bytesRead, bytesWritten,
-  mapBytesRead, mapMessagesRead, messagesRead, messagesWritten,
-  invalidMessagesRead = 0L
+      mapBytesRead, mapMessagesRead, messagesRead, messagesWritten,
+      invalidMessagesRead = 0L
   var bufferUtilization = 0.0d
   clear()
 

@@ -14,7 +14,7 @@ import scala.util.Properties
 object DevModeBuild {
 
   val MaxAttempts = 10
-  val WaitTime = 500l
+  val WaitTime = 500L
   val ConnectTimeout = 10000
   val ReadTimeout = 10000
 

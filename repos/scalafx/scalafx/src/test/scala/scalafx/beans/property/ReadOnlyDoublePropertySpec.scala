@@ -87,7 +87,7 @@ class ReadOnlyDoublePropertySpec extends FlatSpec with BeforeAndAfterEach {
   }
 
   it should "support bindable infix addition of constants" in {
-    doubleProperty2 <== readOnlyDoubleProperty + 35 + 35l + 35f + 35d
+    doubleProperty2 <== readOnlyDoubleProperty + 35 + 35L + 35f + 35d
     doubleProperty2() should equal(190)
     doubleProperty2.unbind()
   }
@@ -100,7 +100,7 @@ class ReadOnlyDoublePropertySpec extends FlatSpec with BeforeAndAfterEach {
   }
 
   it should "support bindable infix subtraction of constants" in {
-    doubleProperty2 <== readOnlyDoubleProperty - 12 - 12l - 12f - 12d
+    doubleProperty2 <== readOnlyDoubleProperty - 12 - 12L - 12f - 12d
     doubleProperty2() should equal(2)
     doubleProperty2.unbind()
   }
@@ -113,7 +113,7 @@ class ReadOnlyDoublePropertySpec extends FlatSpec with BeforeAndAfterEach {
   }
 
   it should "support bindable infix multiplication of constants" in {
-    doubleProperty2 <== readOnlyDoubleProperty * 2 * 2l * 2f * 2d
+    doubleProperty2 <== readOnlyDoubleProperty * 2 * 2L * 2f * 2d
     doubleProperty2() should equal(800)
     doubleProperty2.unbind()
   }
@@ -126,7 +126,7 @@ class ReadOnlyDoublePropertySpec extends FlatSpec with BeforeAndAfterEach {
   }
 
   it should "support bindable infix division of constants" in {
-    doubleProperty2 <== readOnlyDoubleProperty / 2 / 2l / 5f / 5d
+    doubleProperty2 <== readOnlyDoubleProperty / 2 / 2L / 5f / 5d
     doubleProperty2() should equal(.5)
     doubleProperty2.unbind()
   }

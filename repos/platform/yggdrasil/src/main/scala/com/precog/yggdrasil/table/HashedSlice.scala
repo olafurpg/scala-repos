@@ -39,13 +39,14 @@ final class HashedSlice private (
       _.columns.keys map (_.selector)
     }
 
-    { (lrow: Int) =>
-      { (f: Int => Unit) =>
-        val matches = rowMap get hasher.hash(lrow) getOrElse IntNil
-        matches foreach { rrow =>
-          if (rowComparator.compare(lrow, rrow) == scalaz.Ordering.EQ) f(rrow)
+    {
+      (lrow: Int) =>
+        { (f: Int => Unit) =>
+          val matches = rowMap get hasher.hash(lrow) getOrElse IntNil
+          matches foreach { rrow =>
+            if (rowComparator.compare(lrow, rrow) == scalaz.Ordering.EQ) f(rrow)
+          }
         }
-      }
     }
   }
 }

@@ -373,7 +373,9 @@ private[deploy] class Master(
           logWarning("Master change ack from unknown app: " + appId)
       }
 
-      if (canCompleteRecovery) { completeRecovery() }
+      if (canCompleteRecovery) {
+        completeRecovery()
+      }
     }
 
     case WorkerSchedulerStateResponse(workerId, executors, driverIds) => {
@@ -403,7 +405,9 @@ private[deploy] class Master(
           logWarning("Scheduler state from unknown worker: " + workerId)
       }
 
-      if (canCompleteRecovery) { completeRecovery() }
+      if (canCompleteRecovery) {
+        completeRecovery()
+      }
     }
 
     case WorkerLatestState(workerId, executors, driverIds) =>
@@ -661,7 +665,9 @@ private[deploy] class Master(
 
   private def completeRecovery() {
     // Ensure "only-once" recovery semantics using a short synchronization period.
-    if (state != RecoveryState.RECOVERING) { return }
+    if (state != RecoveryState.RECOVERING) {
+      return
+    }
     state = RecoveryState.COMPLETING_RECOVERY
 
     // Kill off any workers and apps that didn't respond to us.

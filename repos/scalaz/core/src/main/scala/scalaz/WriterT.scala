@@ -102,7 +102,7 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
       (r, s) =>
         F.map(self.run) {
           case (w, a) => (w, a, s)
-      }
+        }
     )
 
   def wpoint[G[_]](

@@ -554,7 +554,9 @@ final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
   }
 
   private def noArithmeticException(body: => Unit): Boolean = {
-    try { body; true } catch { case _: ArithmeticException => false }
+    try {
+      body; true
+    } catch { case _: ArithmeticException => false }
   }
 
   def isWhole() = scale <= 0 || bigDecimal.stripTrailingZeros.scale <= 0

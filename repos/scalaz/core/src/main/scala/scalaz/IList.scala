@@ -618,8 +618,7 @@ sealed abstract class IListInstances extends IListInstance0 {
           case (ICons(ah, at), ICons(bh, bt)) =>
             loop(at, bt, f(\&/.Both(ah, bh)) :: accum)
         }
-      (a, b) =>
-        loop(a, b, empty)
+      (a, b) => loop(a, b, empty)
     }
 
     override def toIList[A](fa: IList[A]) = fa
@@ -724,9 +723,9 @@ sealed abstract class IListInstances extends IListInstance0 {
           }
         "[" +:
           (as match {
-          case INil()       => Cord()
-          case ICons(x, xs) => commaSep(xs, A.show(x))
-        }) :+ "]"
+            case INil()       => Cord()
+            case ICons(x, xs) => commaSep(xs, A.show(x))
+          }) :+ "]"
       }
     }
 }

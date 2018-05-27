@@ -16,7 +16,7 @@ final class UserGameSearch(
           data =>
             data.copy(
               players = data.players.copy(a = user.id.some)
-          )
+            )
         )
         .query,
       page = page

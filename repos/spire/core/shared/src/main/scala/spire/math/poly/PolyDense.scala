@@ -83,7 +83,9 @@ class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])(
 
     var even = coeffs.length - 1
     var odd = coeffs.length - 2
-    if ((even & 1) == 1) { even = odd; odd = coeffs.length - 1 }
+    if ((even & 1) == 1) {
+      even = odd; odd = coeffs.length - 1
+    }
 
     var c0 = coeffs(even)
     val x2 = x.pow(2)

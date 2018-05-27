@@ -67,6 +67,8 @@ class StandardCompileClient extends HasCompileSocket with CompileOutputCommon {
 
 object CompileClient extends StandardCompileClient {
   def main(args: Array[String]): Unit = sys exit {
-    try { if (process(args)) 0 else 1 } catch { case _: Exception => 1 }
+    try {
+      if (process(args)) 0 else 1
+    } catch { case _: Exception => 1 }
   }
 }

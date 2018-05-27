@@ -2,7 +2,9 @@ case class Foo(a: String, b: String)
 
 object Bar {
   def unapply(s: String): Option[Long] =
-    try { Some(s.toLong) } catch { case _ => None }
+    try {
+      Some(s.toLong)
+    } catch { case _ => None }
 }
 
 object Test {

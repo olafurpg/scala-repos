@@ -17,7 +17,9 @@ class JdbcPublisherTest
       driver = "org.h2.Driver",
       keepAliveConnection = true)
     // Wait until the database has been initialized and can process queries:
-    try { Await.result(db.run(sql"select 1".as[Int]), Duration.Inf) } catch {
+    try {
+      Await.result(db.run(sql"select 1".as[Int]), Duration.Inf)
+    } catch {
       case NonFatal(ex) =>
     }
     db

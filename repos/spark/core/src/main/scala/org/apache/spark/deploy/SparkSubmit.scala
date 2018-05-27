@@ -643,16 +643,24 @@ object SparkSubmit {
       if (isUserJar(args.primaryResource)) {
         childClasspath += args.primaryResource
       }
-      if (args.jars != null) { childClasspath ++= args.jars.split(",") }
-      if (args.childArgs != null) { childArgs ++= args.childArgs }
+      if (args.jars != null) {
+        childClasspath ++= args.jars.split(",")
+      }
+      if (args.childArgs != null) {
+        childArgs ++= args.childArgs
+      }
     }
 
     // Map all arguments to command-line options or system properties for our chosen mode
     for (opt <- options) {
       if (opt.value != null && (deployMode & opt.deployMode) != 0 &&
           (clusterManager & opt.clusterManager) != 0) {
-        if (opt.clOption != null) { childArgs += (opt.clOption, opt.value) }
-        if (opt.sysProp != null) { sysProps.put(opt.sysProp, opt.value) }
+        if (opt.clOption != null) {
+          childArgs += (opt.clOption, opt.value)
+        }
+        if (opt.sysProp != null) {
+          sysProps.put(opt.sysProp, opt.value)
+        }
       }
     }
 
@@ -679,7 +687,9 @@ object SparkSubmit {
       } else {
         // In legacy standalone cluster mode, use Client as a wrapper around the user class
         childMainClass = "org.apache.spark.deploy.Client"
-        if (args.supervise) { childArgs += "--supervise" }
+        if (args.supervise) {
+          childArgs += "--supervise"
+        }
         Option(args.driverMemory).foreach { m =>
           childArgs += ("--memory", m)
         }

@@ -537,7 +537,7 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
                 Contexts.letClear {
                   endpointClient.newDispatcher(trans)
                 }
-            }
+              }
             ServiceFactory(mkFutureSvc)
         }
         Stack.Leaf(this, factory)

@@ -1,7 +1,7 @@
 object Test {
   def f1 = new { def f { lazy val d = 0d } }
   def f2 = {
-    lazy val d = 4D
+    lazy val d = 4d
     lazy val f = 4f
 
     def bar = "Str " + (d + f)

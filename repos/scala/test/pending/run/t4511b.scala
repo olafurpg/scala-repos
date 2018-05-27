@@ -13,7 +13,9 @@ class Y3[@spec(Int) T](val interval: Interval[T]) { val y = Some(interval) }
 
 object Test {
   def tryit(o: => Any) =
-    println(try { "ok: " + o.getClass.getName } catch {
+    println(try {
+      "ok: " + o.getClass.getName
+    } catch {
       case e => "FAIL: " + e + "\n" + e.getStackTrace.mkString("\n  ")
     })
 

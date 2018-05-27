@@ -68,7 +68,7 @@ object MyBuild extends Build {
     (key: Any) =>
       maxErrors map { _ =>
         ()
-    }
+      }
   def str(o: Option[Int]) = o match {
     case None => "blue"; case Some(i) => i.toString
   }

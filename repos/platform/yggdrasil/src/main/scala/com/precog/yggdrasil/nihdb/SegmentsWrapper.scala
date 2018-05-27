@@ -45,7 +45,7 @@ case class SegmentsWrapper(
 
   private def buildKeyColumns(length: Int): Set[(ColumnRef, Column)] = {
     val hoId = (projectionId.toLong << 32) | (blockId >>> 32)
-    val loId0 = (blockId & 0xFFFFFFFFL) << 32
+    val loId0 = (blockId & 0XFFFFFFFFL) << 32
     def loId(row: Int): Long = loId0 | row.toLong
 
     val hoKey = new LongColumn {

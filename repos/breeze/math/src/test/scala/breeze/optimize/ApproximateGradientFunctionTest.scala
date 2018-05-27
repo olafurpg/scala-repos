@@ -29,7 +29,7 @@ class ApproximateGradientFunctionTest extends OptimizeTestBase {
       val ap = approxF.gradientAt(x)
       val tr = f.gradientAt(x)
       assert(
-        norm(ap - tr, 2) < 1E-4 * math.max(norm(ap, 2), 1),
+        norm(ap - tr, 2) < 1e-4 * math.max(norm(ap, 2), 1),
         ap.toString + " " + tr)
       true
     })

@@ -98,7 +98,7 @@ class BindingFactoryTest
             closes += 1
             Future.Done
           }
-      }
+        }
 
     lazy val factory = new BindingFactory(
       path,
@@ -124,7 +124,7 @@ class BindingFactoryTest
           })
         def close(deadline: Time) = Future.Done
         override def status = st
-    }
+      }
 
   test("BindingFactory reflects status of underlying cached service factory")(
     for (status <- Seq(Status.Busy, Status.Open, Status.Closed)) {
@@ -558,11 +558,11 @@ class NameTreeFactoryTest extends FunSuite {
   test("distributes requests according to weight") {
     val tree = NameTree.Union(
       NameTree.Weighted(
-        1D,
+        1d,
         NameTree.Union(
-          NameTree.Weighted(1D, NameTree.Leaf("foo")),
-          NameTree.Weighted(1D, NameTree.Leaf("bar")))),
-      NameTree.Weighted(1D, NameTree.Leaf("baz"))
+          NameTree.Weighted(1d, NameTree.Leaf("foo")),
+          NameTree.Weighted(1d, NameTree.Leaf("bar")))),
+      NameTree.Weighted(1d, NameTree.Leaf("baz"))
     )
 
     val counts = mutable.HashMap[String, Int]()
@@ -575,7 +575,7 @@ class NameTreeFactoryTest extends FunSuite {
           Future.value(null)
         }
         def close(deadline: Time) = Future.Done
-    })
+      })
 
     // not the world's greatest test since it depends on the
     // implementation of Drv
@@ -620,37 +620,37 @@ class NameTreeFactoryTest extends FunSuite {
               Future.value(null)
             def close(deadline: Time) = Future.Done
             override def status = key
-        })
+          })
       ).isAvailable
 
     assert(
       isAvailable(NameTree.Union(
         NameTree.Weighted(
-          1D,
+          1d,
           NameTree.Union(
-            NameTree.Weighted(1D, NameTree.Leaf(Status.Open)),
-            NameTree.Weighted(1D, NameTree.Leaf(Status.Open)))),
-        NameTree.Weighted(1D, NameTree.Leaf(Status.Open))
+            NameTree.Weighted(1d, NameTree.Leaf(Status.Open)),
+            NameTree.Weighted(1d, NameTree.Leaf(Status.Open)))),
+        NameTree.Weighted(1d, NameTree.Leaf(Status.Open))
       )))
 
     assert(
       !isAvailable(NameTree.Union(
         NameTree.Weighted(
-          1D,
+          1d,
           NameTree.Union(
-            NameTree.Weighted(1D, NameTree.Leaf(Status.Open)),
-            NameTree.Weighted(1D, NameTree.Leaf(Status.Closed)))),
-        NameTree.Weighted(1D, NameTree.Leaf(Status.Open))
+            NameTree.Weighted(1d, NameTree.Leaf(Status.Open)),
+            NameTree.Weighted(1d, NameTree.Leaf(Status.Closed)))),
+        NameTree.Weighted(1d, NameTree.Leaf(Status.Open))
       )))
 
     assert(
       !isAvailable(NameTree.Union(
         NameTree.Weighted(
-          1D,
+          1d,
           NameTree.Union(
-            NameTree.Weighted(1D, NameTree.Leaf(Status.Open)),
-            NameTree.Weighted(1D, NameTree.Leaf(Status.Open)))),
-        NameTree.Weighted(1D, NameTree.Empty)
+            NameTree.Weighted(1d, NameTree.Leaf(Status.Open)),
+            NameTree.Weighted(1d, NameTree.Leaf(Status.Open)))),
+        NameTree.Weighted(1d, NameTree.Empty)
       )))
   }
 }

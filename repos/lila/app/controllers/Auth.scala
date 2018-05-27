@@ -74,7 +74,7 @@ object Auth extends LilaController {
           negotiate(
             html = Unauthorized(html.auth.login(err, get("referrer"))).fuccess,
             api = _ => Unauthorized(errorsAsJson(err)).fuccess
-        ),
+          ),
         _.fold(InternalServerError("Authentication error").fuccess)(
           authenticateUser)
       )
@@ -122,7 +122,7 @@ object Auth extends LilaController {
           err =>
             forms.anyCaptcha map { captcha =>
               BadRequest(html.auth.signup(err, captcha, env.RecaptchaPublicKey))
-          },
+            },
           data =>
             env.recaptcha.verify(data.recaptchaResponse, req).flatMap {
               case false =>
@@ -152,7 +152,7 @@ object Auth extends LilaController {
                         else saveAuthAndRedirect(user)
                       }
                   }
-          }
+            }
         ),
         api = apiVersion =>
           forms.signup.mobile.bindFromRequest.fold(
@@ -169,7 +169,7 @@ object Auth extends LilaController {
                   apiVersion.some)
                 .flatten(s"No user could be created for ${data.username}") flatMap mobileUserOk
             }
-        )
+          )
       )
     }
   }
@@ -230,7 +230,7 @@ object Auth extends LilaController {
       err =>
         forms.anyCaptcha map { captcha =>
           BadRequest(html.auth.passwordReset(err, captcha, false.some))
-      },
+        },
       data => {
         val email = env.emailAddress.validate(data.email) | data.email
         UserRepo enabledByEmail email flatMap {

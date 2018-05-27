@@ -326,7 +326,7 @@ trait NamesDefaults { self: Analyzer =>
                 uncheckedBounds(tp)
               }
             Some((context.scope.enter(s), byName, repeated))
-      })
+        })
       map2(symPs, args) {
         case (None, _) => None
         case (Some((sym, byName, repeated)), arg) =>
@@ -406,7 +406,7 @@ trait NamesDefaults { self: Analyzer =>
                               case _ => ref
                             }
                           }
-                    })
+                      })
                 // cannot call blockTyper.typedBlock here, because the method expr might be partially applied only
                 val res =
                   blockTyper.doTypedApply(tree, expr, refArgs, mode, pt)
@@ -467,7 +467,7 @@ trait NamesDefaults { self: Analyzer =>
       namedArgsOnChangedPosition.forall { arg =>
         val n = argName(arg)
         n.isEmpty || n.get != p.name
-    })
+      })
     val allPositional =
       missingParams.length == paramsWithoutPositionalArg.length
     (missingParams, allPositional)

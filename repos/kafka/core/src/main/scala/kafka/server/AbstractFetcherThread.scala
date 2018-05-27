@@ -214,7 +214,7 @@ abstract class AbstractFetcherThread(
                         partitionsWithError += topicAndPartition
                       }
                   }
-              })
+                })
         }
       }
     }

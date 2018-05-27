@@ -393,7 +393,7 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
               .sortBy(_.topic)
           },
           s"Topic metadata is not correctly updated"
-      ))
+        ))
   }
 
   @Test

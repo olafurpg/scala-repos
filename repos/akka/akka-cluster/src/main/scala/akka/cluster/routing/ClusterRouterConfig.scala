@@ -79,7 +79,7 @@ final case class ClusterRouterGroupSettings(
       case _ ⇒
         throw new IllegalArgumentException(
           s"routeesPaths [$p] is not a valid actor path without address information")
-  })
+    })
 }
 
 object ClusterRouterPoolSettings {

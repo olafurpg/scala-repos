@@ -47,8 +47,7 @@ trait ScTypedDefinition extends ScNamedElement with TypingContextOwner {
     val hasModifierProperty: String => Boolean = nameContext match {
       case v: ScModifierListOwner => v.hasModifierProperty
       case _ =>
-        _ =>
-          false
+        _ => false
     }
     val tType = getType(TypingContext.empty).getOrAny
     new FakePsiMethod(
@@ -67,8 +66,7 @@ trait ScTypedDefinition extends ScNamedElement with TypingContextOwner {
     val hasModifierProperty: String => Boolean = nameContext match {
       case v: ScModifierListOwner => v.hasModifierProperty
       case _ =>
-        _ =>
-          false
+        _ => false
     }
     new FakePsiMethod(
       this,
@@ -86,8 +84,7 @@ trait ScTypedDefinition extends ScNamedElement with TypingContextOwner {
     val hasModifierProperty: String => Boolean = nameContext match {
       case v: ScModifierListOwner => v.hasModifierProperty
       case _ =>
-        _ =>
-          false
+        _ => false
     }
     val tType = getType(TypingContext.empty).getOrAny
     new FakePsiMethod(
@@ -106,8 +103,7 @@ trait ScTypedDefinition extends ScNamedElement with TypingContextOwner {
     val hasModifierProperty: String => Boolean = nameContext match {
       case v: ScModifierListOwner => v.hasModifierProperty
       case _ =>
-        _ =>
-          false
+        _ => false
     }
     new FakePsiMethod(
       this,

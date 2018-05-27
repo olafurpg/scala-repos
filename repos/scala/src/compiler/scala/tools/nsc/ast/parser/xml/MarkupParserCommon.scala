@@ -165,7 +165,9 @@ private[scala] trait MarkupParserCommon {
 
   /** scan [3] S ::= (#x20 | #x9 | #xD | #xA)+ */
   def xSpace() =
-    if (isSpace(ch)) { nextch(); xSpaceOpt() } else
+    if (isSpace(ch)) {
+      nextch(); xSpaceOpt()
+    } else
       xHandleError(ch, "whitespace expected")
 
   /** Apply a function and return the passed value */

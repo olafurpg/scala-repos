@@ -134,5 +134,5 @@ object StepBuilder {
       val path = if (id == "synthetic") "analysis" else id
       logger.info(
         s"http://lichess.org/$path ${err.lines.toList.headOption | "?"}")
-  }
+    }
 }

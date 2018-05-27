@@ -88,8 +88,7 @@ trait RouteTestResultComponent {
     private[this] lazy val entityRecreator: () ⇒ ResponseEntity =
       rawResponse.entity match {
         case s: HttpEntity.Strict ⇒
-          () ⇒
-            s
+          () ⇒ s
 
         case HttpEntity.Default(contentType, contentLength, data) ⇒
           val dataChunks = awaitAllElements(data);

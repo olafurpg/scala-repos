@@ -144,8 +144,8 @@ class OptimizerTest {
   @Test
   def must_not_break_when_folding_double_with_decimal_and_stringLit(): Unit = {
     assumeFalse(isInFullOpt)
-    assertEquals("1.2323919403474454e+21hello", 1.2323919403474454E21 + "hello")
-    assertEquals("hello1.2323919403474454e+21", "hello" + 1.2323919403474454E21)
+    assertEquals("1.2323919403474454e+21hello", 1.2323919403474454e21 + "hello")
+    assertEquals("hello1.2323919403474454e+21", "hello" + 1.2323919403474454e21)
   }
 
   @Test
@@ -257,7 +257,7 @@ class OptimizerTest {
 
     // special cases when ulp > 1
     test(18271179521433728.0)
-    test(1.15292150460684685E18)
+    test(1.15292150460684685e18)
     test(1234567890123456770.0)
     test(2234567890123456770.0)
     test(4234567890123450000.0)

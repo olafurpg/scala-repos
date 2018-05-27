@@ -179,8 +179,7 @@ class SubSource[+Out, +Mat](
     : SubSource[T, Mat] =
     new SubSource(delegate.statefulMapConcat { () ⇒
       val fun = f.create()
-      elem ⇒
-        Util.immutableSeq(fun(elem))
+      elem ⇒ Util.immutableSeq(fun(elem))
     })
 
   /**

@@ -32,7 +32,7 @@ object Sample {
               .copy(
                 projects = libraryToProjectDeps(ti.unit.definitions.projects)))
         case _ => ti.unit
-    }
+      }
 
   def project(name: String) =
     ProjectRef(file(s"akka-samples/$name"), name)
@@ -62,7 +62,7 @@ object Sample {
           classpathWithProjectDependencies,
           dependencies.aggregate)
       }
-  )
+    )
 
   private val excludeLibraryDependencies = (project: Project) =>
     project.settings(
@@ -77,7 +77,7 @@ object Sample {
           module.excludeAll(ExclusionRule(organization = module.organization))
         case module => module
       }
-  )
+    )
 
   /**
     * AutoPlugins are not enabled for externally loaded projects.

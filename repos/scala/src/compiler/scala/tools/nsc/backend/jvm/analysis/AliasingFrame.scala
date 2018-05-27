@@ -459,8 +459,14 @@ class AliasSet(var set: Object /*SmallBitSet | Array[Long]*/, var size: Int) {
     case s: SmallBitSet =>
       (size: @switch) match {
         case 0 => s.a = value; size = 1
-        case 1 => if (value != s.a) { s.b = value; size = 2 }
-        case 2 => if (value != s.a && value != s.b) { s.c = value; size = 3 }
+        case 1 =>
+          if (value != s.a) {
+            s.b = value; size = 2
+          }
+        case 2 =>
+          if (value != s.a && value != s.b) {
+            s.c = value; size = 3
+          }
         case 3 =>
           if (value != s.a && value != s.b && value != s.c) {
             s.d = value; size = 4
@@ -485,21 +491,33 @@ class AliasSet(var set: Object /*SmallBitSet | Array[Long]*/, var size: Int) {
       (size: @switch) match {
         case 0 =>
         case 1 =>
-          if (value == s.a) { s.a = -1; size = 0 }
+          if (value == s.a) {
+            s.a = -1; size = 0
+          }
         case 2 =>
-          if (value == s.a) { s.a = s.b; s.b = -1; size = 1 } else if (value == s.b) {
+          if (value == s.a) {
+            s.a = s.b; s.b = -1; size = 1
+          } else if (value == s.b) {
             s.b = -1; size = 1
           }
         case 3 =>
-          if (value == s.a) { s.a = s.b; s.b = s.c; s.c = -1; size = 2 } else if (value == s.b) {
+          if (value == s.a) {
+            s.a = s.b; s.b = s.c; s.c = -1; size = 2
+          } else if (value == s.b) {
             s.b = s.c; s.c = -1; size = 2
-          } else if (value == s.c) { s.c = -1; size = 2 }
+          } else if (value == s.c) {
+            s.c = -1; size = 2
+          }
         case 4 =>
           if (value == s.a) {
             s.a = s.b; s.b = s.c; s.c = s.d; s.d = -1; size = 3
-          } else if (value == s.b) { s.b = s.c; s.c = s.d; s.d = -1; size = 3 } else if (value == s.c) {
+          } else if (value == s.b) {
+            s.b = s.c; s.c = s.d; s.d = -1; size = 3
+          } else if (value == s.c) {
             s.c = s.d; s.d = -1; size = 3
-          } else if (value == s.d) { s.d = -1; size = 3 }
+          } else if (value == s.d) {
+            s.d = -1; size = 3
+          }
       }
     case bits: Array[Long] =>
       bsRemove(this, value)
@@ -541,7 +559,7 @@ object AliasSet {
     val index = bit >> 6
     val resSet = bsEnsureCapacity(bits, index)
     val before = resSet(index)
-    val result = before | (1l << bit)
+    val result = before | (1L << bit)
     if (result != before) {
       resSet(index) = result
       set.set = resSet
@@ -554,7 +572,7 @@ object AliasSet {
     val index = bit >> 6
     if (index < bits.length) {
       val before = bits(index)
-      val result = before & ~(1l << bit)
+      val result = before & ~(1L << bit)
       if (result != before) {
         bits(index) = result
         set.size -= 1
@@ -654,19 +672,19 @@ object AliasSet {
 
         while (i < end && {
                  val index = i >> 6
-                 if (xs(index) == 0l) {
+                 if (xs(index) == 0L) {
                    // boom. for nullness, this saves 35% of the overall analysis time.
                    i = ((index + 1) << 6) -
                      1 // -1 required because i is incremented in the loop body
                    true
                  } else {
-                   val mask = 1l << i
+                   val mask = 1L << i
                    // if (mask > xs(index)) we could also advance i to the next value, but that didn't pay off in benchmarks
-                   val thisHasI = (xs(index) & mask) != 0l
+                   val thisHasI = (xs(index) & mask) != 0L
                    !thisHasI || {
                      val otherHasI =
                        i == notA || i == notB || i == notC || i == notD ||
-                         (notXs != null && index < notXs.length && (notXs(index) & mask) != 0l)
+                         (notXs != null && index < notXs.length && (notXs(index) & mask) != 0L)
                      if (otherHasI) setThisAndOther(i)
                      otherHasI
                    }

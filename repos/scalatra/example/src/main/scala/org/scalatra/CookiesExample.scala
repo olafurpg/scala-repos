@@ -8,7 +8,7 @@ class CookiesExample extends ScalatraServlet {
     }
     cookies.update("counter", (previous + 1).toString)
     <p>
-      Hi, you have been on this page{ previous }
+      Hi, you have been on this page{previous}
       times already
     </p>
   }

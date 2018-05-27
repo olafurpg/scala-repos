@@ -69,7 +69,7 @@ object TreeViewCellFactoryDemo extends JFXApp {
                   if (p != null)
                     p.value().firstName + " " + p.value().lastName
                   else "?")
-        }
+          }
       }
     }
   }

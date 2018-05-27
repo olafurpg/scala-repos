@@ -66,15 +66,17 @@ private[ui] class ExecutorThreadDumpPage(parent: ExecutorsTab)
           <td id={s"${threadId}_td_id"}>{threadId}</td>
           <td id={s"${threadId}_td_name"}>{thread.threadName}</td>
           <td id={s"${threadId}_td_state"}>{thread.threadState}</td>
-          <td id={s"${threadId}_td_stacktrace"} class="hidden">{thread.stackTrace}</td>
+          <td id={s"${threadId}_td_stacktrace"} class="hidden">{
+              thread.stackTrace
+            }</td>
         </tr>
           }
 
         <div class="row-fluid">
       <p>Updated at {UIUtils.formatDate(time)}</p>
       {
-        // scalastyle:off
-        <p><a class="expandbutton" onClick="expandAllThreadStackTrace(true)">
+          // scalastyle:off
+          <p><a class="expandbutton" onClick="expandAllThreadStackTrace(true)">
           Expand All
         </a></p>
         <p><a class="expandbutton hidden" onClick="collapseAllThreadStackTrace(true)">
@@ -90,9 +92,11 @@ private[ui] class ExecutorThreadDumpPage(parent: ExecutorsTab)
         </div>
         </div>
         <p></p>
-        // scalastyle:on
-      }
-      <table class={UIUtils.TABLE_CLASS_STRIPED + " accordion-group" + " sortable"}>
+          // scalastyle:on
+        }
+      <table class={
+          UIUtils.TABLE_CLASS_STRIPED + " accordion-group" + " sortable"
+        }>
         <thead>
           <th onClick="collapseAllThreadStackTrace(false)">Thread ID</th>
           <th onClick="collapseAllThreadStackTrace(false)">Thread Name</th>

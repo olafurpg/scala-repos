@@ -28,7 +28,7 @@ sealed abstract class MonadCatchIOFunctions {
       p(e) match {
         case Some(z) => handler(z)
         case None    => throw e
-    })
+      })
 
   /**
     * Returns a disjunction result which is right if no exception was raised, or left if an

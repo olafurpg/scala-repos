@@ -69,7 +69,7 @@ trait ThriftTest { self: FunSuite =>
       def close() {
         server.close()
       }
-  }
+    }
 
   private val newBuilderClient = (
       protocolFactory: TProtocolFactory,
@@ -90,7 +90,7 @@ trait ThriftTest { self: FunSuite =>
       def close() {
         service.close()
       }
-  }
+    }
 
   private val newAPIServer = (protocolFactory: TProtocolFactory) =>
     new {
@@ -103,7 +103,7 @@ trait ThriftTest { self: FunSuite =>
       def close() {
         server.close()
       }
-  }
+    }
 
   private val newAPIClient = (
       protocolFactory: TProtocolFactory,
@@ -121,7 +121,7 @@ trait ThriftTest { self: FunSuite =>
       }
 
       def close() = ()
-  }
+    }
 
   private val protocols = Map(
     // Commenting out due to flakiness - see DPT-175 and DPT-181

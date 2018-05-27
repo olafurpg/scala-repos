@@ -910,8 +910,7 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
     : javadsl.Source[T, Mat] =
     new Source(delegate.statefulMapConcat { () ⇒
       val fun = f.create()
-      elem ⇒
-        Util.immutableSeq(fun(elem))
+      elem ⇒ Util.immutableSeq(fun(elem))
     })
 
   /**

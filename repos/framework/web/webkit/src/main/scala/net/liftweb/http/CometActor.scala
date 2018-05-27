@@ -789,7 +789,7 @@ trait BaseCometActor
         case xs => {
           ns ++ Script(xs)
         }
-    })
+      })
 
   /**
     * We have to cache fixedRender and only change it if
@@ -1006,7 +1006,7 @@ trait BaseCometActor
     case ShutdownIfPastLifespan =>
       for {
         ls <- lifespan if listeners.isEmpty &&
-          (lastListenerTime + ls.millis + 1000l) < millis
+          (lastListenerTime + ls.millis + 1000L) < millis
       } {
         this ! ShutDown
       }

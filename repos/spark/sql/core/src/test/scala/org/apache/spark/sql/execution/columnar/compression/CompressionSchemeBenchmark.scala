@@ -50,14 +50,12 @@ object CompressionSchemeBenchmark extends AllCompressionSchemes {
 
   private[this] def genLowerSkewData() = {
     val rng = new LogNormalDistribution(0.0, 0.01)
-    () =>
-      rng.sample
+    () => rng.sample
   }
 
   private[this] def genHigherSkewData() = {
     val rng = new LogNormalDistribution(0.0, 1.0)
-    () =>
-      rng.sample
+    () => rng.sample
   }
 
   private[this] def prepareEncodeInternal[T <: AtomicType](
@@ -152,8 +150,7 @@ object CompressionSchemeBenchmark extends AllCompressionSchemes {
 
     val g = {
       val rng = genLowerSkewData()
-      () =>
-        (rng().toInt % 2).toByte
+      () => (rng().toInt % 2).toByte
     }
     for (i <- 0 until count) {
       testData.put(i * BOOLEAN.defaultSize, g())
@@ -361,8 +358,7 @@ object CompressionSchemeBenchmark extends AllCompressionSchemes {
       val dataTable =
         (0 until tableSize).map(_ => RandomStringUtils.randomAlphabetic(strLen))
       val rng = genHigherSkewData()
-      () =>
-        dataTable(rng().toInt % tableSize)
+      () => dataTable(rng().toInt % tableSize)
     }
     for (i <- 0 until count) {
       testData.putInt(strLen)

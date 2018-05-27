@@ -94,7 +94,7 @@ final class LongMap[V] private[collection] (
 
   private def toIndex(k: Long): Int = {
     // Part of the MurmurHash3 32 bit finalizer
-    val h = ((k ^ (k >>> 32)) & 0xFFFFFFFFL).toInt
+    val h = ((k ^ (k >>> 32)) & 0XFFFFFFFFL).toInt
     val x = (h ^ (h >>> 16)) * 0x85EBCA6B
     (x ^ (x >>> 13)) & mask
   }

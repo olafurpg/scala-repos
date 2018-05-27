@@ -41,11 +41,11 @@ object Report extends LilaController {
           forms.anyCaptcha map { captcha =>
             BadRequest(html.report.form(err, user, captcha))
           }
-      },
+        },
       data =>
         api.create(data, me) map { report =>
           Redirect(routes.Report.thanks(data.user.username))
-      }
+        }
     )
   }
 

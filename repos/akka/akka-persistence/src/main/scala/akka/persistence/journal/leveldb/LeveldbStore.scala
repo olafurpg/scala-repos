@@ -85,7 +85,7 @@ private[persistence] trait LeveldbStore
               if (hasPersistenceIdSubscribers)
                 persistenceIds += a.persistenceId
             }
-      })
+        })
     })
 
     if (hasPersistenceIdSubscribers) {

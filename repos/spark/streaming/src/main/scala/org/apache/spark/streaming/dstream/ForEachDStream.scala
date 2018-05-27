@@ -49,7 +49,7 @@ private[streaming] class ForEachDStream[T: ClassTag](
         val jobFunc = () =>
           createRDDWithLocalProperties(time, displayInnerRDDOps) {
             foreachFunc(rdd, time)
-        }
+          }
         Some(new Job(time, jobFunc))
       case None => None
     }

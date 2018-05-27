@@ -214,7 +214,9 @@ class GraphOpsSuite extends SparkFunSuite with LocalSparkContext {
         case (vid, edges) =>
           val s = edges.toSet
           val edgeIds = s.map(e => if (vid != e.srcId) e.srcId else e.dstId)
-          if (vid == 0) { assert(edgeIds.contains(1)) } else if (vid == 49) {
+          if (vid == 0) {
+            assert(edgeIds.contains(1))
+          } else if (vid == 49) {
             assert(edgeIds.contains(48))
           } else {
             assert(edgeIds.contains(vid + 1))

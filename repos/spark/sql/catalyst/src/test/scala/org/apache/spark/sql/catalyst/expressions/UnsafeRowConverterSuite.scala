@@ -279,11 +279,11 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
 
     val row1 = new SpecificMutableRow(fieldTypes)
     row1.setFloat(0, java.lang.Float.intBitsToFloat(0x7f800001))
-    row1.setDouble(1, java.lang.Double.longBitsToDouble(0x7ff0000000000001L))
+    row1.setDouble(1, java.lang.Double.longBitsToDouble(0X7FF0000000000001L))
 
     val row2 = new SpecificMutableRow(fieldTypes)
     row2.setFloat(0, java.lang.Float.intBitsToFloat(0x7fffffff))
-    row2.setDouble(1, java.lang.Double.longBitsToDouble(0x7fffffffffffffffL))
+    row2.setDouble(1, java.lang.Double.longBitsToDouble(0X7FFFFFFFFFFFFFFFL))
 
     val converter = UnsafeProjection.create(fieldTypes)
     assert(converter.apply(row1).getBytes === converter.apply(row2).getBytes)

@@ -25,7 +25,7 @@ trait Field[@sp(Byte, Short, Int, Long, Float, Double) A]
         "Double must be representable as a fraction.")
 
       val bits = doubleToLongBits(a)
-      val m = bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L
+      val m = bits & 0X000FFFFFFFFFFFFFL | 0X0010000000000000L
       val zeros = numberOfTrailingZeros(m)
       val value = m >>> zeros
       val exp = ((bits >> 52) & 0x7FF).toInt - 1075 + zeros // 1023 + 52

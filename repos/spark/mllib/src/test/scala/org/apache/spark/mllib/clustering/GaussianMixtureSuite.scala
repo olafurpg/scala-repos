@@ -42,9 +42,9 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
     val seeds = Array(314589, 29032897, 50181, 494821, 4660)
     seeds.foreach { seed =>
       val gmm = new GaussianMixture().setK(1).setSeed(seed).run(data)
-      assert(gmm.weights(0) ~== Ew absTol 1E-5)
-      assert(gmm.gaussians(0).mu ~== Emu absTol 1E-5)
-      assert(gmm.gaussians(0).sigma ~== Esigma absTol 1E-5)
+      assert(gmm.weights(0) ~== Ew absTol 1e-5)
+      assert(gmm.gaussians(0).mu ~== Emu absTol 1e-5)
+      assert(gmm.gaussians(0).sigma ~== Esigma absTol 1e-5)
     }
   }
 
@@ -73,12 +73,12 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
     val gmm =
       new GaussianMixture().setK(2).setInitialModel(initialGmm).run(data)
 
-    assert(gmm.weights(0) ~== Ew(0) absTol 1E-3)
-    assert(gmm.weights(1) ~== Ew(1) absTol 1E-3)
-    assert(gmm.gaussians(0).mu ~== Emu(0) absTol 1E-3)
-    assert(gmm.gaussians(1).mu ~== Emu(1) absTol 1E-3)
-    assert(gmm.gaussians(0).sigma ~== Esigma(0) absTol 1E-3)
-    assert(gmm.gaussians(1).sigma ~== Esigma(1) absTol 1E-3)
+    assert(gmm.weights(0) ~== Ew(0) absTol 1e-3)
+    assert(gmm.weights(1) ~== Ew(1) absTol 1e-3)
+    assert(gmm.gaussians(0).mu ~== Emu(0) absTol 1e-3)
+    assert(gmm.gaussians(1).mu ~== Emu(1) absTol 1e-3)
+    assert(gmm.gaussians(0).sigma ~== Esigma(0) absTol 1e-3)
+    assert(gmm.gaussians(1).sigma ~== Esigma(1) absTol 1e-3)
   }
 
   test("two clusters with distributed decompositions") {
@@ -120,9 +120,9 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
     val seeds = Array(42, 1994, 27, 11, 0)
     seeds.foreach { seed =>
       val gmm = new GaussianMixture().setK(1).setSeed(seed).run(data)
-      assert(gmm.weights(0) ~== Ew absTol 1E-5)
-      assert(gmm.gaussians(0).mu ~== Emu absTol 1E-5)
-      assert(gmm.gaussians(0).sigma ~== Esigma absTol 1E-5)
+      assert(gmm.weights(0) ~== Ew absTol 1e-5)
+      assert(gmm.gaussians(0).mu ~== Emu absTol 1e-5)
+      assert(gmm.gaussians(0).sigma ~== Esigma absTol 1e-5)
     }
   }
 
@@ -151,12 +151,12 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
     val sparseGMM =
       new GaussianMixture().setK(2).setInitialModel(initialGmm).run(sparseData)
 
-    assert(sparseGMM.weights(0) ~== Ew(0) absTol 1E-3)
-    assert(sparseGMM.weights(1) ~== Ew(1) absTol 1E-3)
-    assert(sparseGMM.gaussians(0).mu ~== Emu(0) absTol 1E-3)
-    assert(sparseGMM.gaussians(1).mu ~== Emu(1) absTol 1E-3)
-    assert(sparseGMM.gaussians(0).sigma ~== Esigma(0) absTol 1E-3)
-    assert(sparseGMM.gaussians(1).sigma ~== Esigma(1) absTol 1E-3)
+    assert(sparseGMM.weights(0) ~== Ew(0) absTol 1e-3)
+    assert(sparseGMM.weights(1) ~== Ew(1) absTol 1e-3)
+    assert(sparseGMM.gaussians(0).mu ~== Emu(0) absTol 1e-3)
+    assert(sparseGMM.gaussians(1).mu ~== Emu(1) absTol 1e-3)
+    assert(sparseGMM.gaussians(0).sigma ~== Esigma(0) absTol 1e-3)
+    assert(sparseGMM.gaussians(1).sigma ~== Esigma(1) absTol 1e-3)
   }
 
   test("model save / load") {

@@ -666,7 +666,9 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
           case VersionEntry(v, _, _) =>
             val dir = versionDir(v)
             val openf =
-              if (NIHDB.hasProjection(dir)) { resourceBuilder.openNIHDB _ } else {
+              if (NIHDB.hasProjection(dir)) {
+                resourceBuilder.openNIHDB _
+              } else {
                 resourceBuilder.openBlob _
               }
 
@@ -745,10 +747,10 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                 apiKey,
                 cachePath,
                 None,
-                EventId.fromLong(0l),
+                EventId.fromLong(0L),
                 clock.instant())
             }
-        },
+          },
         nihdbr => IO(PrecogUnit)
       )
     }
@@ -811,7 +813,7 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                   // FIXME: We aren't actually guaranteed success here because NIHDB might do something screwy.
                   maybeCompleteJob(msg, terminal, UpdateSuccess(msg.path)) pipeTo requestor
                   PrecogUnit
-              }
+                }
             )
             .join
         } else if (createIfAbsent) {

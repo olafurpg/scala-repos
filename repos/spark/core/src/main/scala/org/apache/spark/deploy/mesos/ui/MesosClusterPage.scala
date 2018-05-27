@@ -80,7 +80,9 @@ private[mesos] class MesosClusterPage(parent: MesosClusterUI)
       <td><a href={s"driver?id=$id"}>{id}</a></td>
       <td>{state.driverDescription.submissionDate}</td>
       <td>{state.driverDescription.command.mainClass}</td>
-      <td>cpus: {state.driverDescription.cores}, mem: {state.driverDescription.mem}</td>
+      <td>cpus: {state.driverDescription.cores}, mem: {
+      state.driverDescription.mem
+    }</td>
       <td>{state.startDate}</td>
       <td>{state.slaveId.getValue}</td>
       <td>{stateString(state.mesosTaskStatus)}</td>

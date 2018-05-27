@@ -226,7 +226,7 @@ case class Union(children: Seq[LogicalPlan]) extends LogicalPlan {
               .zip(children.head.output)
               .forall {
                 case (l, r) => l.dataType == r.dataType
-            })
+              })
 
     children.length > 1 && childrenResolved && allChildrenCompatible
   }

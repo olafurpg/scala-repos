@@ -372,7 +372,9 @@ object FieldSpec extends Specification {
         Str(country.toString),
         JInt(country.id),
         Full(
-          <select tabindex="1" name=".*" id="mandatoryCountryField_id"><option value=".*" selected="selected">{country.toString}</option></select>)
+          <select tabindex="1" name=".*" id="mandatoryCountryField_id"><option value=".*" selected="selected">{
+            country.toString
+          }</option></select>)
       )
     }
   }
@@ -411,8 +413,9 @@ object FieldSpec extends Specification {
       rec.customFormatDateTimeField,
       Str(dtStr),
       JString(dtStr),
-      Full(
-        <input name=".*" type="text" tabindex="1" value={toInternetDate(dt.getTime)} id="customFormatDateTimeField_id"></input>)
+      Full(<input name=".*" type="text" tabindex="1" value={
+        toInternetDate(dt.getTime)
+      } id="customFormatDateTimeField_id"></input>)
     )
   }
 
@@ -477,8 +480,9 @@ object FieldSpec extends Specification {
       rec.mandatoryEmailField,
       Str(email),
       JString(email),
-      Full(
-        <input name=".*" type="text" maxlength="100" tabindex="1" value={email} id="mandatoryEmailField_id"></input>)
+      Full(<input name=".*" type="text" maxlength="100" tabindex="1" value={
+        email
+      } id="mandatoryEmailField_id"></input>)
     )
     "pass validation if field is optional and value is Empty" in {
       S.initIfUninitted(session) {
@@ -522,7 +526,9 @@ object FieldSpec extends Specification {
       Str(ev.toString),
       JInt(ev.id),
       Full(
-        <select tabindex="1" name=".*" id="mandatoryEnumField_id"><option value=".*" selected="selected">{ev.toString}</option></select>)
+        <select tabindex="1" name=".*" id="mandatoryEnumField_id"><option value=".*" selected="selected">{
+          ev.toString
+        }</option></select>)
     )
   }
 
@@ -696,8 +702,9 @@ object FieldSpec extends Specification {
         rec.mandatoryStringField,
         Str(str),
         JString(str),
-        Full(
-          <input name=".*" type="text" maxlength="100" tabindex="1" value={str} id="mandatoryStringField_id"></input>)
+        Full(<input name=".*" type="text" maxlength="100" tabindex="1" value={
+          str
+        } id="mandatoryStringField_id"></input>)
       )
     }
 
@@ -791,7 +798,9 @@ object FieldSpec extends Specification {
       Str(txt),
       JString(txt),
       Full(
-        <textarea name=".*" rows="8" tabindex="1" cols="20" id="mandatoryTextareaField_id">{txt}</textarea>)
+        <textarea name=".*" rows="8" tabindex="1" cols="20" id="mandatoryTextareaField_id">{
+          txt
+        }</textarea>)
     )
   }
 
@@ -817,7 +826,9 @@ object FieldSpec extends Specification {
       Str(example),
       JString(example),
       Full(
-        <select tabindex="1" name=".*" id="mandatoryTimeZoneField_id"><option value=".*" selected="selected">{example}</option></select>)
+        <select tabindex="1" name=".*" id="mandatoryTimeZoneField_id"><option value=".*" selected="selected">{
+          example
+        }</option></select>)
     )
   }
 

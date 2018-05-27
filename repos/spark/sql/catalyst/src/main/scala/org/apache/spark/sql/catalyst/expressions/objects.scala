@@ -139,26 +139,19 @@ case class Invoke(
 
   lazy val unboxer = (dataType, method) match {
     case (IntegerType, "java.lang.Object") =>
-      (s: String) =>
-        s"((java.lang.Integer)$s).intValue()"
+      (s: String) => s"((java.lang.Integer)$s).intValue()"
     case (LongType, "java.lang.Object") =>
-      (s: String) =>
-        s"((java.lang.Long)$s).longValue()"
+      (s: String) => s"((java.lang.Long)$s).longValue()"
     case (FloatType, "java.lang.Object") =>
-      (s: String) =>
-        s"((java.lang.Float)$s).floatValue()"
+      (s: String) => s"((java.lang.Float)$s).floatValue()"
     case (ShortType, "java.lang.Object") =>
-      (s: String) =>
-        s"((java.lang.Short)$s).shortValue()"
+      (s: String) => s"((java.lang.Short)$s).shortValue()"
     case (ByteType, "java.lang.Object") =>
-      (s: String) =>
-        s"((java.lang.Byte)$s).byteValue()"
+      (s: String) => s"((java.lang.Byte)$s).byteValue()"
     case (DoubleType, "java.lang.Object") =>
-      (s: String) =>
-        s"((java.lang.Double)$s).doubleValue()"
+      (s: String) => s"((java.lang.Double)$s).doubleValue()"
     case (BooleanType, "java.lang.Object") =>
-      (s: String) =>
-        s"((java.lang.Boolean)$s).booleanValue()"
+      (s: String) => s"((java.lang.Boolean)$s).booleanValue()"
     case _ => identity[String] _
   }
 
@@ -406,48 +399,34 @@ case class MapObjects private (
     dataType match {
       case NullType =>
         val nullTypeClassName = NullType.getClass.getName + ".MODULE$"
-        (i: String) =>
-          s".get($i, $nullTypeClassName)"
+        (i: String) => s".get($i, $nullTypeClassName)"
       case IntegerType =>
-        (i: String) =>
-          s".getInt($i)"
+        (i: String) => s".getInt($i)"
       case LongType =>
-        (i: String) =>
-          s".getLong($i)"
+        (i: String) => s".getLong($i)"
       case FloatType =>
-        (i: String) =>
-          s".getFloat($i)"
+        (i: String) => s".getFloat($i)"
       case DoubleType =>
-        (i: String) =>
-          s".getDouble($i)"
+        (i: String) => s".getDouble($i)"
       case ByteType =>
-        (i: String) =>
-          s".getByte($i)"
+        (i: String) => s".getByte($i)"
       case ShortType =>
-        (i: String) =>
-          s".getShort($i)"
+        (i: String) => s".getShort($i)"
       case BooleanType =>
-        (i: String) =>
-          s".getBoolean($i)"
+        (i: String) => s".getBoolean($i)"
       case StringType =>
-        (i: String) =>
-          s".getUTF8String($i)"
+        (i: String) => s".getUTF8String($i)"
       case s: StructType =>
-        (i: String) =>
-          s".getStruct($i, ${s.size})"
+        (i: String) => s".getStruct($i, ${s.size})"
       case a: ArrayType =>
-        (i: String) =>
-          s".getArray($i)"
+        (i: String) => s".getArray($i)"
       case _: MapType =>
-        (i: String) =>
-          s".getMap($i)"
+        (i: String) => s".getMap($i)"
       case udt: UserDefinedType[_] => itemAccessorMethod(udt.sqlType)
       case DecimalType.Fixed(p, s) =>
-        (i: String) =>
-          s".getDecimal($i, $p, $s)"
+        (i: String) => s".getDecimal($i, $p, $s)"
       case DateType =>
-        (i: String) =>
-          s".getInt($i)"
+        (i: String) => s".getInt($i)"
     }
 
   private lazy val (lengthFunction, itemAccessor, primitiveElement) =

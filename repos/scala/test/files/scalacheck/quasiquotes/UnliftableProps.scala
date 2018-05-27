@@ -136,28 +136,21 @@ object UnliftableProps extends QuasiquoteProperties("unliftable") {
       q"(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)"
     val q"${t14: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)}" =
       q"(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14)"
-    val q"${t15: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
-    Int, Int, Int)}" = q"(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)"
-    val q"${t16: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
-    Int, Int, Int, Int)}" =
+    val q"${t15: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)}" =
+      q"(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)"
+    val q"${t16: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)}" =
       q"(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)"
-    val q"${t17: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
-    Int, Int, Int, Int, Int)}" =
+    val q"${t17: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)}" =
       q"(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)"
-    val q"${t18: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
-    Int, Int, Int, Int, Int, Int)}" =
+    val q"${t18: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)}" =
       q"(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18)"
-    val q"${t19: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
-    Int, Int, Int, Int, Int, Int, Int)}" =
+    val q"${t19: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)}" =
       q"(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19)"
-    val q"${t20: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
-    Int, Int, Int, Int, Int, Int, Int, Int)}" =
+    val q"${t20: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)}" =
       q"(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)"
-    val q"${t21: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
-    Int, Int, Int, Int, Int, Int, Int, Int, Int)}" =
+    val q"${t21: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)}" =
       q"(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21)"
-    val q"${t22: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
-    Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)}" =
+    val q"${t22: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)}" =
       q"(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22)"
     // assert(t1 == Tuple1(1))
     assert(t2 == (1, 2))

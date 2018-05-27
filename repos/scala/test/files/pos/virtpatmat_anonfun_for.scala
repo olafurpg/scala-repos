@@ -4,6 +4,6 @@ trait Foo {
     Nil.foreach(x =>
       x match {
         case _ => println(tvs)
-    })
+      })
   }
 }

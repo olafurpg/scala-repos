@@ -123,7 +123,7 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
           val r = f(w.pos)
           (w put r, Some(r))
         }
-    })
+      })
 
   def :=[A >: A2 <: A1](b: => B2): PState[A, B2] =
     %=(_ => b)
@@ -139,7 +139,7 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
           val r = s.run(w.pos): (B2, C)
           (w put r._1, Some(r._2))
         }
-    })
+      })
 
   def >-[A >: A2 <: A1, C](f: B1 => C): PState[A, C] =
     State(a => (a, get(a) map f))
@@ -152,7 +152,7 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
           f(w) apply a match {
             case (y, x) => (y, Some(x))
           }
-    })
+      })
 
   def ->>-[A >: A2 <: A1, C](f: => State[A, C]): PState[A, C] =
     >>-(_ => f)
@@ -592,7 +592,7 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
       else
         lookupr((EphemeralStream.emptyEphemeralStream, s.head(), s.tail())) map {
           case (l, (k, v), r) => Store(w => l.reverse ++ cons((k, w), r), v)
-      })
+        })
   }
 
   def ephemeralStreamLookupPLens[K: Equal, V](

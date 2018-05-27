@@ -86,7 +86,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
       (r, s) =>
         M.map(self(r)) { b =>
           (W.zero, b, s)
-      }
+        }
     )
 
   def state(implicit M: Monad[M]): StateT[M, A, B] =

@@ -75,7 +75,7 @@ object ParseKey extends Properties("Key parser test") {
 
       ("Key: " + displayFull(key)) |: ("Mask: " + mask) |:
         ("Expected configuration: " +
-        resolvedConfig.map(_.name)) |: parse(structure, string) {
+          resolvedConfig.map(_.name)) |: parse(structure, string) {
         case Right(sk) => sk.scope.config == resolvedConfig
         case Left(err) => false
       }

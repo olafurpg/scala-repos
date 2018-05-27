@@ -132,8 +132,8 @@ object EventJson4sSupport {
           // disable tags from API for now
           JField("prId", d.prId.map(JString(_)).getOrElse(JNothing)) :: // don't show creationTime for now
           JField(
-          "creationTime",
-          JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
+            "creationTime",
+            JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
     }
   }
 

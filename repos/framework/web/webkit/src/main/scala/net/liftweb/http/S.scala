@@ -1153,7 +1153,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
                       (name, loc),
                       LiftRules.resourceBundleFactories.toList)
                     .map(List(_)) openOr Nil
-              )))
+                )))
         _resBundle.value
       }
       case Full(bundles) => bundles
@@ -1705,7 +1705,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
         rh =>
           rh.headers.iterator.toList ::: in.filter {
             case (n, v) => !rh.headers.contains(n)
-        }
+          }
       )
       .openOr(Nil)
   }

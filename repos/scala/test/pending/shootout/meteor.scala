@@ -78,7 +78,13 @@ final class Solver(n: Int) {
     if (first == null) {
       first = b; last = b
     } else {
-      if (b < first) { first = b } else { if (b > last) { last = b } }
+      if (b < first) {
+        first = b
+      } else {
+        if (b > last) {
+          last = b
+        }
+      }
     }
     countdown = countdown - 1
   }
@@ -442,7 +448,9 @@ final class BoardCell(_number: Int) extends {
           count = count + neighbour.contiguousEmptyCells
 
       count
-    } else { 0 }
+    } else {
+      0
+    }
   }
 }
 

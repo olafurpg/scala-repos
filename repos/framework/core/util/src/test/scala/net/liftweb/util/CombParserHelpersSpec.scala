@@ -58,7 +58,7 @@ object CombParserHelpersSpec extends Specification with ScalaCheck {
       val whiteSpaceParse = (s: String) =>
         whiteSpace(s) must beLike {
           case Success(x, y) => x.toString must_== "()"
-      }
+        }
       forAll(whiteSpaceParse)
     }
     "provide an acceptCI parser to parse whatever string matching another string ignoring case" in {
@@ -68,7 +68,7 @@ object CombParserHelpersSpec extends Specification with ScalaCheck {
           acceptCI(s).apply(s2) match {
             case Success(x, y) => s2.toUpperCase must startWith(s.toUpperCase)
             case _             => true
-        }
+          }
       forAll(ignoreCaseStringParse)
     }
 
@@ -77,7 +77,7 @@ object CombParserHelpersSpec extends Specification with ScalaCheck {
         digit(s) match {
           case Success(x, y) => s must beMatching("(?s)\\p{Nd}.*")
           case _             => true
-      }
+        }
       forAll(isDigit)
     }
     "provide an aNumber parser - returning an Int if succeeding" in {

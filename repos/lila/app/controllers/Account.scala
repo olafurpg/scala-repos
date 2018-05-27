@@ -55,7 +55,7 @@ object Account extends LilaController {
                     "nbFollowers" -> nbFollowers)
                 }
             }
-      }
+        }
     ) map ensureSessionId(ctx.req)
   }
 

@@ -156,7 +156,7 @@ class LocalActorRefProviderSpec
               case Some(Success(a: ActorRef)) ⇒ 1
               case Some(Failure(ex: InvalidActorNameException)) ⇒ 2
               case x ⇒ x
-          })
+            })
         set should ===(Set[Any](1, 2))
       }
     }

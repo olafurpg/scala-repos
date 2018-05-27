@@ -58,34 +58,44 @@ class CodeGeneratorRoundTripTest(val tdb: JdbcTestDB) extends DBTest {
         },
         (X.map(r => (r.pk, r.pk2, r.column, r.schemaNameXX, r.schemaNameX)) +=
           (1, 1,
-          1, 1.1, "test")).map { _ =>
-          // testing name and types especially in case of collisions
-          import slick.lifted._
-          X.map(r => { (r.pk: Rep[Int]) == null })
-          X.map(r => { (r.pk2: Rep[Int]) == null })
-          X.map(r => { (r.`val`: Rep[Option[Int]]) == null })
-          X.map(r => { (r.column: Rep[Int]) == null })
-          X.map(r => { (r.schemaNameXX: Rep[Double]) == null })
-          X.map(r => { (r.schemaNameX: Rep[String]) == null })
-          X.map(r => { (r.index1: Rep[Option[Int]]) == null })
-          X.map(r => { (r.posts: Rep[Option[Int]]) == null })
-          X.map(r => { (r.pkX: PrimaryKey) == null })
-          X.map(r => { (r.postsFk: ForeignKeyQuery[Posts, PostsRow]) == null })
-          X.map(r => {
-            (r.categoriesFk2: ForeignKeyQuery[Categories, CategoriesRow]) == null
-          })
-          X.map(r => {
-            (r.categoriesFk3: ForeignKeyQuery[Categories, CategoriesRow]) == null
-          })
-          X.map(r => { (r.index1X: Index) == null })
-          X.map(r => { (r.index2: Index) == null })
-          X.map(r => { (r.index1X: Index) == null })
-          X.map(r => { (r.index2: Index) == null })
-          X.map(r => { (r.index3: Index) == null })
-          X.map(r => { (r.index4: Index) == null })
+          1, 1.1, "test"))
+          .map {
+            _ =>
+              // testing name and types especially in case of collisions
+              import slick.lifted._
+              X.map(r => { (r.pk: Rep[Int]) == null })
+              X.map(r => { (r.pk2: Rep[Int]) == null })
+              X.map(r => { (r.`val`: Rep[Option[Int]]) == null })
+              X.map(r => { (r.column: Rep[Int]) == null })
+              X.map(r => { (r.schemaNameXX: Rep[Double]) == null })
+              X.map(r => { (r.schemaNameX: Rep[String]) == null })
+              X.map(r => { (r.index1: Rep[Option[Int]]) == null })
+              X.map(r => { (r.posts: Rep[Option[Int]]) == null })
+              X.map(r => { (r.pkX: PrimaryKey) == null })
+              X.map(r => {
+                (r.postsFk: ForeignKeyQuery[Posts, PostsRow]) == null
+              })
+              X.map(
+                  r => {
+                    (r.categoriesFk2: ForeignKeyQuery[
+                      Categories,
+                      CategoriesRow]) == null
+                  })
+              X.map(
+                  r => {
+                    (r.categoriesFk3: ForeignKeyQuery[
+                      Categories,
+                      CategoriesRow]) == null
+                  })
+              X.map(r => { (r.index1X: Index) == null })
+              X.map(r => { (r.index2: Index) == null })
+              X.map(r => { (r.index1X: Index) == null })
+              X.map(r => { (r.index2: Index) == null })
+              X.map(r => { (r.index3: Index) == null })
+              X.map(r => { (r.index4: Index) == null })
 
-          TypeTest.map(r => { (r.pk: PrimaryKey) == null })
-        }
+              TypeTest.map(r => { (r.pk: PrimaryKey) == null })
+          }
       )
       .withPinnedSession
   }

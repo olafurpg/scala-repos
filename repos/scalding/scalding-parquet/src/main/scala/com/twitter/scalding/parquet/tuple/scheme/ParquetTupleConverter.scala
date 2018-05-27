@@ -54,13 +54,13 @@ class StringConverter extends PrimitiveFieldConverter[String] {
 }
 
 class DoubleConverter extends PrimitiveFieldConverter[Double] {
-  override val defaultValue: Double = 0D
+  override val defaultValue: Double = 0d
 
   override def addDouble(v: Double): Unit = value = v
 }
 
 class FloatConverter extends PrimitiveFieldConverter[Float] {
-  override val defaultValue: Float = 0F
+  override val defaultValue: Float = 0f
 
   override def addFloat(v: Float): Unit = value = v
 }

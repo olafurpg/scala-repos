@@ -517,13 +517,13 @@ abstract class ByteBufferTest extends BaseBufferTest {
     val buf = withContent(20, elemRange(0x76, 0x8a): _*)
 
     buf.order(ByteOrder.BIG_ENDIAN)
-    assertEquals(0x767778797a7b7c7dL, buf.getLong())
+    assertEquals(0X767778797A7B7C7DL, buf.getLong())
     assertEquals(8, buf.position)
-    assertEquals(0x7e7f808182838485L, buf.getLong())
+    assertEquals(0X7E7F808182838485L, buf.getLong())
 
     buf.order(ByteOrder.LITTLE_ENDIAN)
     buf.position(6)
-    assertEquals(0x838281807f7e7d7cL, buf.getLong())
+    assertEquals(0X838281807F7E7D7CL, buf.getLong())
 
     expectThrows(classOf[BufferUnderflowException], buf.getLong())
   }
@@ -531,7 +531,7 @@ abstract class ByteBufferTest extends BaseBufferTest {
   @Test def relative_putLong(): Unit = {
     if (!createsReadOnly) {
       val buf = allocBuffer(20)
-      buf.putLong(0x767778797a7b7c7dL)
+      buf.putLong(0X767778797A7B7C7DL)
       assertEquals(8, buf.position())
       assertEquals(0x76, buf.get(0))
       assertEquals(0x77, buf.get(1))
@@ -541,7 +541,7 @@ abstract class ByteBufferTest extends BaseBufferTest {
       assertEquals(0x7b, buf.get(5))
       assertEquals(0x7c, buf.get(6))
       assertEquals(0x7d, buf.get(7))
-      buf.putLong(0x7e7f808182838485L)
+      buf.putLong(0X7E7F808182838485L)
       assertEquals(0x7e, buf.get(8))
       assertEquals(0x7f, buf.get(9))
       assertEquals(0x80.toByte, buf.get(10))
@@ -554,7 +554,7 @@ abstract class ByteBufferTest extends BaseBufferTest {
 
       buf.order(ByteOrder.LITTLE_ENDIAN)
       buf.position(7)
-      buf.putLong(0x8182838485868788L)
+      buf.putLong(0X8182838485868788L)
       assertEquals(0x7c, buf.get(6))
       assertEquals(0x88.toByte, buf.get(7))
       assertEquals(0x87.toByte, buf.get(8))
@@ -578,14 +578,14 @@ abstract class ByteBufferTest extends BaseBufferTest {
     val buf = withContent(20, elemRange(0x76, 0x8a): _*)
 
     buf.order(ByteOrder.BIG_ENDIAN)
-    assertEquals(0x797a7b7c7d7e7f80L, buf.getLong(3))
+    assertEquals(0X797A7B7C7D7E7F80L, buf.getLong(3))
     assertEquals(0, buf.position)
-    assertEquals(0x7c7d7e7f80818283L, buf.getLong(6))
+    assertEquals(0X7C7D7E7F80818283L, buf.getLong(6))
 
     buf.order(ByteOrder.LITTLE_ENDIAN)
     buf.position(6)
-    assertEquals(0x8584838281807f7eL, buf.getLong(8))
-    assertEquals(0x8988878685848382L, buf.getLong(12))
+    assertEquals(0X8584838281807F7EL, buf.getLong(8))
+    assertEquals(0X8988878685848382L, buf.getLong(12))
 
     expectThrows(classOf[IndexOutOfBoundsException], buf.getLong(15))
   }
@@ -593,7 +593,7 @@ abstract class ByteBufferTest extends BaseBufferTest {
   @Test def absolute_putLong(): Unit = {
     if (!createsReadOnly) {
       val buf = allocBuffer(20)
-      buf.putLong(2, 0x7b7c7d7e7f808182L)
+      buf.putLong(2, 0X7B7C7D7E7F808182L)
       assertEquals(0, buf.position())
       assertEquals(0, buf.get(0))
       assertEquals(0x7b, buf.get(2))
@@ -604,7 +604,7 @@ abstract class ByteBufferTest extends BaseBufferTest {
       assertEquals(0x80.toByte, buf.get(7))
       assertEquals(0x81.toByte, buf.get(8))
       assertEquals(0x82.toByte, buf.get(9))
-      buf.putLong(7, 0x7d7e7f8081828384L)
+      buf.putLong(7, 0X7D7E7F8081828384L)
       assertEquals(0x7f, buf.get(6))
       assertEquals(0x7d, buf.get(7))
       assertEquals(0x7e, buf.get(8))
@@ -618,7 +618,7 @@ abstract class ByteBufferTest extends BaseBufferTest {
 
       buf.order(ByteOrder.LITTLE_ENDIAN)
       buf.position(11)
-      buf.putLong(9, 0x8182838485868788L)
+      buf.putLong(9, 0X8182838485868788L)
       assertEquals(0x7e, buf.get(8))
       assertEquals(0x88.toByte, buf.get(9))
       assertEquals(0x87.toByte, buf.get(10))
@@ -651,9 +651,9 @@ abstract class ByteBufferTest extends BaseBufferTest {
     assertEquals(0, longBuf1.position)
     assertEquals(2, longBuf1.limit)
     assertEquals(ByteOrder.BIG_ENDIAN, longBuf1.order)
-    assertEquals(0x8182838485868788L, longBuf1.get(1))
+    assertEquals(0X8182838485868788L, longBuf1.get(1))
     assertEquals(0, longBuf1.position)
-    assertEquals(0x797a7b7c7d7e7f80L, longBuf1.get())
+    assertEquals(0X797A7B7C7D7E7F80L, longBuf1.get())
     assertEquals(1, longBuf1.position)
 
     buf.order(ByteOrder.LITTLE_ENDIAN)
@@ -663,9 +663,9 @@ abstract class ByteBufferTest extends BaseBufferTest {
     assertEquals(0, longBuf2.position)
     assertEquals(2, longBuf2.limit)
     assertEquals(ByteOrder.LITTLE_ENDIAN, longBuf2.order)
-    assertEquals(0x8887868584838281L, longBuf2.get(1))
+    assertEquals(0X8887868584838281L, longBuf2.get(1))
     assertEquals(0, longBuf2.position)
-    assertEquals(0x807f7e7d7c7b7a79L, longBuf2.get())
+    assertEquals(0X807F7E7D7C7B7A79L, longBuf2.get())
     assertEquals(1, longBuf2.position)
   }
 
@@ -676,7 +676,7 @@ abstract class ByteBufferTest extends BaseBufferTest {
 
       buf.order(ByteOrder.BIG_ENDIAN)
       val longBuf1 = buf.asLongBuffer()
-      longBuf1.put(1, 0x8182838485868788L)
+      longBuf1.put(1, 0X8182838485868788L)
       assertEquals(0x81.toByte, buf.get(11))
       assertEquals(0x82.toByte, buf.get(12))
       assertEquals(0x83.toByte, buf.get(13))
@@ -686,7 +686,7 @@ abstract class ByteBufferTest extends BaseBufferTest {
       assertEquals(0x87.toByte, buf.get(17))
       assertEquals(0x88.toByte, buf.get(18))
       assertEquals(0, longBuf1.position)
-      longBuf1.put(0x797a7b7c7d7e7f80L)
+      longBuf1.put(0X797A7B7C7D7E7F80L)
       assertEquals(0x79, buf.get(3))
       assertEquals(0x7a, buf.get(4))
       assertEquals(0x7b, buf.get(5))
@@ -699,7 +699,7 @@ abstract class ByteBufferTest extends BaseBufferTest {
 
       buf.order(ByteOrder.LITTLE_ENDIAN)
       val longBuf2 = buf.asLongBuffer()
-      longBuf2.put(1, 0x8182838485868788L)
+      longBuf2.put(1, 0X8182838485868788L)
       assertEquals(0x88.toByte, buf.get(11))
       assertEquals(0x87.toByte, buf.get(12))
       assertEquals(0x86.toByte, buf.get(13))
@@ -709,7 +709,7 @@ abstract class ByteBufferTest extends BaseBufferTest {
       assertEquals(0x82.toByte, buf.get(17))
       assertEquals(0x81.toByte, buf.get(18))
       assertEquals(0, longBuf2.position)
-      longBuf2.put(0x797a7b7c7d7e7f80L)
+      longBuf2.put(0X797A7B7C7D7E7F80L)
       assertEquals(0x80.toByte, buf.get(3))
       assertEquals(0x7f, buf.get(4))
       assertEquals(0x7e, buf.get(5))
@@ -726,7 +726,7 @@ abstract class ByteBufferTest extends BaseBufferTest {
       val longBuf1 = buf.asReadOnlyBuffer().asLongBuffer()
       expectThrows(
         classOf[ReadOnlyBufferException],
-        longBuf1.put(1, 0x8182838485868788L))
+        longBuf1.put(1, 0X8182838485868788L))
     }
   }
 

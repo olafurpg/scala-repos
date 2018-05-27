@@ -608,7 +608,7 @@ sealed abstract class ISet[A] {
               case EQ => r
               case GT => r.filterGt(a)
             }
-      },
+        },
       this)
 
   final def filterLt(a: Option[A])(implicit o: Order[A]): ISet[A] =
@@ -622,7 +622,7 @@ sealed abstract class ISet[A] {
               case EQ => l
               case GT => l.filterLt(a)
             }
-      },
+        },
       this)
 
   override final def equals(other: Any): Boolean =

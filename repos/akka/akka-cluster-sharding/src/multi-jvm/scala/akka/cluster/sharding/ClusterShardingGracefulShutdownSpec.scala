@@ -40,7 +40,7 @@ object ClusterShardingGracefulShutdownSpec {
   val extractShardId: ShardRegion.ExtractShardId = msg ⇒
     msg match {
       case id: Int ⇒ id.toString
-  }
+    }
 
   //#graceful-shutdown
   class IllustrateGracefulShutdown extends Actor {

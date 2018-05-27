@@ -182,8 +182,7 @@ class SubFlow[-In, +Out, +Mat](
     : SubFlow[In, T, Mat] =
     new SubFlow(delegate.statefulMapConcat { () ⇒
       val fun = f.create()
-      elem ⇒
-        Util.immutableSeq(fun(elem))
+      elem ⇒ Util.immutableSeq(fun(elem))
     })
 
   /**

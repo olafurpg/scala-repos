@@ -42,12 +42,12 @@ final class UUID private (
   }
 
   def getLeastSignificantBits(): Long = {
-    if (l2 eq null) l2 = (i3.toLong << 32) | (i4.toLong & 0xffffffffL)
+    if (l2 eq null) l2 = (i3.toLong << 32) | (i4.toLong & 0XFFFFFFFFL)
     l2.longValue
   }
 
   def getMostSignificantBits(): Long = {
-    if (l1 eq null) l1 = (i1.toLong << 32) | (i2.toLong & 0xffffffffL)
+    if (l1 eq null) l1 = (i1.toLong << 32) | (i2.toLong & 0XFFFFFFFFL)
     l1.longValue
   }
 
@@ -71,7 +71,7 @@ final class UUID private (
     if (version() != TimeBased)
       throw new UnsupportedOperationException("Not a time-based UUID")
     (((i2 >>> 16) | ((i2 & 0x0fff) << 16)).toLong << 32) |
-      (i1.toLong & 0xffffffffL)
+      (i1.toLong & 0XFFFFFFFFL)
   }
 
   def clockSequence(): Int = {
@@ -83,7 +83,7 @@ final class UUID private (
   def node(): Long = {
     if (version() != TimeBased)
       throw new UnsupportedOperationException("Not a time-based UUID")
-    ((i3 & 0xffff).toLong << 32) | (i4.toLong & 0xffffffffL)
+    ((i3 & 0xffff).toLong << 32) | (i4.toLong & 0XFFFFFFFFL)
   }
 
   override def toString(): String = {

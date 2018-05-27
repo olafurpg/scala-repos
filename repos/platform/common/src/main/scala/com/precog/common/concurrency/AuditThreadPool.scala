@@ -111,7 +111,7 @@ class AuditExecutor(
   }
 
   private class WorkerThread(id: Int) extends Thread(name + "-" + id) {
-    private[this] var lastCpuTime = 0l
+    private[this] var lastCpuTime = 0L
 
     def cpuDelta = synchronized {
       val newTime = threadMXBean.getThreadCpuTime(this.getId)

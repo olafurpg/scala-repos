@@ -222,7 +222,7 @@ object Validators {
         val u = URI.create(url).normalize()
         !absolute || u.isAbsolute
       }).isDefined &&
-      (allowLocalHost || UrlValidator.getInstance().isValid(url))
+        (allowLocalHost || UrlValidator.getInstance().isValid(url))
     }
     new PredicateValidator[String](fieldName, validator, messageFormat)
   }

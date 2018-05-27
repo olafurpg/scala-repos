@@ -42,7 +42,7 @@ private[process] trait ProcessImpl { self: Process.type =>
           result.get match {
             case Right(value)    => value
             case Left(exception) => throw exception
-        })
+          })
     }
   }
 

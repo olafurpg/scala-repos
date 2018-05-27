@@ -39,7 +39,7 @@ class LogDoubleTest extends FunSuite with Checkers {
   });
 
   implicit def ae(x: Double) = new {
-    def =~=(y: Double) = math.abs(x - y) / x < 1E-6;
+    def =~=(y: Double) = math.abs(x - y) / x < 1e-6;
   }
 
   test("addition") {

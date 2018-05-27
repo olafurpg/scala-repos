@@ -56,7 +56,7 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
               r.implicitConversionClass,
               r,
               r.substitutor)
-      }),
+        }),
       noImplicit = false
     ).map(_.repr)
   }

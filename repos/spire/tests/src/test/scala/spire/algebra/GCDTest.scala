@@ -44,8 +44,8 @@ class GCDTest extends FunSuite with Checkers {
   }
 
   test("GCD of floats with 0 exponent in result is correct") {
-    val x = -1.586002E-34f
-    val y = 3.3793717E-7f
+    val x = -1.586002e-34f
+    val y = 3.3793717e-7f
     val d = spire.math.gcd(x, y)
     assert((x / d).isWhole === true)
     assert((y / d).isWhole === true)

@@ -1424,9 +1424,9 @@ trait ContextErrors { self: Analyzer =>
 
       object SymValidateErrors extends Enumeration {
         val ImplicitConstr, ImplicitNotTermOrClass, ImplicitAtToplevel,
-        OverrideClass, SealedNonClass, AbstractNonClass, OverrideConstr,
-        AbstractOverride, AbstractOverrideOnTypeMember, LazyAndEarlyInit,
-        ByNameParameter, AbstractVar = Value
+            OverrideClass, SealedNonClass, AbstractNonClass, OverrideConstr,
+            AbstractOverride, AbstractOverrideOnTypeMember, LazyAndEarlyInit,
+            ByNameParameter, AbstractVar = Value
       }
 
       object DuplicatesErrorKinds extends Enumeration {

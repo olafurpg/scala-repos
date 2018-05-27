@@ -109,7 +109,7 @@ class MapStatusSuite extends SparkFunSuite {
     (1 to 200000).foreach(i =>
       if (i % 200 != 0) {
         r.add(i)
-    })
+      })
     val size1 = r.getSizeInBytes
     val success = r.runOptimize()
     r.trim()
@@ -123,7 +123,7 @@ class MapStatusSuite extends SparkFunSuite {
     (1 to 200000).foreach(i =>
       if (i % 200 == 0) {
         r.add(i)
-    })
+      })
     val size1 = r.getSizeInBytes
     val success = r.runOptimize()
     r.trim()

@@ -364,12 +364,12 @@ object Long {
   def highestOneBit(i: scala.Long): scala.Long = {
     val hi = (i >>> 32).toInt
     if (hi != 0) Integer.highestOneBit(hi).toLong << 32
-    else Integer.highestOneBit(i.toInt).toLong & 0xffffffffL
+    else Integer.highestOneBit(i.toInt).toLong & 0XFFFFFFFFL
   }
 
   def lowestOneBit(i: scala.Long): scala.Long = {
     val lo = i.toInt
-    if (lo != 0) Integer.lowestOneBit(lo).toLong & 0xffffffffL
+    if (lo != 0) Integer.lowestOneBit(lo).toLong & 0XFFFFFFFFL
     else Integer.lowestOneBit((i >>> 32).toInt).toLong << 32
   }
 
@@ -382,7 +382,7 @@ object Long {
   def reverseBytes(i: scala.Long): scala.Long = {
     val hiReversed = Integer.reverseBytes((i >>> 32).toInt)
     val loReversed = Integer.reverseBytes(i.toInt)
-    (loReversed.toLong << 32) | (hiReversed.toLong & 0xffffffffL)
+    (loReversed.toLong << 32) | (hiReversed.toLong & 0XFFFFFFFFL)
   }
 
   def rotateLeft(i: scala.Long, distance: scala.Int): scala.Long =

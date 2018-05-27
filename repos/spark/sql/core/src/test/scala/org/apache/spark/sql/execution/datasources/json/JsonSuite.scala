@@ -93,7 +93,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       Decimal(longNumber),
       enforceCorrectType(longNumber, DecimalType.SYSTEM_DEFAULT))
 
-    val doubleNumber: Double = 1.7976931348623157E308d
+    val doubleNumber: Double = 1.7976931348623157e308d
     checkTypePromotion(
       doubleNumber.toDouble,
       enforceCorrectType(doubleNumber, DoubleType))
@@ -339,7 +339,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       Row(
         new java.math.BigDecimal("92233720368547758070"),
         true,
-        1.7976931348623157E308,
+        1.7976931348623157e308,
         10,
         21474836470L,
         null,
@@ -763,7 +763,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       Row(
         new java.math.BigDecimal("92233720368547758070"),
         true,
-        1.7976931348623157E308,
+        1.7976931348623157e308,
         10,
         21474836470L,
         null,
@@ -1001,7 +1001,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       Row(
         new java.math.BigDecimal("92233720368547758070"),
         true,
-        1.7976931348623157E308,
+        1.7976931348623157e308,
         10,
         21474836470L,
         null,
@@ -1042,7 +1042,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       Row(
         new java.math.BigDecimal("92233720368547758070"),
         true,
-        1.7976931348623157E308,
+        1.7976931348623157e308,
         10,
         21474836470L,
         null,
@@ -1060,7 +1060,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       Row(
         new java.math.BigDecimal("92233720368547758070"),
         true,
-        1.7976931348623157E308,
+        1.7976931348623157e308,
         10,
         21474836470L,
         null,
@@ -1395,7 +1395,7 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       Row(
         new java.math.BigDecimal("92233720368547758070"),
         true,
-        1.7976931348623157E308,
+        1.7976931348623157e308,
         10,
         21474836470L,
         "this is a simple string.")

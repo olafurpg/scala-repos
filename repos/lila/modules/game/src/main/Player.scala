@@ -177,7 +177,7 @@ object Player {
                 holdAlert = r.getO[HoldAlert](holdAlert),
                 berserk = r boolD berserk,
                 name = r strO name
-      )
+              )
 
     def writes(w: BSON.Writer, o: Builder) =
       o(chess.White)("0000")(none)(none) |> { p =>

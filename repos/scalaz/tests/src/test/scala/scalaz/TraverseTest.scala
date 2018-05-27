@@ -105,12 +105,11 @@ object TraverseTest extends SpecLite {
 
     "mapAccumL/R" ! forAll {
       val L = Traverse[List]; import L.traverseSyntax._
-      (l: List[Int]) =>
-        {
-          val (acc, l2) = l.mapAccumL(List[Int]())((acc, a) => (a :: acc, a))
-          val (acc2, l3) = l.mapAccumR(List[Int]())((acc, a) => (a :: acc, a))
-          acc == l.reverse && l2 == l && acc2 == l3 && l3 == l
-        }
+      (l: List[Int]) => {
+        val (acc, l2) = l.mapAccumL(List[Int]())((acc, a) => (a :: acc, a))
+        val (acc2, l3) = l.mapAccumR(List[Int]())((acc, a) => (a :: acc, a))
+        acc == l.reverse && l2 == l && acc2 == l3 && l3 == l
+      }
     }
 
     "double reverse" ! forAll { (is: List[Int]) =>

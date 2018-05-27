@@ -61,45 +61,57 @@ private[ui] class ExecutorTable(
         <th>Total Tasks</th>
         <th>Failed Tasks</th>
         <th>Succeeded Tasks</th>
-        {if (hasInput) {
-          <th>
+        {
+      if (hasInput) {
+        <th>
             <span data-toggle="tooltip" title={ToolTips.INPUT}>Input Size / Records</span>
           </th>
-        }}
-        {if (hasOutput) {
-          <th>
+      }
+    }
+        {
+      if (hasOutput) {
+        <th>
             <span data-toggle="tooltip" title={ToolTips.OUTPUT}>Output Size / Records</span>
           </th>
-        }}
-        {if (hasShuffleRead) {
-          <th>
+      }
+    }
+        {
+      if (hasShuffleRead) {
+        <th>
             <span data-toggle="tooltip" title={ToolTips.SHUFFLE_READ}>
             Shuffle Read Size / Records</span>
           </th>
-        }}
-        {if (hasShuffleWrite) {
-          <th>
+      }
+    }
+        {
+      if (hasShuffleWrite) {
+        <th>
             <span data-toggle="tooltip" title={ToolTips.SHUFFLE_WRITE}>
             Shuffle Write Size / Records</span>
           </th>
-        }}
-        {if (hasBytesSpilled) {
-          <th>Shuffle Spill (Memory)</th>
+      }
+    }
+        {
+      if (hasBytesSpilled) {
+        <th>Shuffle Spill (Memory)</th>
           <th>Shuffle Spill (Disk)</th>
-        }}
+      }
+    }
       </thead>
       <tbody>
         {createExecutorTable()}
       </tbody>
     </table>
     <script>
-      {Unparsed {
+      {
+      Unparsed {
         """
           |      window.onload = function() {
           |        sorttable.innerSortFunction.apply(document.getElementById('executorid'), [])
           |      };
         """.stripMargin
-      }}
+      }
+    }
     </script>
   }
 
@@ -119,38 +131,54 @@ private[ui] class ExecutorTable(
             <tr>
             <td>{k}</td>
             <td>{executorIdToAddress.getOrElse(k, "CANNOT FIND ADDRESS")}</td>
-            <td sorttable_customkey={v.taskTime.toString}>{UIUtils.formatDuration(v.taskTime)}</td>
+            <td sorttable_customkey={v.taskTime.toString}>{
+              UIUtils.formatDuration(v.taskTime)
+            }</td>
             <td>{v.failedTasks + v.succeededTasks}</td>
             <td>{v.failedTasks}</td>
             <td>{v.succeededTasks}</td>
-            {if (stageData.hasInput) {
-              <td sorttable_customkey={v.inputBytes.toString}>
+            {
+              if (stageData.hasInput) {
+                <td sorttable_customkey={v.inputBytes.toString}>
                 {s"${Utils.bytesToString(v.inputBytes)} / ${v.inputRecords}"}
               </td>
-            }}
-            {if (stageData.hasOutput) {
-              <td sorttable_customkey={v.outputBytes.toString}>
+              }
+            }
+            {
+              if (stageData.hasOutput) {
+                <td sorttable_customkey={v.outputBytes.toString}>
                 {s"${Utils.bytesToString(v.outputBytes)} / ${v.outputRecords}"}
               </td>
-            }}
-            {if (stageData.hasShuffleRead) {
-              <td sorttable_customkey={v.shuffleRead.toString}>
-                {s"${Utils.bytesToString(v.shuffleRead)} / ${v.shuffleReadRecords}"}
+              }
+            }
+            {
+              if (stageData.hasShuffleRead) {
+                <td sorttable_customkey={v.shuffleRead.toString}>
+                {
+                  s"${Utils.bytesToString(v.shuffleRead)} / ${v.shuffleReadRecords}"
+                }
               </td>
-            }}
-            {if (stageData.hasShuffleWrite) {
-              <td sorttable_customkey={v.shuffleWrite.toString}>
-                {s"${Utils.bytesToString(v.shuffleWrite)} / ${v.shuffleWriteRecords}"}
+              }
+            }
+            {
+              if (stageData.hasShuffleWrite) {
+                <td sorttable_customkey={v.shuffleWrite.toString}>
+                {
+                  s"${Utils.bytesToString(v.shuffleWrite)} / ${v.shuffleWriteRecords}"
+                }
               </td>
-            }}
-            {if (stageData.hasBytesSpilled) {
-              <td sorttable_customkey={v.memoryBytesSpilled.toString}>
+              }
+            }
+            {
+              if (stageData.hasBytesSpilled) {
+                <td sorttable_customkey={v.memoryBytesSpilled.toString}>
                 {Utils.bytesToString(v.memoryBytesSpilled)}
               </td>
               <td sorttable_customkey={v.diskBytesSpilled.toString}>
                 {Utils.bytesToString(v.diskBytesSpilled)}
               </td>
-            }}
+              }
+            }
           </tr>
         }
       case None =>

@@ -272,14 +272,14 @@ case class ScExistentialType(
                   res.update(
                     arg,
                     res.getOrElse(arg, Seq.empty[ScType]) ++ Seq(tp))
-              })
+                })
             case _ =>
           }
         case ScTypeVariable(name) =>
           wildcards.foreach(arg =>
             if (arg.name == name && !rejected.contains(arg.name)) {
               res.update(arg, res.getOrElse(arg, Seq.empty[ScType]) ++ Seq(tp))
-          })
+            })
         case ex: ScExistentialType =>
           var newSet =
             if (ex ne this) rejected ++ ex.wildcards.map(_.name) else rejected
@@ -342,12 +342,10 @@ case class ScExistentialType(
             tp.name,
             tp.typeParams.map(updateTypeParam), {
               val res = updateRecursive(tp.lowerType(), newSet, variance)
-              () =>
-                res
+              () => res
             }, {
               val res = updateRecursive(tp.upperType(), newSet, -variance)
-              () =>
-                res
+              () => res
             },
             tp.ptp
           )
@@ -447,7 +445,7 @@ case class ScExistentialType(
                     .asInstanceOf[ScTypeParameterType]),
                 updateRecursive(arg.lowerBound, newSet, -variance),
                 updateRecursive(arg.upperBound, newSet, variance)
-            ))
+              ))
         )
       case ScThisType(clazz) => tp
       case ScDesignatorType(element) =>
@@ -516,7 +514,7 @@ case class ScExistentialType(
                 () => updateRecursive(tp.lowerType(), rejected, variance),
                 () => updateRecursive(tp.upperType(), rejected, variance),
                 tp.ptp
-            ))
+              ))
         )
       case _ => tp
     }

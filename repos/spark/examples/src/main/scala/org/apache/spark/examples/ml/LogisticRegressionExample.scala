@@ -57,7 +57,7 @@ object LogisticRegressionExample {
       elasticNetParam: Double = 0.0,
       maxIter: Int = 100,
       fitIntercept: Boolean = true,
-      tol: Double = 1E-6,
+      tol: Double = 1e-6,
       fracTest: Double = 0.2)
       extends AbstractParams[Params]
 

@@ -34,7 +34,7 @@ object Runner extends Logging {
         p.split('=') match {
           case Array(k, v) => List(k -> v)
           case _           => Nil
-      })
+        })
       .toMap
 
   def argumentValue(

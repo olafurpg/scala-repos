@@ -75,7 +75,9 @@ class HashMap[A, B] private[collection] (
   override def put(key: A, value: B): Option[B] = {
     val e = findOrAddEntry(key, value)
     if (e eq null) None
-    else { val v = e.value; e.value = value; Some(v) }
+    else {
+      val v = e.value; e.value = value; Some(v)
+    }
   }
 
   override def update(key: A, value: B): Unit = put(key, value)

@@ -71,7 +71,7 @@ class MultivariateGaussianTest extends FunSuite with Checkers {
     check(Prop.forAll { (distr: MultivariateGaussian) =>
       val sample = DenseVector.horzcat(distr.sample(numSamples): _*)
       val m = mean(sample(*, ::))
-      if (norm(m - distr.mean, Double.PositiveInfinity) > 1E-1) {
+      if (norm(m - distr.mean, Double.PositiveInfinity) > 1e-1) {
         println("MExpected " + distr.mean + " but got " + m)
         false
       } else {

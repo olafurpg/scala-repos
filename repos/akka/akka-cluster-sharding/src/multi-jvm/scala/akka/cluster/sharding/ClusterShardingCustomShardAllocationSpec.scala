@@ -40,7 +40,7 @@ object ClusterShardingCustomShardAllocationSpec {
   val extractShardId: ShardRegion.ExtractShardId = msg ⇒
     msg match {
       case id: Int ⇒ id.toString
-  }
+    }
 
   case object AllocateReq
   case class UseRegion(region: ActorRef)

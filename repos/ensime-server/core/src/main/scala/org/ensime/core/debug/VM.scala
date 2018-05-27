@@ -225,11 +225,15 @@ class VM(
     for (types <- fileToUnits.get(key)) {
       for (t <- types) {
         for (m <- t.methods()) {
-          try { buf ++= m.locationsOfLine(line).map(LocationClass.apply) } catch {
+          try {
+            buf ++= m.locationsOfLine(line).map(LocationClass.apply)
+          } catch {
             case e: AbsentInformationException =>
           }
         }
-        try { buf ++= t.locationsOfLine(line).map(LocationClass.apply) } catch {
+        try {
+          buf ++= t.locationsOfLine(line).map(LocationClass.apply)
+        } catch {
           case e: AbsentInformationException =>
         }
       }
@@ -535,7 +539,9 @@ class VM(
   }
 
   def ignoreErr[T](action: => T, orElse: => T): T = {
-    try { action } catch { case e: Exception => orElse }
+    try {
+      action
+    } catch { case e: Exception => orElse }
   }
 
   private def makeStackFrame(index: Int, frame: StackFrame): DebugStackFrame = {

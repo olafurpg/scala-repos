@@ -65,7 +65,9 @@ private[stream] object AbstractStage {
       // No need to refer to the handle in a private val
       val handler = new InHandler with OutHandler {
         override def onPush(): Unit =
-          try { currentStage.onPush(grab(shape.in), ctx) } catch {
+          try {
+            currentStage.onPush(grab(shape.in), ctx)
+          } catch {
             case NonFatal(ex) ⇒ onSupervision(ex)
           }
 

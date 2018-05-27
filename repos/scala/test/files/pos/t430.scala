@@ -16,7 +16,7 @@ object Test extends App {
   bar(1: Short)
   bar('a')
   bar(1)
-  bar(1l)
+  bar(1L)
   bar(1.0f)
   bar(1.0)
 }

@@ -81,7 +81,7 @@ sealed abstract class Heap[A] {
             val f3 = zs.foldRight(f2)(skewInsert(leq, _, _))
             Heap(s - 1, leq, Node(Ranked(0, x), f3))
           }
-      }
+        }
     )
   }
 

@@ -3,8 +3,8 @@ class D(val a: () => Int => () => Any) {
 }
 
 object Crash
-    extends D(() => { (x: Int) =>
-      { () =>
+    extends D(() => {
+      (x: Int) => { () =>
         { new { println(x.toString) } }
       }
     })

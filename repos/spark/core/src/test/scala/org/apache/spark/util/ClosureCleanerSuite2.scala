@@ -160,9 +160,7 @@ class ClosureCleanerSuite2
 
   test("get inner closure classes") {
     val closure1 = () => 1
-    val closure2 = () => { () =>
-      1
-    }
+    val closure2 = () => { () => 1 }
     val closure3 = (i: Int) => {
       (1 to i)
         .map { x =>
@@ -692,19 +690,15 @@ class ClosureCleanerSuite2
     }
 
     // Same as above, but with more levels of nesting
-    val test3 = () => { () =>
-      test1()
-    }
-    val test4 = () => { () =>
-      test2()
-    }
-    val test5 = () => { () =>
-      { () =>
+    val test3 = () => { () => test1() }
+    val test4 = () => { () => test2() }
+    val test5 = () => {
+      () => { () =>
         test3()
       }
     }
-    val test6 = () => { () =>
-      { () =>
+    val test6 = () => {
+      () => { () =>
         test4()
       }
     }

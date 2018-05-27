@@ -506,7 +506,7 @@ abstract class SuperAccessors
             MethodType(
               List(protAcc.newSyntheticValueParam(objType)),
               memberType.cloneInfo(protAcc).asSeenFrom(qual.tpe, sym.owner))
-      }
+        }
 
       val protAcc =
         clazz.info

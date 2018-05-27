@@ -89,8 +89,8 @@ class IntegerTestOnJDK8 {
     test(0, 0L)
     test(5, 5L)
     test(43345, 43345L)
-    test(0xEE6B2800, 0xEE6B2800L)
-    test(0xFFFFFFFF, 0xFFFFFFFFL)
+    test(0xEE6B2800, 0XEE6B2800L)
+    test(0xFFFFFFFF, 0XFFFFFFFFL)
   }
 
   @Test def should_provide_divideUnsigned(): Unit = {

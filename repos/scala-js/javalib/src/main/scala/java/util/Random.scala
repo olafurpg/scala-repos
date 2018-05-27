@@ -18,7 +18,7 @@ class Random(seed_in: Long) extends AnyRef with java.io.Serializable {
   def this() = this(Random.randomSeed())
 
   def setSeed(seed_in: Long): Unit = {
-    val seed = ((seed_in ^ 0x5DEECE66DL) & ((1L << 48) - 1)) // as documented
+    val seed = ((seed_in ^ 0X5DEECE66DL) & ((1L << 48) - 1)) // as documented
     seedHi = (seed >>> 24).toInt
     seedLo = seed.toInt & ((1 << 24) - 1)
     haveNextNextGaussian = false
@@ -52,7 +52,7 @@ class Random(seed_in: Long) extends AnyRef with java.io.Serializable {
     val oldSeedHi = seedHi
     val oldSeedLo = seedLo
 
-    val mul = 0x5DEECE66DL
+    val mul = 0X5DEECE66DL
     val mulHi = (mul >>> 24).toInt
     val mulLo = mul.toInt & ((1 << 24) - 1)
 
@@ -174,7 +174,7 @@ object Random {
 
   /** Generate a random long from JS RNG to seed a new Random */
   private def randomSeed(): Long =
-    (randomInt().toLong << 32) | (randomInt().toLong & 0xffffffffL)
+    (randomInt().toLong << 32) | (randomInt().toLong & 0XFFFFFFFFL)
 
   private def randomInt(): Int =
     (Math.floor(js.Math.random() * 4294967296.0) - 2147483648.0).toInt

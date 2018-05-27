@@ -74,7 +74,7 @@ object Pack {
   }
 
   @inline private[this] def lsm(n: Long, shift: Int): Byte =
-    ((n >>> shift) & 0xffL).toByte
+    ((n >>> shift) & 0XFFL).toByte
 
   def longToBytes(n: Long): Array[Byte] = {
     val arr = new Array[Byte](8)
@@ -124,8 +124,8 @@ object Pack {
       b6: Byte,
       b7: Byte,
       b8: Byte): Long =
-    (b1 & 0xffL) << 56 | (b2 & 0xffL) << 48 | (b3 & 0xffL) << 40 | (b4 & 0xffL) << 32 |
-      (b5 & 0xffL) << 24 | (b6 & 0xffL) << 16 | (b7 & 0xffL) << 8 | (b8 & 0xffL)
+    (b1 & 0XFFL) << 56 | (b2 & 0XFFL) << 48 | (b3 & 0XFFL) << 40 | (b4 & 0XFFL) << 32 |
+      (b5 & 0XFFL) << 24 | (b6 & 0XFFL) << 16 | (b7 & 0XFFL) << 8 | (b8 & 0XFFL)
 
   def longFromByteBuffer(bb: ByteBuffer): Long =
     if (bb.remaining >= 8) {

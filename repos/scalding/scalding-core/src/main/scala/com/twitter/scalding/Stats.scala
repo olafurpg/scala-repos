@@ -197,11 +197,10 @@ object RuntimeStats extends java.io.Serializable {
   def getKeepAliveFunction(implicit flowDef: FlowDef): () => Unit = {
     // Don't capture the flowDef, just the id
     val id = UniqueID.getIDFor(flowDef)
-    () =>
-      {
-        val flowProcess = RuntimeStats.getFlowProcessForUniqueId(id)
-        flowProcess.keepAlive
-      }
+    () => {
+      val flowProcess = RuntimeStats.getFlowProcessForUniqueId(id)
+      flowProcess.keepAlive
+    }
   }
 }
 

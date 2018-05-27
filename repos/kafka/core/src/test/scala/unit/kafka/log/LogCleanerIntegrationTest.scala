@@ -162,7 +162,7 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
   /* create a cleaner instance and logs with the given parameters */
   def makeCleaner(
       parts: Int,
-      minCleanableDirtyRatio: Float = 0.0F,
+      minCleanableDirtyRatio: Float = 0.0f,
       numThreads: Int = 1,
       defaultPolicy: String = "compact",
       policyOverrides: Map[String, String] = Map()): LogCleaner = {

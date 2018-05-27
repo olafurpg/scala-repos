@@ -483,6 +483,6 @@ class CSCMatrixTest extends FunSuite with Checkers {
           0.1813186813186811,
           -0.3131868131868131,
           0.43956043956043944),
-        inf) < 1E-5)
+        inf) < 1e-5)
   }
 }

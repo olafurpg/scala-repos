@@ -319,11 +319,11 @@ object Codec {
 
     def encodedSize(sn: Long) = {
       @tailrec def loop(size: Int, n: Long): Int = {
-        if ((n & ~0x7FL) != 0) loop(size + 1, n >> 7) else size
+        if ((n & ~0X7FL) != 0) loop(size + 1, n >> 7) else size
       }
 
       val n = if (sn < 0) ~sn else sn
-      if ((n & ~0x3FL) != 0) loop(2, n >> 6) else 1
+      if ((n & ~0X3FL) != 0) loop(2, n >> 6) else 1
     }
 
     def writeInit(n: Long, buf: ByteBuffer): Option[S] = {
@@ -343,8 +343,8 @@ object Codec {
       @tailrec
       def loop(n: Long): Unit = if (n != 0) {
         buf.put(
-          if ((n & ~0x7FL) != 0) (n & 0x7FL | 0x80L).toByte
-          else (n & 0x7FL).toByte)
+          if ((n & ~0X7FL) != 0) (n & 0X7FL | 0X80L).toByte
+          else (n & 0X7FL).toByte)
         loop(n >> 7)
       }
 
@@ -352,13 +352,13 @@ object Codec {
       val lo =
         if (sn < 0) {
           n = ~sn
-          n & 0x3FL | 0x40L
+          n & 0X3FL | 0X40L
         } else {
-          n & 0x3FL
+          n & 0X3FL
         }
 
-      if ((~0x3FL & n) != 0) {
-        buf.put((lo | 0x80L).toByte)
+      if ((~0X3FL & n) != 0) {
+        buf.put((lo | 0X80L).toByte)
         loop(n >> 6)
       } else {
         buf.put(lo.toByte)
@@ -369,13 +369,13 @@ object Codec {
       @inline
       @tailrec def loop(offset: Int, n: Long): Long = {
         val lo = buf.get().toLong
-        val nn = n | ((lo & 0x7FL) << offset)
-        if ((lo & 0x80L) != 0) loop(offset + 7, nn) else nn
+        val nn = n | ((lo & 0X7FL) << offset)
+        if ((lo & 0X80L) != 0) loop(offset + 7, nn) else nn
       }
 
       val lo = buf.get().toLong
-      val n = if ((lo & 0x80L) != 0) loop(6, lo & 0x3FL) else (lo & 0x3FL)
-      if ((lo & 0x40L) != 0) ~n else n
+      val n = if ((lo & 0X80L) != 0) loop(6, lo & 0X3FL) else (lo & 0X3FL)
+      if ((lo & 0X40L) != 0) ~n else n
     }
 
     override def skip(buf: ByteBuffer) {

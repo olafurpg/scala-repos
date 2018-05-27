@@ -31,9 +31,9 @@ abstract class PersistentFSMSpec(config: Config)
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
 
-      val shirt = Item("1", "Shirt", 59.99F)
-      val shoes = Item("2", "Shoes", 89.99F)
-      val coat = Item("3", "Coat", 119.99F)
+      val shirt = Item("1", "Shirt", 59.99f)
+      val shoes = Item("2", "Shoes", 89.99f)
+      val coat = Item("3", "Coat", 119.99f)
 
       fsmRef ! GetCurrentCart
       fsmRef ! AddItem(shirt)
@@ -68,7 +68,7 @@ abstract class PersistentFSMSpec(config: Config)
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
 
-      val shirt = Item("1", "Shirt", 59.99F)
+      val shirt = Item("1", "Shirt", 59.99f)
 
       fsmRef ! AddItem(shirt)
 
@@ -90,9 +90,9 @@ abstract class PersistentFSMSpec(config: Config)
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
 
-      val shirt = Item("1", "Shirt", 59.99F)
-      val shoes = Item("2", "Shoes", 89.99F)
-      val coat = Item("3", "Coat", 119.99F)
+      val shirt = Item("1", "Shirt", 59.99f)
+      val shoes = Item("2", "Shoes", 89.99f)
+      val coat = Item("3", "Coat", 119.99f)
 
       fsmRef ! GetCurrentCart
       fsmRef ! AddItem(shirt)
@@ -144,9 +144,9 @@ abstract class PersistentFSMSpec(config: Config)
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
 
-      val shirt = Item("1", "Shirt", 59.99F)
-      val shoes = Item("2", "Shoes", 89.99F)
-      val coat = Item("3", "Coat", 119.99F)
+      val shirt = Item("1", "Shirt", 59.99f)
+      val shoes = Item("2", "Shoes", 89.99f)
+      val coat = Item("3", "Coat", 119.99f)
 
       fsmRef ! AddItem(shirt)
       fsmRef ! AddItem(shoes)
@@ -170,9 +170,9 @@ abstract class PersistentFSMSpec(config: Config)
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
 
-      val shirt = Item("1", "Shirt", 59.99F)
-      val shoes = Item("2", "Shoes", 89.99F)
-      val coat = Item("3", "Coat", 119.99F)
+      val shirt = Item("1", "Shirt", 59.99f)
+      val shoes = Item("2", "Shoes", 89.99f)
+      val coat = Item("3", "Coat", 119.99f)
 
       fsmRef ! AddItem(shirt)
       fsmRef ! AddItem(shoes)
@@ -193,7 +193,7 @@ abstract class PersistentFSMSpec(config: Config)
       watch(fsmRef)
       fsmRef ! SubscribeTransitionCallBack(testActor)
 
-      val shirt = Item("1", "Shirt", 59.99F)
+      val shirt = Item("1", "Shirt", 59.99f)
 
       fsmRef ! AddItem(shirt)
 
@@ -251,9 +251,9 @@ abstract class PersistentFSMSpec(config: Config)
         WebStoreCustomerFSM.props(persistenceId, dummyReportActorRef))
       watch(fsmRef)
 
-      val shirt = Item("1", "Shirt", 59.99F)
-      val shoes = Item("2", "Shoes", 89.99F)
-      val coat = Item("3", "Coat", 119.99F)
+      val shirt = Item("1", "Shirt", 59.99f)
+      val shoes = Item("2", "Shoes", 89.99f)
+      val coat = Item("3", "Coat", 119.99f)
 
       fsmRef ! GetCurrentCart
       fsmRef ! AddItem(shirt)
@@ -279,13 +279,13 @@ abstract class PersistentFSMSpec(config: Config)
       val persistentEventsStreamer =
         system.actorOf(PersistentEventsStreamer.props(persistenceId, testActor))
 
-      expectMsg(ItemAdded(Item("1", "Shirt", 59.99F)))
+      expectMsg(ItemAdded(Item("1", "Shirt", 59.99f)))
       expectMsgType[StateChangeEvent] //because a timeout is defined, State Change is persisted
 
-      expectMsg(ItemAdded(Item("2", "Shoes", 89.99F)))
+      expectMsg(ItemAdded(Item("2", "Shoes", 89.99f)))
       expectMsgType[StateChangeEvent] //because a timeout is defined, State Change is persisted
 
-      expectMsg(ItemAdded(Item("3", "Coat", 119.99F)))
+      expectMsg(ItemAdded(Item("3", "Coat", 119.99f)))
       expectMsgType[StateChangeEvent] //because a timeout is defined, State Change is persisted
 
       expectMsg(OrderExecuted)

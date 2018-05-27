@@ -51,13 +51,12 @@ class UnsafeRowSerializerSuite extends SparkFunSuite with LocalSparkContext {
 
   private def unsafeRowConverter(schema: Array[DataType]): Row => UnsafeRow = {
     val converter = UnsafeProjection.create(schema)
-    (row: Row) =>
-      {
-        converter(
-          CatalystTypeConverters
-            .convertToCatalyst(row)
-            .asInstanceOf[InternalRow])
-      }
+    (row: Row) => {
+      converter(
+        CatalystTypeConverters
+          .convertToCatalyst(row)
+          .asInstanceOf[InternalRow])
+    }
   }
 
   test("toUnsafeRow() test helper method") {

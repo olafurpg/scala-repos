@@ -188,7 +188,9 @@ private[spark] object UIUtils extends Logging {
           href={prependBaseUri("/static/jquery.dataTables.1.10.4.min.css")} type="text/css"/>
     <link rel="stylesheet"
           href={prependBaseUri("/static/dataTables.bootstrap.css")} type="text/css"/>
-    <link rel="stylesheet" href={prependBaseUri("/static/jsonFormatter.min.css")} type="text/css"/>
+    <link rel="stylesheet" href={
+      prependBaseUri("/static/jsonFormatter.min.css")
+    } type="text/css"/>
     <script src={prependBaseUri("/static/jquery.dataTables.1.10.4.min.js")}></script>
     <script src={prependBaseUri("/static/jquery.cookies.2.2.0.min.js")}></script>
     <script src={prependBaseUri("/static/jquery.blockUI.min.js")}></script>
@@ -211,7 +213,9 @@ private[spark] object UIUtils extends Logging {
       if (appName.length < 36) appName else appName.take(32) + "..."
     val header = activeTab.headerTabs.map { tab =>
       <li class={if (tab == activeTab) "active" else ""}>
-        <a href={prependBaseUri(activeTab.basePath, "/" + tab.prefix + "/")}>{tab.name}</a>
+        <a href={prependBaseUri(activeTab.basePath, "/" + tab.prefix + "/")}>{
+        tab.name
+      }</a>
       </li>
     }
     val helpButton: Seq[Node] =
@@ -272,7 +276,9 @@ private[spark] object UIUtils extends Logging {
                 <a style="text-decoration: none" href={prependBaseUri("/")}>
                   <img src={prependBaseUri("/static/spark-logo-77x50px-hd.png")} />
                   <span class="version"
-                        style="margin-right: 15px;">{org.apache.spark.SPARK_VERSION}</span>
+                        style="margin-right: 15px;">{
+      org.apache.spark.SPARK_VERSION
+    }</span>
                 </a>
                 {title}
               </h3>
@@ -319,7 +325,7 @@ private[spark] object UIUtils extends Logging {
     def getHeaderContent(header: String): Seq[Node] = {
       if (newlinesInHeader) {
         <ul class="unstyled">
-          { header.split("\n").map { case t => <li> {t} </li> } }
+          {header.split("\n").map { case t => <li> {t} </li> }}
         </ul>
       } else {
         Text(header)
@@ -355,8 +361,8 @@ private[spark] object UIUtils extends Logging {
     <div class="progress">
       <span style="text-align:center; position:absolute; width:100%; left:0;">
         {completed}/{total}
-        { if (failed > 0) s"($failed failed)" }
-        { if (skipped > 0) s"($skipped skipped)" }
+        {if (failed > 0) s"($failed failed)"}
+        {if (skipped > 0) s"($skipped skipped)"}
       </span>
       <div class="bar bar-completed" style={completeWidth}></div>
       <div class="bar bar-running" style={startWidth}></div>
@@ -391,7 +397,9 @@ private[spark] object UIUtils extends Logging {
       <span id={if (forJob) "job-dag-viz" else "stage-dag-viz"}
             class="expand-dag-viz" onclick={s"toggleDagViz($forJob);"}>
         <span class="expand-dag-viz-arrow arrow-closed"></span>
-        <a data-toggle="tooltip" title={if (forJob) ToolTips.JOB_DAG else ToolTips.STAGE_DAG}
+        <a data-toggle="tooltip" title={
+      if (forJob) ToolTips.JOB_DAG else ToolTips.STAGE_DAG
+    }
            data-placement="right">
           DAG Visualization
         </a>
@@ -399,21 +407,30 @@ private[spark] object UIUtils extends Logging {
       <div id="dag-viz-graph"></div>
       <div id="dag-viz-metadata" style="display:none">
         {
-          graphs.map { g =>
-            val stageId = g.rootCluster.id.replaceAll(RDDOperationGraph.STAGE_CLUSTER_PREFIX, "")
-            val skipped = g.rootCluster.name.contains("skipped").toString
-            <div class="stage-metadata" stage-id={stageId} skipped={skipped}>
+      graphs.map { g =>
+        val stageId = g.rootCluster.id
+          .replaceAll(RDDOperationGraph.STAGE_CLUSTER_PREFIX, "")
+        val skipped = g.rootCluster.name.contains("skipped").toString
+        <div class="stage-metadata" stage-id={stageId} skipped={skipped}>
               <div class="dot-file">{RDDOperationGraph.makeDotFile(g)}</div>
-              { g.incomingEdges.map { e => <div class="incoming-edge">{e.fromId},{e.toId}</div> } }
-              { g.outgoingEdges.map { e => <div class="outgoing-edge">{e.fromId},{e.toId}</div> } }
               {
-                g.rootCluster.getCachedNodes.map { n =>
-                  <div class="cached-rdd">{n.id}</div>
-                }
-              }
-            </div>
+          g.incomingEdges.map { e =>
+            <div class="incoming-edge">{e.fromId},{e.toId}</div>
           }
         }
+              {
+          g.outgoingEdges.map { e =>
+            <div class="outgoing-edge">{e.fromId},{e.toId}</div>
+          }
+        }
+              {
+          g.rootCluster.getCachedNodes.map { n =>
+            <div class="cached-rdd">{n.id}</div>
+          }
+        }
+            </div>
+      }
+    }
       </div>
     </div>
   }

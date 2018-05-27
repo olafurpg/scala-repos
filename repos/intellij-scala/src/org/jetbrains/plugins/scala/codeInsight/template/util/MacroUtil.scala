@@ -109,7 +109,7 @@ object MacroUtil {
           l.split(":").map(_.trim).toList match {
             case a :: b :: Nil => (a, b)
             case _             => ("", "")
-        })
+          })
         .toList
 
   val scalaIdPrefix = "scala_"

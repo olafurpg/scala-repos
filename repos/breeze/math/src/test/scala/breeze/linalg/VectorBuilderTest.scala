@@ -32,9 +32,9 @@ class VectorBuilderTest extends FunSuite with Checkers {
     : Arbitrary[(VectorBuilder[Double], VectorBuilder[Double])] = {
     Arbitrary {
       for {
-        x <- Arbitrary.arbitrary[Double].map { _ % 1E3 }
+        x <- Arbitrary.arbitrary[Double].map { _ % 1e3 }
         xl <- Arbitrary.arbitrary[List[Int]]
-        y <- Arbitrary.arbitrary[Double].map { _ % 1E3 }
+        y <- Arbitrary.arbitrary[Double].map { _ % 1e3 }
         yl <- Arbitrary.arbitrary[List[Int]]
       } yield {
         (
@@ -62,8 +62,8 @@ class VectorBuilderTest extends FunSuite with Checkers {
         val sum2 = (hv1 + hv2)
         hv1 += vb2
         hv2 += vb1
-        (norm(hv1 - hv2) < 1E-4 && norm(hv1 - sum1) < 1E-4 &&
-        norm(hv1 - sum2) < 1E-4)
+        (norm(hv1 - hv2) < 1e-4 && norm(hv1 - sum1) < 1e-4 &&
+        norm(hv1 - sum2) < 1e-4)
     })
   }
 }
@@ -78,18 +78,18 @@ class VectorBuilderOpsTest
   val space: MutableModule[VectorBuilder[Double], Double] =
     VectorBuilder.space[Double]
 
-  override val TOL: Double = 1E-4
+  override val TOL: Double = 1e-4
 
   val N = 3
   implicit def genTriple: Arbitrary[
     (VectorBuilder[Double], VectorBuilder[Double], VectorBuilder[Double])] = {
     Arbitrary {
       for {
-        x <- Arbitrary.arbitrary[Double].map { _ % 1E3 }
+        x <- Arbitrary.arbitrary[Double].map { _ % 1e3 }
         xl <- Arbitrary.arbitrary[List[Int]]
-        y <- Arbitrary.arbitrary[Double].map { _ % 1E3 }
+        y <- Arbitrary.arbitrary[Double].map { _ % 1e3 }
         yl <- Arbitrary.arbitrary[List[Int]]
-        z <- Arbitrary.arbitrary[Double].map { _ % 1E3 }
+        z <- Arbitrary.arbitrary[Double].map { _ % 1e3 }
         zl <- Arbitrary.arbitrary[List[Int]]
       } yield {
         (
@@ -104,5 +104,5 @@ class VectorBuilderOpsTest
   }
 
   def genScalar: Arbitrary[Double] =
-    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1E3 })
+    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1e3 })
 }

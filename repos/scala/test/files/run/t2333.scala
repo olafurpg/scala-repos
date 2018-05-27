@@ -1,7 +1,9 @@
 class A {
   def whatever() {
     lazy val a = 1
-    lazy val b = try { 2 } catch { case _: Throwable => 0 }
+    lazy val b = try {
+      2
+    } catch { case _: Throwable => 0 }
     a
     b
   }

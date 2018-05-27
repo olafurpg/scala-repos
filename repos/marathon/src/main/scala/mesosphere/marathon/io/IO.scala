@@ -110,7 +110,9 @@ object IO {
         }
       }
       read()
-    } finally { if (close) Try(in.close()) }
+    } finally {
+      if (close) Try(in.close())
+    }
   }
 
   def copyInputStreamToString(in: InputStream): String = {

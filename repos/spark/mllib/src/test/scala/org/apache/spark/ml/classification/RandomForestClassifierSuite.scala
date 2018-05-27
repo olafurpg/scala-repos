@@ -174,7 +174,7 @@ class RandomForestClassifierSuite
         assert(
           Vectors.dense(rawPred.toArray.map(_ / sum)) === probPred,
           "probability prediction mismatch")
-        assert(probPred.toArray.sum ~== 1.0 relTol 1E-5)
+        assert(probPred.toArray.sum ~== 1.0 relTol 1e-5)
     }
   }
 

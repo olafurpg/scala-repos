@@ -23,7 +23,7 @@ object Inspect {
           allKeyParser(s).map(key => (opt, Def.ScopedKey(Global, key)))
         case opt @ (DependencyTree | Details(_)) =>
           spacedKeyParser(s).map(key => (opt, key))
-    }
+      }
   val spacedModeParser: (State => Parser[Mode]) = (s: State) => {
     val actual = "actual" ^^^ Details(true)
     val tree = "tree" ^^^ DependencyTree

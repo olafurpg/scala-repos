@@ -177,7 +177,7 @@ private[play] class PlayRequestHandler(val server: NettyServer)
                   HeaderNames.UPGRADE -> "websocket",
                   HeaderNames.CONNECTION -> HeaderNames.UPGRADE
                 )
-          ))
+            ))
         handleAction(action, requestHeader, request, Some(app))
 
       case Left(e) =>

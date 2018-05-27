@@ -172,14 +172,12 @@ trait ItemsList[T <: Mapper[T]] {
   }
   def sortFn(field: MappedField[_, T]) = (sortField, ascending) match {
     case (Some(f), true) if f eq field =>
-      () =>
-        ascending = false
+      () => ascending = false
     case _ | null =>
-      () =>
-        {
-          sortField = Some(field)
-          ascending = true
-        }
+      () => {
+        sortField = Some(field)
+        ascending = true
+      }
   }
 
   reload
@@ -271,7 +269,9 @@ trait ItemsListEditor[T <: Mapper[T]] {
   def customBind(item: T): NodeSeq => NodeSeq = (ns: NodeSeq) => ns
 
   def edit: (NodeSeq) => NodeSeq = {
-    def unsavedScript = (<head>{Script(Run("""
+    def unsavedScript =
+      (<head>{
+        Script(Run("""
                            var safeToContinue = false
                            window.onbeforeunload = function(evt) {{  // thanks Tim!
                              if(!safeToContinue) {{
@@ -281,7 +281,8 @@ trait ItemsListEditor[T <: Mapper[T]] {
                                return reply;
                              }}
                            }}
-    """))}</head>)
+    """))
+      }</head>)
     val noPrompt = "onclick" -> "safeToContinue=true"
     val optScript =
       if ((items.added.length + items.removed.length == 0) &&

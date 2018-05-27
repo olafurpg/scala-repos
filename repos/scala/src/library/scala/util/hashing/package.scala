@@ -23,8 +23,8 @@ package object hashing {
     *  for 64-bit values.
     */
   def byteswap64(v: Long): Long = {
-    var hc = v * 0x9e3775cd9e3775cdL
+    var hc = v * 0X9E3775CD9E3775CDL
     hc = java.lang.Long.reverseBytes(hc)
-    hc * 0x9e3775cd9e3775cdL
+    hc * 0X9E3775CD9E3775CDL
   }
 }

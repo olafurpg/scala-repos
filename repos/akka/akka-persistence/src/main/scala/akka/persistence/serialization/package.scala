@@ -18,7 +18,9 @@ package object serialization {
     @scala.annotation.tailrec
     def copy(): Array[Byte] = {
       val n = inputStream.read(buf, 0, len)
-      if (n != -1) { out.write(buf, 0, n); copy() } else out.toByteArray
+      if (n != -1) {
+        out.write(buf, 0, n); copy()
+      } else out.toByteArray
     }
 
     copy()

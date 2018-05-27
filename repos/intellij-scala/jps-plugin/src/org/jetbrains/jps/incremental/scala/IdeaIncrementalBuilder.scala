@@ -142,7 +142,7 @@ class IdeaIncrementalBuilder(category: BuilderCategory)
         else {
           if (ScalaReflectMacroExpansionParser.expansions.nonEmpty)
             ScalaReflectMacroExpansionParser.serializeExpansions(context)
-          client.progress("Compilation completed", Some(1.0F))
+          client.progress("Compilation completed", Some(1.0f))
           code
         }
     }

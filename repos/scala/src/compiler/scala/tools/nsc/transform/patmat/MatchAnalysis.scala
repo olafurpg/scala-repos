@@ -882,7 +882,7 @@ trait MatchAnalysis extends MatchApproximation {
             map2 <- ys
           } yield {
             map1 ++ map2
-        })
+          })
 
         // add expanded variables
         // note that we can just use `++`

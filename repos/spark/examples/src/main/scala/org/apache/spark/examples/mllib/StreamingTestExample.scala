@@ -72,7 +72,7 @@ object StreamingTestExample {
         line.split(",") match {
           case Array(label, value) =>
             BinarySample(label.toBoolean, value.toDouble)
-      })
+        })
 
     val streamingTest = new StreamingTest()
       .setPeacePeriod(0)

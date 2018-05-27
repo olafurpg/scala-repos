@@ -439,7 +439,7 @@ private trait EitherTBindRec[F[_], E]
           _.fold(
             e => \/.right(\/.left(e)),
             _.fold(a => \/.left(a), b => \/.right(\/.right(b))))
-      })(a)
+        })(a)
     )
 }
 

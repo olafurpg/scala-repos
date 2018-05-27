@@ -98,7 +98,7 @@ case class Poisson(mean: Double)(implicit rand: RandBasis = Rand)
       correction = meanmean * ln_k_! / exp(ln_k_!)
       extra += correction
       k += 1
-    } while (correction > 1E-6)
+    } while (correction > 1e-6)
 
     entr + exp(-mean) * extra
   }

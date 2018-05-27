@@ -973,7 +973,7 @@ object MimaExcludes {
                   .sameElements(Seq("org.apache.spark.Logging")) =>
               false
             case _ => true
-        }
+          }
       )
     case v if v.startsWith("1.6") =>
       Seq(

@@ -49,11 +49,9 @@ case class SimplePrunedScan(from: Int, to: Int)(
   override def buildScan(requiredColumns: Array[String]): RDD[Row] = {
     val rowBuilders = requiredColumns.map {
       case "a" =>
-        (i: Int) =>
-          Seq(i)
+        (i: Int) => Seq(i)
       case "b" =>
-        (i: Int) =>
-          Seq(i * 2)
+        (i: Int) => Seq(i * 2)
     }
 
     sqlContext.sparkContext

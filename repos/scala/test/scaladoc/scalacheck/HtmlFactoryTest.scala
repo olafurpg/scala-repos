@@ -11,7 +11,7 @@ object XMLUtil {
   def stripGroup(seq: Node): Node = {
     seq match {
       case group: Group => {
-        <div class="group">{ group.nodes.map(stripGroup _) }</div>
+        <div class="group">{group.nodes.map(stripGroup _)}</div>
       }
       case e: Elem => {
         val child = e.child.map(stripGroup _)

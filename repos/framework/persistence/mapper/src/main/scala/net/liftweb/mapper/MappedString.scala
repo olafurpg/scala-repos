@@ -160,7 +160,12 @@ abstract class MappedString[T <: Mapper[T]](val fieldOwner: T, val maxLen: Int)
     }) { name =>
       Full(appendFieldId(<input type={formInputType} maxlength={maxLen.toString}
                        name={name}
-                       value={get match {case null => "" case s => s.toString}}/>))
+                       value={
+        get match {
+          case null => ""
+          case s    => s.toString
+        }
+      }/>))
     }
 
   protected def i_obscure_!(in: String): String = {

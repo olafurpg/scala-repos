@@ -45,7 +45,10 @@ class ImportAllMembersIntention extends PsiElementBaseIntentionAction {
           .search(named, new LocalSearchScope(importHolder))
           .findAll()
         val pathWithWildcard =
-          ScalaNamesUtil.qualifiedName(named).getOrElse(return ) + "._"
+          ScalaNamesUtil
+            .qualifiedName(named)
+            .getOrElse(return
+            ) + "._"
         importHolder.addImportForPath(pathWithWildcard)
         sorted(usages, isQualifier = true).foreach {
           case isQualifierFor(ref @ resolve(resolved: PsiNamedElement))

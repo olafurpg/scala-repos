@@ -78,8 +78,7 @@ abstract class Filter[-ReqIn, +RepOut, +ReqOut, -RepIn]
 
   def andThen(f: ReqOut => Future[RepIn]): ReqIn => Future[RepOut] = {
     val service = Service.mk(f)
-    req =>
-      Filter.this.apply(req, service)
+    req => Filter.this.apply(req, service)
   }
 
   /**

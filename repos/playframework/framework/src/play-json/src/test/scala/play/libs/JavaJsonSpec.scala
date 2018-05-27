@@ -78,7 +78,7 @@ class JavaJsonSpec extends Specification {
       val javaPOJO = Json.fromJson(testJson, classOf[JavaPOJO])
       javaPOJO.getBar must_== "baz"
       javaPOJO.getFoo must_== "bar"
-      javaPOJO.getInstant must_== Instant.ofEpochSecond(1425435861l)
+      javaPOJO.getInstant must_== Instant.ofEpochSecond(1425435861L)
       javaPOJO.getOptNumber must_== Optional.of(55555)
     }
   }

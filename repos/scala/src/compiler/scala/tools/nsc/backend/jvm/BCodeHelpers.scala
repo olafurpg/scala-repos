@@ -723,7 +723,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           assoc.collectFirst {
             case (`nme`.value, LiteralAnnotArg(Constant(value: Symbol))) =>
               value
-        })
+          })
         .getOrElse(AnnotationRetentionPolicyClassValue)
 
     def ubytesToCharArray(bytes: Array[Byte]): Array[Char] = {
@@ -793,7 +793,9 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       (arg: @unchecked) match {
 
         case LiteralAnnotArg(const) =>
-          if (const.isNonUnitAnyVal) { av.visit(name, const.value) } else {
+          if (const.isNonUnitAnyVal) {
+            av.visit(name, const.value)
+          } else {
             const.tag match {
               case StringTag =>
                 assert(const.value != null, const) // TODO this invariant isn't documented in `case class Constant`
@@ -953,16 +955,22 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         sym: Symbol,
         owner: Symbol,
         memberTpe: Type): String = {
-      if (!needsGenericSignature(sym)) { return null }
+      if (!needsGenericSignature(sym)) {
+        return null
+      }
 
       val jsOpt: Option[String] = erasure.javaSig(sym, memberTpe)
-      if (jsOpt.isEmpty) { return null }
+      if (jsOpt.isEmpty) {
+        return null
+      }
 
       val sig = jsOpt.get
       log(sig) // This seems useful enough in the general case.
 
       def wrap(op: => Unit) = {
-        try { op; true } catch { case _: Throwable => false }
+        try {
+          op; true
+        } catch { case _: Throwable => false }
       }
 
       if (settings.Xverify) {
@@ -970,8 +978,12 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         val isValidSignature = wrap {
           // Alternative: scala.tools.reflect.SigParser (frontend to sun.reflect.generics.parser.SignatureParser)
           import scala.tools.asm.util.CheckClassAdapter
-          if (sym.isMethod) { CheckClassAdapter checkMethodSignature sig } // requires asm-util.jar
-          else if (sym.isTerm) { CheckClassAdapter checkFieldSignature sig } else {
+          if (sym.isMethod) {
+            CheckClassAdapter checkMethodSignature sig
+          } // requires asm-util.jar
+          else if (sym.isTerm) {
+            CheckClassAdapter checkFieldSignature sig
+          } else {
             CheckClassAdapter checkClassSignature sig
           }
         }
@@ -1358,7 +1370,9 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         for (f <- lst) {
           constructor.visitInsn(asm.Opcodes.DUP)
           constructor.visitLdcInsn(new java.lang.Integer(fi))
-          if (f == null) { constructor.visitInsn(asm.Opcodes.ACONST_NULL) } else {
+          if (f == null) {
+            constructor.visitInsn(asm.Opcodes.ACONST_NULL)
+          } else {
             constructor.visitLdcInsn(f)
           }
           constructor.visitInsn(StringRef.typedOpcode(asm.Opcodes.IASTORE))

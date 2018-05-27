@@ -440,7 +440,9 @@ trait Infer extends Checkable { self: Analyzer =>
 
       if (conforms)
         try solve()
-        catch { case _: NoInstance => null } else null
+        catch {
+          case _: NoInstance => null
+        } else null
     }
 
     /** Overload which allocates fresh type vars.
@@ -502,7 +504,7 @@ trait Infer extends Checkable { self: Analyzer =>
             try instantiateToBound(tvar, varianceInTypes(formals)(tparam))
             catch {
               case ex: NoInstance => WildcardType
-          })
+            })
       else tvars map (_ => WildcardType)
     }
 
@@ -693,7 +695,7 @@ trait Infer extends Checkable { self: Analyzer =>
                 argumentPosition(idx),
                 s"a type was inferred to be `${sym.name}`; this may indicate a programming error.")
             case _ =>
-        })
+          })
       }
       adjustTypeArgs(tparams, tvars, targs, restpe)
     }

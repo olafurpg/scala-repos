@@ -18,7 +18,9 @@ object Spawn {
     override def run(): Unit = sleep()
   }
   private def sleep(): Unit = {
-    try { Thread.sleep(1000) } catch {
+    try {
+      Thread.sleep(1000)
+    } catch {
       case e: InterruptedException =>
         val msg = "TrapExit improperly interrupted non-daemon thread"
         System.err.println(msg)

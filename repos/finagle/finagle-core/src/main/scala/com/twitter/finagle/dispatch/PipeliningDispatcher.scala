@@ -37,7 +37,7 @@ class PipeliningDispatcher[Req, Rep](
     trans.read().respond { res =>
       try p.update(res)
       finally loop()
-  }
+    }
 
   private[this] def loop(): Unit =
     q.poll().onSuccess(transRead)

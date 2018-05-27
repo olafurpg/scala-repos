@@ -16,11 +16,11 @@ class FilterTest extends FunSuite {
   test(
     "BP filtering tested against output from scipy.signal.firwin/ifilter (0.13.2-1)") {
 
-    val testNormThreshold = 1.0E-6
-    val spFirwin1 = DenseVector(1.40718797E-02, -7.94274374E-18,
-      -1.16636001E-01, -1.75719493E-01, 1.37640418E-01, 4.04633024E-01,
-      1.37640418E-01, -1.75719493E-01, -1.16636001E-01, -7.94274374E-18,
-      1.40718797E-02)
+    val testNormThreshold = 1.0e-6
+    val spFirwin1 = DenseVector(1.40718797e-02, -7.94274374e-18,
+      -1.16636001e-01, -1.75719493e-01, 1.37640418e-01, 4.04633024e-01,
+      1.37640418e-01, -1.75719493e-01, -1.16636001e-01, -7.94274374e-18,
+      1.40718797e-02)
 
     val testSignal = DenseVector(-1.27168894, -1.48442932, -0.5481519,
       -0.53087595, 1.55426056, 1.30248503, 0.06143029, 0.69251918, 0.68418296,

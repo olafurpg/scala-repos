@@ -21,7 +21,7 @@ object QaComment extends QaController {
               Redirect(
                 routes.QaQuestion.show(q.id, q.slug) + "#comment-" +
                   comment.id)
-          }
+            }
         )
       }
     }
@@ -40,7 +40,7 @@ object QaComment extends QaController {
                   Redirect(
                     routes.QaQuestion.show(q.id, q.slug) +
                       "#comment-" + comment.id)
-              }
+                }
             )
           case _ => notFound
         }

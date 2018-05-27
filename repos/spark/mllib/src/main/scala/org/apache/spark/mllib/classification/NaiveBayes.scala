@@ -164,7 +164,7 @@ class NaiveBayesModel private[spark] (
       if (value != 0.0 && value != 1.0) {
         throw new SparkException(
           s"Bernoulli naive Bayes requires 0 or 1 feature values but found $testData.")
-    })
+      })
     val prob = thetaMinusNegTheta.get.multiply(testData)
     BLAS.axpy(1.0, piVector, prob)
     BLAS.axpy(1.0, negThetaSum.get, prob)

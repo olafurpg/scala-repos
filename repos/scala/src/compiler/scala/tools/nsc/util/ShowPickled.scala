@@ -207,7 +207,9 @@ object ShowPickled extends Names {
           if (tag == CLASSsym && (buf.readIndex < end)) printTypeRef()
         case EXTref | EXTMODCLASSref =>
           printNameRef()
-          if (buf.readIndex < end) { printSymbolRef() }
+          if (buf.readIndex < end) {
+            printSymbolRef()
+          }
         case THIStpe =>
           printSymbolRef()
         case SINGLEtpe =>

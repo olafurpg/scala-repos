@@ -96,7 +96,7 @@ class Servlet30AsyncProvider(req: HTTPRequest)
     asyncCtx = startAsync.invoke(servletReq)
     try {
       val st = asyncCtx.asInstanceOf[SetTimeout]
-      st.setTimeout(0l)
+      st.setTimeout(0L)
     } catch {
       case e: Exception =>
         logger.error("Servlet 3.0 Async: Failed to set timeout", e)

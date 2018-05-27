@@ -135,7 +135,7 @@ trait ProtoUser {
       * Get an email link
       */
     def niceNameWEmailLink =
-      <a href={"mailto:"+urlEncode(getEmail)}>{niceName}</a>
+      <a href={"mailto:" + urlEncode(getEmail)}>{niceName}</a>
   }
 
   /**
@@ -688,7 +688,7 @@ trait ProtoUser {
 
   def signupXhtml(user: TheUserType) = {
     (<form method="post" action={S.uri}><table><tr><td
-              colspan="2">{ S.?("sign.up") }</td></tr>
+              colspan="2">{S.?("sign.up")}</td></tr>
           {localForm(user, false, signupFields)}
           <tr><td>&nbsp;</td><td><input type="submit" /></td></tr>
                                         </table></form>)

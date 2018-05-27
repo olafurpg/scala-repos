@@ -30,21 +30,21 @@ class LogarthmicTest extends FunSuite with Checkers with MomentsTestBase[Int] {
 
   override val numSamples = 10000
 
-  override val VARIANCE_TOLERANCE: Double = 1E-1
+  override val VARIANCE_TOLERANCE: Double = 1e-1
 
   def paramsClose(p: Double, q: Double) = {
-    (p - q).abs / (p.abs / 2 + q.abs / 2 + 1) < 1E-1
+    (p - q).abs / (p.abs / 2 + q.abs / 2 + 1) < 1e-1
   }
 
   implicit def arbParameter = Arbitrary {
     for (p <- arbitrary[Double].map { m =>
-           (math.abs(m) % 1.0) + 1E-3
+           (math.abs(m) % 1.0) + 1e-3
          }) yield p
   }
 
   implicit def arbDistr: Arbitrary[Logarthmic] = Arbitrary {
     for (p <- arbitrary[Double].map { m =>
-           (math.abs(m) % 1.0) + 1E-3
+           (math.abs(m) % 1.0) + 1e-3
          }) yield new Logarthmic(p)(RandBasis.mt0)
   }
 

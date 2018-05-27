@@ -23,10 +23,11 @@ final class IndexedContsT[W[_], M[_], R, O, A] private (
   def flatMap[E, B](f: A => IndexedContsT[W, M, O, E, B])(
       implicit W: Cobind[W]): IndexedContsT[W, M, R, E, B] =
     IndexedContsT { wbme =>
-      run(W.cobind(wbme) { wk =>
-        { a =>
-          f(a).run(wk)
-        }
+      run(W.cobind(wbme) {
+        wk =>
+          { a =>
+            f(a).run(wk)
+          }
       })
     }
 
@@ -34,10 +35,11 @@ final class IndexedContsT[W[_], M[_], R, O, A] private (
       implicit M: Functor[M],
       W: Functor[W]): IndexedContsT[W, M, R, I, A] =
     IndexedContsT { wami =>
-      run(W.map(wami) { ami =>
-        { a =>
-          M.map(ami(a))(f)
-        }
+      run(W.map(wami) {
+        ami =>
+          { a =>
+            M.map(ami(a))(f)
+          }
       })
     }
 
@@ -57,10 +59,11 @@ final class IndexedContsT[W[_], M[_], R, O, A] private (
       implicit M: Functor[M],
       W: Functor[W]): IndexedContsT[W, M, E, I, A] =
     IndexedContsT { wami =>
-      M.map(run(W.map(wami) { ami =>
-        { a =>
-          M.map(ami(a))(g)
-        }
+      M.map(run(W.map(wami) {
+        ami =>
+          { a =>
+            M.map(ami(a))(g)
+          }
       }))(f)
     }
 
@@ -70,10 +73,11 @@ final class IndexedContsT[W[_], M[_], R, O, A] private (
       implicit M: Functor[M],
       W: Functor[W]): ContsT[W, M, Z, A] =
     IndexedContsT { wami =>
-      M.map(run(W.map(wami) { ami =>
-        { a =>
-          M.map(ami(a))(f from _)
-        }
+      M.map(run(W.map(wami) {
+        ami =>
+          { a =>
+            M.map(ami(a))(f from _)
+          }
       }))(f to _)
     }
 }
@@ -106,10 +110,11 @@ trait IndexedContsTFunctions {
       def apply[A](
           fa: IndexedContsT[W, M, R, O, A]): IndexedContsT[W, N, R, O, A] =
         IndexedContsT { wk =>
-          f(fa.run(W.map(wk) { k =>
-            { x =>
-              g(k(x))
-            }
+          f(fa.run(W.map(wk) {
+            k =>
+              { x =>
+                g(k(x))
+              }
           }))
         }
     }

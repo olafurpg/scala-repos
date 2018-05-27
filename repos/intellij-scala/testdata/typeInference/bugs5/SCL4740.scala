@@ -24,8 +24,7 @@ object PhoneCode {
                                       "ghz").zipWithIndex;
                                     char <- (chars2Digit._1 ++ chars2Digit._1.toUpperCase))
           yield (char -> chars2Digit._2)).toMap
-        (word: String) =>
-          word.map(mappingReversed).mkString
+        (word: String) => word.map(mappingReversed).mkString
       }
       dictEntries.toArray.groupBy(cleanString andThen wordToDigits)
     }

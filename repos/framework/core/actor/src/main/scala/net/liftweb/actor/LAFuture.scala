@@ -121,7 +121,7 @@ class LAFuture[T](val scheduler: LAScheduler) {
             case e: EmptyBox => ret.complete(e)
           }
         case e: EmptyBox => ret.complete(e)
-    })
+      })
     ret
   }
 

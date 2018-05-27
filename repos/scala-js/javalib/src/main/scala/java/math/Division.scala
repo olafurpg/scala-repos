@@ -60,7 +60,7 @@ import BigInteger.QuotAndRem
   */
 private[math] object Division {
 
-  private final val UINT_MAX = 0xffffffffL
+  private final val UINT_MAX = 0XFFFFFFFFL
 
   /** Divides an array by another array.
     *
@@ -932,7 +932,7 @@ private[math] object Division {
     do {
       if (((m0 * n2) & powerOfTwo) != 0) n2 |= powerOfTwo
       powerOfTwo <<= 1
-    } while (powerOfTwo < 0x100000000L)
+    } while (powerOfTwo < 0X100000000L)
     n2 = -n2
     (n2 & UINT_MAX).toInt
   }

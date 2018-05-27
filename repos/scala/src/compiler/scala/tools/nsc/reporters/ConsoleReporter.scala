@@ -60,7 +60,9 @@ class ConsoleReporter(
   /** Prints the column marker of the given position.
     */
   def printColumnMarker(pos: Position) =
-    if (pos.isDefined) { printMessage(" " * (pos.column - 1) + "^") }
+    if (pos.isDefined) {
+      printMessage(" " * (pos.column - 1) + "^")
+    }
 
   /** Prints the number of errors and warnings if their are non-zero. */
   def printSummary() {

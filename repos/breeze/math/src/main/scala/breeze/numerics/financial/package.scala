@@ -254,7 +254,7 @@ package object financial {
       fv: Double,
       when: PaymentTime = End,
       guess: Double = 0.1,
-      tol: Double = 1E-06,
+      tol: Double = 1e-06,
       maxiter: Int = 100) = {
     var rate = guess;
     var iter = 0

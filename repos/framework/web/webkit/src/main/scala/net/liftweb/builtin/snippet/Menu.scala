@@ -177,20 +177,18 @@ object Menu extends DispatchSnippet {
                   Null,
                   TopScope,
                   true,
-                  <xml:group> <a href={uri}>{text}</a>{ifExpandCurrent(buildUlLine(kids))}</xml:group>) % S
+                  <xml:group> <a href={uri}>{text}</a>{
+                    ifExpandCurrent(buildUlLine(kids))
+                  }</xml:group>) % S
                   .prefixedAttrsToMetaData("li_item", liMap)
               )
 
             case MenuItem(text, uri, kids, true, _, _) =>
               Helpers.addCssClass(
                 i.cssClass,
-                Elem(
-                  null,
-                  innerTag,
-                  Null,
-                  TopScope,
-                  true,
-                  <xml:group> <span>{text}</span>{ifExpandCurrent(buildUlLine(kids))}</xml:group>) % S
+                Elem(null, innerTag, Null, TopScope, true, <xml:group> <span>{
+                  text
+                }</span>{ifExpandCurrent(buildUlLine(kids))}</xml:group>) % S
                   .prefixedAttrsToMetaData("li_item", liMap)
               )
 
@@ -198,26 +196,18 @@ object Menu extends DispatchSnippet {
             case MenuItem(text, uri, kids, _, true, _) =>
               Helpers.addCssClass(
                 i.cssClass,
-                Elem(
-                  null,
-                  innerTag,
-                  Null,
-                  TopScope,
-                  true,
-                  <xml:group> <a href={uri}>{text}</a>{buildUlLine(kids)}</xml:group>) % S
+                Elem(null, innerTag, Null, TopScope, true, <xml:group> <a href={
+                  uri
+                }>{text}</a>{buildUlLine(kids)}</xml:group>) % S
                   .prefixedAttrsToMetaData("li_path", liMap)
               )
 
             case MenuItem(text, uri, kids, _, _, _) =>
               Helpers.addCssClass(
                 i.cssClass,
-                Elem(
-                  null,
-                  innerTag,
-                  Null,
-                  TopScope,
-                  true,
-                  <xml:group> <a href={uri}>{text}</a>{ifExpandAll(buildUlLine(kids))}</xml:group>) % li)
+                Elem(null, innerTag, Null, TopScope, true, <xml:group> <a href={
+                  uri
+                }>{text}</a>{ifExpandAll(buildUlLine(kids))}</xml:group>) % li)
           }
         }
 
@@ -226,13 +216,9 @@ object Menu extends DispatchSnippet {
             NodeSeq.Empty
           } else {
             if (outerTag.length > 0) {
-              Elem(
-                null,
-                outerTag,
-                Null,
-                TopScope,
-                true,
-                <xml:group>{in.flatMap(buildANavItem)}</xml:group>) % S
+              Elem(null, outerTag, Null, TopScope, true, <xml:group>{
+                in.flatMap(buildANavItem)
+              }</xml:group>) % S
                 .prefixedAttrsToMetaData("ul")
             } else {
               in.flatMap(buildANavItem)
@@ -270,8 +256,9 @@ object Menu extends DispatchSnippet {
 
   private def renderWhat(expandAll: Boolean): Seq[MenuItem] =
     (if (expandAll)
-       for { sm <- LiftRules.siteMap; req <- S.request } yield
-         sm.buildMenu(req.location).lines
+       for {
+         sm <- LiftRules.siteMap; req <- S.request
+       } yield sm.buildMenu(req.location).lines
      else S.request.map(_.buildMenu.lines)) openOr Nil
 
   def jsonMenu(ignore: NodeSeq): NodeSeq = {

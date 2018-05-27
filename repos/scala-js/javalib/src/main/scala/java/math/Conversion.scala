@@ -67,7 +67,7 @@ private[math] object Conversion {
       "0"
     } else if (numberLength == 1) {
       val highDigit = digits(numberLength - 1)
-      var v = highDigit & 0xFFFFFFFFL
+      var v = highDigit & 0XFFFFFFFFL
       if (sign < 0) v = -v
       java.lang.Long.toString(v, radix)
     } else if (radix == 10 || radixOutOfBounds) {
@@ -169,7 +169,7 @@ private[math] object Conversion {
       if (numberLength == 1) {
         val highDigit = digits(0)
         if (highDigit < 0) {
-          var v: Long = highDigit & 0xFFFFFFFFL
+          var v: Long = highDigit & 0XFFFFFFFFL
           do {
             val prev = v
             v /= 10
@@ -199,7 +199,7 @@ private[math] object Conversion {
           var result11: Long = 0
           var i1: Int = tempLen - 1
           while (i1 >= 0) {
-            val temp1: Long = (result11 << 32) + (temp(i1) & 0xFFFFFFFFL)
+            val temp1: Long = (result11 << 32) + (temp(i1) & 0XFFFFFFFFL)
             val res: Long = divideLongByBillion(temp1)
             temp(i1) = res.toInt
             result11 = (res >> 32).toInt
@@ -324,7 +324,7 @@ private[math] object Conversion {
         val bPos: Long = 1000000000L >>> 1
         (aPos / bPos, (aPos % bPos << 1) + (a & 1))
       }
-    (rem << 32) | (quot & 0xFFFFFFFFL)
+    (rem << 32) | (quot & 0XFFFFFFFFL)
   }
 
   def bigInteger2Double(bi: BigInteger): Double = {
@@ -338,12 +338,12 @@ private[math] object Conversion {
       var exponent: Long = bitLen - 1
       val delta = bitLen - 54
       val lVal = bi.abs().shiftRight(delta).longValue()
-      var mantissa = lVal & 0x1FFFFFFFFFFFFFL
+      var mantissa = lVal & 0X1FFFFFFFFFFFFFL
 
       if (exponent == 1023 && mantissa == 0X1FFFFFFFFFFFFFL) {
         if (bi.sign > 0) Double.PositiveInfinity
         else Double.NegativeInfinity
-      } else if (exponent == 1023 && mantissa == 0x1FFFFFFFFFFFFEL) {
+      } else if (exponent == 1023 && mantissa == 0X1FFFFFFFFFFFFEL) {
         if (bi.sign > 0) Double.MaxValue
         else -Double.MaxValue
       } else {
@@ -352,8 +352,8 @@ private[math] object Conversion {
           mantissa += 2
 
         mantissa >>= 1
-        val resSign = if (bi.sign < 0) 0x8000000000000000L else 0
-        exponent = ((1023 + exponent) << 52) & 0x7FF0000000000000L
+        val resSign = if (bi.sign < 0) 0X8000000000000000L else 0
+        exponent = ((1023 + exponent) << 52) & 0X7FF0000000000000L
         val result = resSign | exponent | mantissa
         java.lang.Double.longBitsToDouble(result)
       }

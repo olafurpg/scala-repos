@@ -293,7 +293,7 @@ private[finagle] class TrafficDistributor[Req, Rep](
           }
           .sum
           .toFloat / size
-      else 0.0F
+      else 0.0f
   }
 
   // Translate the stream of weightClasses into a stream of underlying

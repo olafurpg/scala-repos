@@ -29,8 +29,7 @@ object Parsing {
       val jumpBadCharecter: (Byte => Int) = {
         val map =
           Map(needle.dropRight(1).reverse.zipWithIndex.reverse: _*) //remove the last
-        byte =>
-          map.get(byte).map(_ + 1).getOrElse(fullJump)
+        byte => map.get(byte).map(_ + 1).getOrElse(fullJump)
       }
 
       def applyOn[A](inner: Iteratee[MatchInfo[Array[Byte]], A])
@@ -130,7 +129,7 @@ object Parsing {
                                       Input.EOF) //suffix maybe empty
                                   case other =>
                                     step(ss ++ suffix, Cont(k))(other)
-                              })),
+                                })),
                         (err, e) => throw new Exception()
                       )(dec)
                   }(dec)

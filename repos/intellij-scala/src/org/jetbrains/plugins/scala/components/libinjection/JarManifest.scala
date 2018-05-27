@@ -32,17 +32,25 @@ case class JarManifest(
     modTimeStamp: Long)(val isBlackListed: Boolean) {
   def serialize() = {
     <intellij-compat>
-      {for (PluginDescriptor(since, until, injtors) <- pluginDescriptors) {
-      <scala-plugin since-version={since.toString} until-version={until.toString}>
-        {for (InjectorDescriptor(version, iface, impl, srcs) <- injtors) {
-        <psi-injector version={version.toString} ifnterface={iface} implementation={impl}>
+      {
+      for (PluginDescriptor(since, until, injtors) <- pluginDescriptors) {
+        <scala-plugin since-version={since.toString} until-version={
+          until.toString
+        }>
+        {
+          for (InjectorDescriptor(version, iface, impl, srcs) <- injtors) {
+            <psi-injector version={version.toString} ifnterface={iface} implementation={
+              impl
+            }>
           {for (src <- srcs) <source>
           {src}
         </source>}
         </psi-injector>
-      }}
+          }
+        }
       </scala-plugin>
-    }}
+      }
+    }
     </intellij-compat>
   }
 }

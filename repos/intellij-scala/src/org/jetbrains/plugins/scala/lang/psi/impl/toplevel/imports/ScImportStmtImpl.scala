@@ -142,7 +142,7 @@ class ScImportStmtImpl private (
                   .getInstance(getProject)
                   .getPackageObjectByName(p.getQualifiedName, getResolveScope))
             case _ => None
-        }
+          }
 
         val exprQualRefType = () =>
           ScSimpleTypeElementImpl.calculateReferenceType(

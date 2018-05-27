@@ -357,7 +357,7 @@ class BigInteger extends Number with Comparable[BigInteger] {
       val thisLen = numberLength
       val divisorLen = divisor.numberLength
       if (thisLen + divisorLen == 2) {
-        var bi = (digits(0) & 0xFFFFFFFFL) / (divisor.digits(0) & 0xFFFFFFFFL)
+        var bi = (digits(0) & 0XFFFFFFFFL) / (divisor.digits(0) & 0XFFFFFFFFL)
         if (thisSign != divisorSign) bi = -bi
         valueOf(bi)
       } else {
@@ -519,8 +519,8 @@ class BigInteger extends Number with Comparable[BigInteger] {
   override def longValue(): Long = {
     val value =
       if (numberLength > 1)
-        (digits(1).toLong << 32) | (digits(0) & 0xFFFFFFFFL)
-      else digits(0) & 0xFFFFFFFFL
+        (digits(1).toLong << 32) | (digits(0) & 0XFFFFFFFFL)
+      else digits(0) & 0XFFFFFFFFL
     sign * value
   }
 

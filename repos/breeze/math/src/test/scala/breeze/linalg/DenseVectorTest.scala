@@ -519,7 +519,7 @@ class DenseVectorTest extends FunSuite with Checkers {
   test("isClose") {
     check((a: DenseVector[Double]) => isClose(a, a))
     check((a: DenseVector[Double], b: DenseVector[Double]) =>
-      isClose(a, b) == zipValues(a, b).forall((a, b) => (a - b).abs < 1E-8))
+      isClose(a, b) == zipValues(a, b).forall((a, b) => (a - b).abs < 1e-8))
   }
 
   test("nonfinite") {
@@ -550,9 +550,9 @@ class DenseVectorOps_DoubleTest
     val N = 30
     Arbitrary {
       for {
-        x <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
-        y <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
-        z <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
+        x <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
+        y <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
+        z <- Arbitrary.arbitrary[Double].map { _ % 1e100 }
         n <- Gen.choose(1, N)
         stride <- Gen.choose(1, 4)
         offset <- Gen.choose(0, 5)
@@ -568,7 +568,7 @@ class DenseVectorOps_DoubleTest
   }
 
   def genScalar: Arbitrary[Double] =
-    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1E10 })
+    Arbitrary(Arbitrary.arbitrary[Double].map { _ % 1e10 })
 }
 
 @RunWith(classOf[JUnitRunner])
@@ -632,7 +632,7 @@ class DenseVectorOps_FloatTest
     extends TensorSpaceTestBase[DenseVector[Float], Int, Float] {
   val space = DenseVector.space[Float]
 
-  override val TOL: Double = 1E-3
+  override val TOL: Double = 1e-3
 
   val N = 30
   implicit def genTriple: Arbitrary[

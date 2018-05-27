@@ -49,10 +49,13 @@ object `package` {
   implicit class RichVFS(val vfs: DefaultFileSystemManager) extends AnyVal {
     implicit def toFileObject(f: File): FileObject = vfile(f)
 
-    private def withContext[T](msg: String)(t: => T): T = try { t } catch {
-      case e: FileSystemException =>
-        throw new FileSystemException(e.getMessage + " in " + msg, e)
-    }
+    private def withContext[T](msg: String)(t: => T): T =
+      try {
+        t
+      } catch {
+        case e: FileSystemException =>
+          throw new FileSystemException(e.getMessage + " in " + msg, e)
+      }
 
     def vfile(name: String) = withContext(s"$name =>")(
       vfs.resolveFile(name.intern)

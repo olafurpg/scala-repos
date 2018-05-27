@@ -200,26 +200,26 @@ trait ColumnarTableModuleSpec[M[+ _]]
         JObject(
           JField(
             "key",
-            JArray(JNum(-3090012080927607325l), JNum(2875286661755661474l))),
+            JArray(JNum(-3090012080927607325L), JNum(2875286661755661474L))),
           JField(
             "value",
             JObject(
               JField(
                 "q8b",
                 JArray(
-                  JNum(6.615224799778253E307d),
+                  JNum(6.615224799778253e307d),
                   JArray(
                     JBool(false),
                     JNull,
-                    JNum(-8.988465674311579E307d),
-                    JNum(-3.536399224770604E307d))
+                    JNum(-8.988465674311579e307d),
+                    JNum(-3.536399224770604e307d))
                 )),
-              JField("lwu", JNum(-5.121099465699862E307d))
+              JField("lwu", JNum(-5.121099465699862e307d))
             )
           )
         ),
         JObject(
-          JField("key", JArray(JNum(-3918416808128018609l), JNum(-1L))),
+          JField("key", JArray(JNum(-3918416808128018609L), JNum(-1L))),
           JField("value", JNum(-1.0))
         )
       )
@@ -333,38 +333,38 @@ trait ColumnarTableModuleSpec[M[+ _]]
             JField(
               "key",
               JArray(
-                JNum(-3090012080927607325l) :: JNum(2875286661755661474l) :: Nil)) :: JField(
+                JNum(-3090012080927607325L) :: JNum(2875286661755661474L) :: Nil)) :: JField(
               "value",
               JObject(List(
                 JField(
                   "q8b",
                   JArray(List(
-                    JNum(6.615224799778253E307d),
+                    JNum(6.615224799778253e307d),
                     JArray(
-                      List(JBool(false), JNull, JNum(-8.988465674311579E307d))),
-                    JNum(-3.536399224770604E307d)))),
-                JField("lwu", JNum(-5.121099465699862E307d))
+                      List(JBool(false), JNull, JNum(-8.988465674311579e307d))),
+                    JNum(-3.536399224770604e307d)))),
+                JField("lwu", JNum(-5.121099465699862e307d))
               ))
             ) :: Nil
           ),
           JObject(
             JField(
               "key",
-              JArray(JNum(-3918416808128018609l) :: JNum(-1L) :: Nil)) :: JField(
+              JArray(JNum(-3918416808128018609L) :: JNum(-1L) :: Nil)) :: JField(
               "value",
               JNum(-1.0)) :: Nil
           ),
           JObject(
             JField(
               "key",
-              JArray(JNum(-3918416898128018609l) :: JNum(-2L) :: Nil)) :: JField(
+              JArray(JNum(-3918416898128018609L) :: JNum(-2L) :: Nil)) :: JField(
               "value",
               JNum(-1.0)) :: Nil
           ),
           JObject(
             JField(
               "key",
-              JArray(JNum(-3918426808128018609l) :: JNum(-3L) :: Nil)) :: JField(
+              JArray(JNum(-3918426808128018609L) :: JNum(-3L) :: Nil)) :: JField(
               "value",
               JNum(-1.0)) :: Nil
           )
@@ -589,7 +589,7 @@ trait ColumnarTableModuleSpec[M[+ _]]
         t.logged(xlogger, "test-logging", "start stream", "end stream") {
           slice =>
             "size: " + slice.size
-      })
+        })
     }
   }
 

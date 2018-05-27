@@ -73,7 +73,7 @@ class C1 {
           C1.this.getClass,
           fv,
           fv.getClass)
-    }
+      }
     def ff = {
       lazy val ffv: AnyRef => Boolean = lock =>
         synchronized {
@@ -83,7 +83,7 @@ class C1 {
             lock.getClass,
             C1.this,
             C1.this.getClass)
-      }
+        }
       ffv(this)
     }
     def fl = {
@@ -149,7 +149,7 @@ class C1 {
           fv.getClass,
           C1.this,
           C1.this.getClass)
-    }
+      }
     def ff = {
       lazy val ffv: AnyRef => Boolean = lock =>
         synchronized {
@@ -159,7 +159,7 @@ class C1 {
             ffv.getClass,
             C1.this,
             C1.this.getClass)
-      }
+        }
       ffv(this)
     }
     def fl = {
@@ -254,12 +254,12 @@ object O1 {
     val fv: () => Boolean = () =>
       synchronized {
         checkLocks(this)(this.getClass, O1, O1.getClass, fv, fv.getClass)
-    }
+      }
     def ff = {
       lazy val ffv: AnyRef => Boolean = lock =>
         synchronized {
           checkLocks(lock)(ffv, ffv.getClass, lock.getClass, O1, O1.getClass)
-      }
+        }
       ffv(this)
     }
     def fl = {
@@ -299,12 +299,12 @@ object O1 {
     val fv: () => Boolean = () =>
       synchronized {
         checkLocks(this)(this.getClass, fv, fv.getClass, O1, O1.getClass)
-    }
+      }
     def ff = {
       lazy val ffv: AnyRef => Boolean = lock =>
         synchronized {
           checkLocks(lock)(lock.getClass, ffv, ffv.getClass, O1, O1.getClass)
-      }
+        }
       ffv(this)
     }
     def fl = {
@@ -356,7 +356,7 @@ trait T {
         classOf[T],
         classOf[C2],
         O2.getClass)
-  }
+    }
   def ff = {
     lazy val ffv: AnyRef => Boolean = lock =>
       synchronized {
@@ -367,7 +367,7 @@ trait T {
           classOf[T],
           classOf[C2],
           O2.getClass)
-    }
+      }
     ffv(this)
   }
   def fl = {
@@ -452,7 +452,7 @@ trait T {
           classOf[C2],
           O2,
           O2.getClass)
-    }
+      }
     def ff = {
       lazy val ffv: AnyRef => Boolean = lock =>
         synchronized {
@@ -466,7 +466,7 @@ trait T {
             classOf[C2],
             O2,
             O2.getClass)
-      }
+        }
       ffv(this)
     }
     def fl = {
@@ -599,7 +599,7 @@ trait T {
           classOf[C2],
           O2,
           O2.getClass)
-    }
+      }
     def ff = {
       lazy val ffv: AnyRef => Boolean = lock =>
         synchronized {
@@ -613,7 +613,7 @@ trait T {
             classOf[C2],
             O2,
             O2.getClass)
-      }
+        }
       ffv(this)
     }
     def fl = {

@@ -85,7 +85,7 @@ object CORSHeaderHandler {
                   resp.copy(headers = headers ++ corsHeaders)
               }
             }
-      }
+        }
 
       val metadata = delegateService.metadata
     }

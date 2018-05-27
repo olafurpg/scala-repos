@@ -293,7 +293,7 @@ object SparkBuild extends PomBuild {
                   out.log.warn(s)
                 } else {
                   out.log.error("[warn] " + s)
-              }
+                }
 
               logProblem(printer, k, p)
             }

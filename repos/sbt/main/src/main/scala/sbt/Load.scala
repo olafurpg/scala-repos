@@ -128,7 +128,9 @@ object Load {
       log)
   }
   private def bootIvyHome(app: xsbti.AppConfiguration): Option[File] =
-    try { Option(app.provider.scalaProvider.launcher.ivyHome) } catch {
+    try {
+      Option(app.provider.scalaProvider.launcher.ivyHome)
+    } catch {
       case _: NoSuchMethodError => None
     }
   def injectGlobal(state: State): Seq[Setting[_]] =
@@ -167,14 +169,13 @@ object Load {
 
     val imports = BuildUtil.baseImports ++ config.detectedGlobalPlugins.imports
 
-    loader =>
-      {
-        val loaded = EvaluateConfigurations(eval, files, imports)(loader)
-        // TODO - We have a potential leak of config-classes in the global directory right now.
-        // We need to find a way to clean these safely, or at least warn users about
-        // unused class files that could be cleaned when multiple sbt instances are not running.
-        loaded.settings
-      }
+    loader => {
+      val loaded = EvaluateConfigurations(eval, files, imports)(loader)
+      // TODO - We have a potential leak of config-classes in the global directory right now.
+      // We need to find a way to clean these safely, or at least warn users about
+      // unused class files that could be cleaned when multiple sbt instances are not running.
+      loaded.settings
+    }
   }
   def loadGlobal(
       state: State,
@@ -287,7 +288,7 @@ object Load {
           case ik: InputTask[t] =>
             ik.mapTask(tk => setDefinitionKey(tk, key)).asInstanceOf[T]
           case _ => value
-      }
+        }
     def setResolved(defining: ScopedKey[_]) = new (ScopedKey ~> Option) {
       def apply[T](key: ScopedKey[T]): Option[T] =
         key.key match {
@@ -421,8 +422,7 @@ object Load {
 
   def lazyEval(unit: sbt.BuildUnit): () => Eval = {
     lazy val eval = mkEval(unit)
-    () =>
-      eval
+    () => eval
   }
   def mkEval(unit: sbt.BuildUnit): Eval =
     mkEval(
@@ -637,8 +637,7 @@ object Load {
       checkProjectBase(against, fResolved)
       fResolved
     }
-    p =>
-      p.copy(base = resolve(p.base))
+    p => p.copy(base = resolve(p.base))
   }
   def resolveProjects(loaded: sbt.PartBuild): sbt.LoadedBuild = {
     val rootProject = getRootProject(loaded.units)
@@ -1275,7 +1274,10 @@ object Load {
     def addToLoader() = pm.loader add Path.toURLs(data(depcp))
 
     val parentLoader =
-      if (depcp.isEmpty) pm.initialLoader else { addToLoader(); pm.loader }
+      if (depcp.isEmpty) pm.initialLoader
+      else {
+        addToLoader(); pm.loader
+      }
     val pluginLoader =
       if (defcp.isEmpty) parentLoader
       else {

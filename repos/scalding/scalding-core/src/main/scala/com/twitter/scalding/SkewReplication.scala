@@ -59,8 +59,8 @@ case class SkewReplicationA(replicationFactor: Int = 1)
   * See https://github.com/twitter/scalding/pull/229#issuecomment-10792296
   */
 case class SkewReplicationB(
-    maxKeysInMemory: Int = 1E6.toInt,
-    maxReducerOutput: Int = 1E7.toInt)
+    maxKeysInMemory: Int = 1e6.toInt,
+    maxReducerOutput: Int = 1e7.toInt)
     extends SkewReplication {
 
   override def getReplications(

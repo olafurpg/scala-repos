@@ -168,7 +168,7 @@ class CSRFAction(
                 false
               }
             }
-        ))
+          ))
         .splitWhen(_ => false)
         .prefixAndTail(0)
         .map(_._2)

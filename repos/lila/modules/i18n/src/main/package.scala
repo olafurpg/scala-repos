@@ -15,7 +15,11 @@ package object i18n extends PackageObject with WithPlay {
   private[i18n] def printToFile(f: java.io.File)(
       op: java.io.PrintWriter => Unit): Funit = Future {
     val p = new java.io.PrintWriter(f)
-    try { op(p) } finally { p.close() }
+    try {
+      op(p)
+    } finally {
+      p.close()
+    }
   }
 
   private[i18n] def printToFile(f: String)(

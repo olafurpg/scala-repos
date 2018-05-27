@@ -41,7 +41,7 @@ class EmaTest extends FunSuite {
 
     e.reset()
 
-    assert(e.last == 0D)
+    assert(e.last == 0d)
     assert(e.update(2, 5) == 5)
   }
 }

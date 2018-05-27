@@ -94,7 +94,7 @@ object Digit extends DigitInstances {
       Digit.digitFromChar(a) match {
         case None    => F.empty[Digit]
         case Some(d) => F.point(d)
-    })
+      })
 
   def traverseDigits[F[_]](chars: F[Char])(
       implicit F: Traverse[F]): Option[F[Digit]] = {

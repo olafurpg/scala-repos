@@ -75,11 +75,9 @@ case class SimpleFilteredScan(from: Int, to: Int)(
       filters: Array[Filter]): RDD[Row] = {
     val rowBuilders = requiredColumns.map {
       case "a" =>
-        (i: Int) =>
-          Seq(i)
+        (i: Int) => Seq(i)
       case "b" =>
-        (i: Int) =>
-          Seq(i * 2)
+        (i: Int) => Seq(i * 2)
       case "c" =>
         (i: Int) =>
           val c = (i - 1 + 'a').toChar.toString
@@ -92,44 +90,31 @@ case class SimpleFilteredScan(from: Int, to: Int)(
     // Predicate test on integer column
     def translateFilterOnA(filter: Filter): Int => Boolean = filter match {
       case EqualTo("a", v) =>
-        (a: Int) =>
-          a == v
+        (a: Int) => a == v
       case EqualNullSafe("a", v) =>
-        (a: Int) =>
-          a == v
+        (a: Int) => a == v
       case LessThan("a", v: Int) =>
-        (a: Int) =>
-          a < v
+        (a: Int) => a < v
       case LessThanOrEqual("a", v: Int) =>
-        (a: Int) =>
-          a <= v
+        (a: Int) => a <= v
       case GreaterThan("a", v: Int) =>
-        (a: Int) =>
-          a > v
+        (a: Int) => a > v
       case GreaterThanOrEqual("a", v: Int) =>
-        (a: Int) =>
-          a >= v
+        (a: Int) => a >= v
       case In("a", values) =>
-        (a: Int) =>
-          values.map(_.asInstanceOf[Int]).toSet.contains(a)
+        (a: Int) => values.map(_.asInstanceOf[Int]).toSet.contains(a)
       case IsNull("a") =>
-        (a: Int) =>
-          false // Int can't be null
+        (a: Int) => false // Int can't be null
       case IsNotNull("a") =>
-        (a: Int) =>
-          true
+        (a: Int) => true
       case Not(pred) =>
-        (a: Int) =>
-          !translateFilterOnA(pred)(a)
+        (a: Int) => !translateFilterOnA(pred)(a)
       case And(left, right) =>
-        (a: Int) =>
-          translateFilterOnA(left)(a) && translateFilterOnA(right)(a)
+        (a: Int) => translateFilterOnA(left)(a) && translateFilterOnA(right)(a)
       case Or(left, right) =>
-        (a: Int) =>
-          translateFilterOnA(left)(a) || translateFilterOnA(right)(a)
+        (a: Int) => translateFilterOnA(left)(a) || translateFilterOnA(right)(a)
       case _ =>
-        (a: Int) =>
-          true
+        (a: Int) => true
     }
 
     // Predicate test on string column
@@ -141,11 +126,9 @@ case class SimpleFilteredScan(from: Int, to: Int)(
       case EqualTo("c", v: UTF8String) =>
         sys.error("UTF8String should not appear in filters")
       case In("c", values) =>
-        (s: String) =>
-          values.map(_.asInstanceOf[String]).toSet.contains(s)
+        (s: String) => values.map(_.asInstanceOf[String]).toSet.contains(s)
       case _ =>
-        (c: String) =>
-          true
+        (c: String) => true
     }
 
     def eval(a: Int) = {

@@ -299,8 +299,7 @@ private[http] object StreamUtils {
           ctx.absorbTermination()
         } else super.onUpstreamFailure(cause, ctx)
     }
-    () ⇒
-      stage
+    () ⇒ stage
   }
 
   /**

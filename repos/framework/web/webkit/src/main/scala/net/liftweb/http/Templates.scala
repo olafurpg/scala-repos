@@ -224,12 +224,15 @@ object Templates {
                 } catch {
                   case e: ValidationException
                       if Props.devMode | Props.testMode =>
-                    return Helpers.errorDiv(
-                      <div>Error locating template: <b>{name}</b><br/>
+                    return Helpers.errorDiv(<div>Error locating template: <b>{
+                      name
+                    }</b><br/>
                       Message: <b>{e.getMessage}</b><br/>
                       {
-                      <pre>{e.toString}{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
-                      }
+                      <pre>{e.toString}{
+                        e.getStackTrace.map(_.toString).mkString("\n")
+                      }</pre>
+                    }
                     </div>)
 
                   case e: ValidationException => Empty
@@ -245,15 +248,19 @@ object Templates {
                            (Props.devMode | Props.testMode)) {
                   val msg = xmlb.asInstanceOf[Failure].msg
                   val e = xmlb.asInstanceOf[Failure].exception
-                  return Helpers.errorDiv(
-                    <div>Error locating template: <b>{name}</b><br/>Message: <b>{msg}</b><br/>{
-                  {
-                    e match {
-                      case Full(e) =>
-                        <pre>{e.toString}{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
-                      case _ => NodeSeq.Empty
+                  return Helpers.errorDiv(<div>Error locating template: <b>{
+                    name
+                  }</b><br/>Message: <b>{msg}</b><br/>{
+                    {
+                      e match {
+                        case Full(e) =>
+                          <pre>{e.toString}{
+                            e.getStackTrace.map(_.toString).mkString("\n")
+                          }</pre>
+                        case _ => NodeSeq.Empty
+                      }
                     }
-                  }}
+                  }
                   </div>)
                 }
               }
