@@ -233,46 +233,44 @@ trait IssuesControllerBase extends ControllerBase {
   post("/:owner/:repository/issue_comments/new", commentForm)(
     readableUsersOnly { (form, repository) =>
       getIssue(repository.owner, repository.name, form.issueId.toString)
-        .flatMap {
-          issue =>
-            val actionOpt = params
-              .get("action")
-              .filter(
-                _ =>
-                  isEditable(
-                    issue.userName,
-                    issue.repositoryName,
-                    issue.openedUserName))
-            handleComment(issue, Some(form.content), repository, actionOpt) map {
-              case (issue, id) =>
-                redirect(
-                  s"/${repository.owner}/${repository.name}/${if (issue.isPullRequest)
-                    "pull"
-                  else "issues"}/${form.issueId}#comment-${id}")
-            }
+        .flatMap { issue =>
+          val actionOpt = params
+            .get("action")
+            .filter(
+              _ =>
+                isEditable(
+                  issue.userName,
+                  issue.repositoryName,
+                  issue.openedUserName))
+          handleComment(issue, Some(form.content), repository, actionOpt) map {
+            case (issue, id) =>
+              redirect(
+                s"/${repository.owner}/${repository.name}/${if (issue.isPullRequest)
+                  "pull"
+                else "issues"}/${form.issueId}#comment-${id}")
+          }
         } getOrElse NotFound
     })
 
   post("/:owner/:repository/issue_comments/state", issueStateForm)(
     readableUsersOnly { (form, repository) =>
       getIssue(repository.owner, repository.name, form.issueId.toString)
-        .flatMap {
-          issue =>
-            val actionOpt = params
-              .get("action")
-              .filter(
-                _ =>
-                  isEditable(
-                    issue.userName,
-                    issue.repositoryName,
-                    issue.openedUserName))
-            handleComment(issue, form.content, repository, actionOpt) map {
-              case (issue, id) =>
-                redirect(
-                  s"/${repository.owner}/${repository.name}/${if (issue.isPullRequest)
-                    "pull"
-                  else "issues"}/${form.issueId}#comment-${id}")
-            }
+        .flatMap { issue =>
+          val actionOpt = params
+            .get("action")
+            .filter(
+              _ =>
+                isEditable(
+                  issue.userName,
+                  issue.repositoryName,
+                  issue.openedUserName))
+          handleComment(issue, form.content, repository, actionOpt) map {
+            case (issue, id) =>
+              redirect(
+                s"/${repository.owner}/${repository.name}/${if (issue.isPullRequest)
+                  "pull"
+                else "issues"}/${form.issueId}#comment-${id}")
+          }
         } getOrElse NotFound
     })
 

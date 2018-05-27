@@ -510,9 +510,10 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       assert(
         Await.result(replicatedClient.add("foo", Buf.Utf8("bar"))) == ConsistentReplication(
           false))
-      assert(Await.result(replicatedClient
-        .replace("no-such-key", Buf.Utf8("test"))) == ConsistentReplication(
-        false))
+      assert(
+        Await.result(replicatedClient
+          .replace("no-such-key", Buf.Utf8("test"))) == ConsistentReplication(
+          false))
 
       // inconsistent data
       assert(
